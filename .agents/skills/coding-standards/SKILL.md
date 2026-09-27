@@ -11,10 +11,10 @@ them. **Do not read every rule file.**
 
 ## Where the architecture is written down
 
-`docs/architecture/target-architecture.md` describes the live structure of `apps/web`: two tiers
+ADR-0010 to ADR-0015 in `docs/adr/` pin the decisions behind the structure of `apps/web`: two tiers
 sharing one bucket set, transport-agnostic services under thin tRPC routers, and one domain-error
-vocabulary mapped exactly once per boundary. ADR-0010 to ADR-0015 in `docs/adr/` pin the decisions
-behind it. The rule files under `rules/` are the working form of all of it, so read those first.
+vocabulary mapped exactly once per boundary. The rule files under `rules/` are the working form of
+those decisions, so read those first.
 
 Three facts settle most placement questions:
 
@@ -28,9 +28,9 @@ Three facts settle most placement questions:
   instantiates a library for the whole application and makes no business decision), or it is a
   cross-cutting abstraction at least two domains or transports need whose server implementation no
   barrel can export. Inverse test: a file that makes a business decision for one glossary entity is a
-  domain service, even when it calls an SDK. The rule and its named exemptions are in
-  `docs/architecture/target-architecture.md`, section "The server folder", and an always-on
-  `no-restricted-imports` block stops the folder reaching into the app tree by deep path.
+  domain service, even when it calls an SDK. An always-on `no-restricted-imports` block stops the
+  folder reaching into the app tree by deep path, and its exemptions are named file by file in
+  `packages/eslint-config/next.js`.
 - **A service throws a domain error**, never a `TRPCError` and never a bare `Error`. The vocabulary
   is at `@/server/errors/domain-errors` and every boundary maps it back into its own dialect (see
   `rules/backend.md` and `rules/errors.md`).

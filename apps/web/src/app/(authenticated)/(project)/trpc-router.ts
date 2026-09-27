@@ -62,6 +62,8 @@ import { updateProjectSlackLink } from "./settings/_services/update-project-slac
 import { UpdateProjectSlackLinkSchema } from "./settings/_services/update-project-slack-link.schema";
 import { listProjects } from "./_services/list-projects";
 import { ListProjectsSchema } from "./_services/list-projects.schema";
+import { countNewFeedback } from "./inbox/_services/count-new-feedback";
+import { CountNewFeedbackSchema } from "./inbox/_services/count-new-feedback.schema";
 import { createGitHubIssueForFeedback } from "./inbox/_services/create-github-issue-for-feedback";
 import { CreateGitHubIssueForFeedbackSchema } from "./inbox/_services/create-github-issue-for-feedback.schema";
 import { createJiraIssueForFeedback } from "./inbox/_services/create-jira-issue-for-feedback";
@@ -182,6 +184,14 @@ export const projectsRouter = router({
         userId: ctx.session.user.id,
       }),
     ),
+    countNew: protectedProcedure
+      .input(CountNewFeedbackSchema)
+      .query(({ input, ctx }) =>
+        countNewFeedback({
+          projectId: input.projectId,
+          userId: ctx.session.user.id,
+        }),
+      ),
     listArchived: protectedProcedure
       .input(ListArchivedFeedbackSchema)
       .query(({ input, ctx }) =>

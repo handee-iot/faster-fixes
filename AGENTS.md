@@ -41,15 +41,12 @@ All coding standards for this project live in the `coding-standards` skill at `.
 
 ## Required checks before done
 
+- Work is done only when these pass, whether or not you commit:
+  - `sh .husky/pre-commit` from the repo root. The hook is the single list of checks, so read it rather than restating it. Typecheck, tests and Knip read the whole working tree, so unstaged work can fail the hook too.
+  - `pnpm lint` and `pnpm format:check`. The hook's lint-staged step covers staged files only; these cover every workspace, so they catch a file your change broke without touching it. Every lint rule is at `error` with zero warnings tolerated, so any report is a regression.
 - **On a fresh clone, generate before you lint.** The Prisma client, the published package builds and the Next.js route types are all untracked. `pnpm typecheck` generates them itself (the task depends on `^build`, and the web script runs `next typegen` first), but the type-aware lint rules report errors unrelated to your change until you have run `pnpm build:packages`, `pnpm --filter @workspace/db db:gen` and `pnpm --filter web exec next typegen`.
-- Run from repo root: `pnpm typecheck`.
-- Run from repo root: `pnpm test`.
-- Run from repo root: `pnpm lint` (all workspaces). Zero warnings tolerated: it runs with `--max-warnings 0`, so a warning fails it just like an error. Every convention rule is at `error` and reports nothing, which means any report is a regression.
-- Run from repo root: `pnpm format:check`. CI fails on any unformatted `ts`, `tsx` or `md` file; `pnpm format` fixes them.
 - If DB schema changed: run `pnpm --filter @workspace/db migrate:dev`, then `pnpm --filter @workspace/db db:gen`.
 - A production build is `pnpm --filter web build` from the repo root, not `pnpm build` inside `apps/web`: the filter is what resolves the workspace packages. Note that `apps/web/src/app/_domains/integration/_services/github/github-app.ts` reads `GITHUB_PRIVATE_KEY` at module evaluation, so page-data collection for `/api/github/setup` fails without a value in the environment.
-- Never declare completion while required checks fail.
-- The pre-commit hook runs the same checks: lint-staged (Prettier on every staged file, ESLint with zero warnings on staged `ts`, `tsx`, `js`, `jsx` files), then `pnpm typecheck` and `pnpm test`. There is one lint mode, so the hook enforces every convention rule (ADR-0015). The hook only sees staged files and `--no-verify` skips it, which is why CI runs the same commands.
 
 ## Keep costs low
 

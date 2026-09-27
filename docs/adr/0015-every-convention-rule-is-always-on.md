@@ -53,10 +53,9 @@ Measured on the finished tree, none of that holds:
   like the three server folder exemptions.
 - The hook lints staged files only and `--no-verify` skips it, so the CI job is the
   enforcement of record; the hook is fast feedback.
-- The "Which gate a rule belongs in" paragraph and the `pnpm lint:agent-rules` row of
-  `docs/architecture/target-architecture.md`, the "Required checks" section of `AGENTS.md`,
-  `packages/eslint-config/README.md` and the gate assertions in
-  `packages/eslint-config/next-config.test.js` describe the gate and change with it.
+- The "Required checks" section of `AGENTS.md`, `packages/eslint-config/README.md` and the
+  gate assertions in `packages/eslint-config/next-config.test.js` describe the gate and change
+  with it.
 - Rules stay custom `local/` rules rather than `no-restricted-syntax` or
   `no-restricted-imports` blocks: flat config replaces, rather than merges, two blocks of the
   same core rule matching one file, so a later block silently cancels an earlier one. The

@@ -71,7 +71,7 @@ export function DeleteUserButton({ userId }: DeleteUserButtonProps) {
           <AlertDialogAction
             onClick={handleDelete}
             disabled={deleteUserMutation.isPending}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            variant="destructive"
           >
             {deleteUserMutation.isPending ? "Deleting..." : "Delete"}
           </AlertDialogAction>

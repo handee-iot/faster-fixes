@@ -45,10 +45,7 @@ export function DeleteFeedbackDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={onConfirm}
-            className="bg-destructive text-white hover:bg-destructive/90"
-          >
+          <AlertDialogAction onClick={onConfirm} variant="destructive">
             Delete permanently
           </AlertDialogAction>
         </AlertDialogFooter>

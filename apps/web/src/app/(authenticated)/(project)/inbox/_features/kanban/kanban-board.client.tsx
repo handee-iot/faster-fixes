@@ -15,6 +15,7 @@ import {
 import * as React from "react";
 import { BulkActionToolbar } from "../actions-toolbar/bulk-action-toolbar.client";
 import type { ListFeedbackOutput } from "../../_services/list-feedback";
+import { BoardSummaryStrip } from "./board-summary-strip";
 import { KanbanCardOverlay } from "./kanban-card.client";
 import { KanbanColumnBody, KanbanColumnHeader } from "./kanban-column.client";
 import { KanbanMobile } from "./kanban-mobile.client";
@@ -167,10 +168,12 @@ export function KanbanBoard({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          {totalCount} {totalCount === 1 ? "item" : "items"}
-        </p>
+      <p className="text-sm text-muted-foreground lg:hidden">
+        {totalCount} {totalCount === 1 ? "item" : "items"}
+      </p>
+
+      <div className="hidden lg:block">
+        <BoardSummaryStrip columns={COLUMNS} feedback={filtered} />
       </div>
 
       <KanbanMobile

@@ -8,9 +8,11 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
+import { cn } from "@workspace/ui/lib/utils";
 import * as React from "react";
 import type { ListFeedbackOutput } from "../../_services/list-feedback";
 import { KanbanCard } from "./kanban-card.client";
+import { getBoardStatusAppearance } from "./board-status-appearance";
 import { getColumnSelectionState } from "./column-selection-state";
 
 type FeedbackItem = ListFeedbackOutput[number];
@@ -47,6 +49,12 @@ export function KanbanMobile({
       <TabsList className="w-full">
         {columns.map((col) => (
           <TabsTrigger key={col.id} value={col.id}>
+            <span
+              className={cn(
+                "mr-1.5 size-2 rounded-full",
+                getBoardStatusAppearance(col.id).swatchClassName,
+              )}
+            />
             {col.title}
             <span className="ml-1.5 tabular-nums">
               ({(grouped[col.id] ?? []).length})

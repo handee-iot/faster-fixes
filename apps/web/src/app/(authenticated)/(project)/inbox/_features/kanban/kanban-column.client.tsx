@@ -1,10 +1,10 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
-import { Badge } from "@workspace/ui/components/badge";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { cn } from "@workspace/ui/lib/utils";
 import type { ListFeedbackOutput } from "../../_services/list-feedback";
+import { getBoardStatusAppearance } from "./board-status-appearance";
 import { KanbanCard } from "./kanban-card.client";
 import { getColumnSelectionState } from "./column-selection-state";
 
@@ -27,16 +27,20 @@ export function KanbanColumnHeader({
   itemIds,
   onToggleSelectAll,
 }: KanbanColumnHeaderProps) {
+  const appearance = getBoardStatusAppearance(id);
+  const StatusIcon = appearance.icon;
+
   return (
     <div className="flex items-center gap-2">
       <Checkbox
         checked={getColumnSelectionState(itemIds, selectedIds)}
         onCheckedChange={() => onToggleSelectAll(id, itemIds)}
       />
+      <StatusIcon className={cn("size-4", appearance.iconClassName)} />
       <h3 className="text-sm font-medium">{title}</h3>
-      <Badge variant="secondary" className="text-xs">
+      <span className="text-sm text-muted-foreground tabular-nums">
         {count}
-      </Badge>
+      </span>
     </div>
   );
 }
@@ -63,7 +67,9 @@ export function KanbanColumnBody({
       ref={setNodeRef}
       className={cn(
         "flex flex-1 flex-col gap-2 rounded-lg border border-dashed p-2 transition-colors",
-        isOver ? "border-primary/50 bg-primary/5" : "border-transparent",
+        isOver
+          ? "border-primary/50 bg-primary/5"
+          : "border-transparent bg-muted/50",
       )}
     >
       {items.length === 0 ? (

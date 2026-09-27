@@ -49,19 +49,19 @@ const integrationLinks = [
     label: "Linear",
     description:
       "Auto-create Linear issues from feedback, sync status both ways.",
-    icon: <LinearIcon className="size-4 shrink-0" />,
+    icon: <LinearIcon colored className="size-4 shrink-0" />,
   },
   {
     href: "/integrations/jira",
     label: "Jira",
     description: "Auto-create Jira Cloud issues, sync status both ways.",
-    icon: <JiraIcon className="size-4 shrink-0" />,
+    icon: <JiraIcon colored className="size-4 shrink-0" />,
   },
   {
     href: "/integrations/slack",
     label: "Slack",
     description: "Get notified in Slack when feedback arrives or changes.",
-    icon: <SlackIcon className="size-4 shrink-0" />,
+    icon: <SlackIcon colored className="size-4 shrink-0" />,
   },
   {
     href: "/integrations/mcp",
