@@ -16,6 +16,15 @@ export function useFeedbackMutations() {
   const feedbackQueryKey = trpc.authenticated.projects.feedback.list.queryKey({
     projectId,
   });
+  const newCountQueryKey =
+    trpc.authenticated.projects.feedback.countNew.queryKey({ projectId });
+
+  // The sidebar badge counts New Feedback, so every status change refreshes it.
+  const invalidateAfterStatusChange = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: feedbackQueryKey }),
+      queryClient.invalidateQueries({ queryKey: newCountQueryKey }),
+    ]);
 
   const updateStatus = useMutation(
     trpc.authenticated.projects.feedback.updateStatus.mutationOptions({
@@ -37,8 +46,7 @@ export function useFeedbackMutations() {
         }
         toast.error("Failed to update status.");
       },
-      onSettled: () =>
-        queryClient.invalidateQueries({ queryKey: feedbackQueryKey }),
+      onSettled: invalidateAfterStatusChange,
     }),
   );
 
@@ -63,8 +71,7 @@ export function useFeedbackMutations() {
         }
         toast.error("Failed to update status.");
       },
-      onSettled: () =>
-        queryClient.invalidateQueries({ queryKey: feedbackQueryKey }),
+      onSettled: invalidateAfterStatusChange,
     }),
   );
 

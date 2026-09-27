@@ -15,6 +15,7 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Inbox, Settings2, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { InboxNewCountBadge } from "./inbox-new-count-badge.client";
 import { NoProjectsCard } from "./no-projects-card.client";
 
 export function ProjectNavigation() {
@@ -69,6 +70,9 @@ export function ProjectNavigation() {
                     <span>{item.label}</span>
                   </Link>
                 </SidebarMenuButton>
+                {item.href === "/inbox" && (
+                  <InboxNewCountBadge projectId={activeProject.id} />
+                )}
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
