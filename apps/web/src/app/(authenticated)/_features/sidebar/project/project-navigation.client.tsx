@@ -64,6 +64,7 @@ export function ProjectNavigation() {
                   asChild
                   isActive={pathname === item.href}
                   tooltip={item.label}
+                  className="data-[active=true]:[&>svg]:text-primary"
                 >
                   <Link href={item.href} onClick={() => setOpenMobile(false)}>
                     <item.icon />
