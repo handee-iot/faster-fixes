@@ -1,18 +1,14 @@
 "use client";
 
 import { useDraggable } from "@dnd-kit/core";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@workspace/ui/components/avatar";
 import { Checkbox } from "@workspace/ui/components/checkbox";
-import { GithubIcon } from "@workspace/ui/components/icons/github-icon";
-import { resolveS3Url } from "@/utils/url/resolve-s3-url";
 import { cn } from "@workspace/ui/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { GripVertical } from "lucide-react";
+import { getWaitingDays, isWaitingTooLong } from "../../_helpers/board-summary";
 import type { ListFeedbackOutput } from "../../_services/list-feedback";
+import { getBoardStatusAppearance } from "./board-status-appearance";
+import { AssigneeAvatar, TrackerChips, WaitingChip } from "./kanban-card-parts";
 
 type FeedbackItem = ListFeedbackOutput[number];
 
@@ -24,10 +20,10 @@ type KanbanCardProps = {
   onSelect: (id: string) => void;
 };
 
-function formatPageUrl(url: string) {
+// The host is the same for every Feedback of a Project, so only the path helps.
+function formatPagePath(url: string) {
   try {
-    const parsed = new URL(url);
-    return parsed.hostname + parsed.pathname.replace(/\/$/, "");
+    return new URL(url).pathname.replace(/\/$/, "") || "/";
   } catch {
     return url;
   }
@@ -55,6 +51,16 @@ function KanbanCardView({
   onToggleSelect,
   onSelect,
 }: KanbanCardViewProps) {
+  const appearance = getBoardStatusAppearance(feedback.status);
+  const StatusIcon = appearance.icon;
+  const now = new Date();
+  const isWaiting = isWaitingTooLong(feedback, now);
+  const hasTracker = [
+    feedback.issueLink,
+    feedback.linearIssueLink,
+    feedback.jiraIssueLink,
+  ].some(Boolean);
+
   return (
     <div
       className={cn(
@@ -80,45 +86,35 @@ function KanbanCardView({
         </div>
       )}
 
+      <StatusIcon
+        className={cn("mt-0.5 size-4 shrink-0", appearance.iconClassName)}
+      />
+
       <div className="min-w-0 flex-1">
         <p className="line-clamp-3 text-sm leading-snug">{feedback.comment}</p>
 
-        <p className="mt-1.5 truncate text-xs text-muted-foreground">
-          {formatPageUrl(feedback.pageUrl)}
+        <p className="mt-1 truncate text-xs text-muted-foreground">
+          {formatPagePath(feedback.pageUrl)}
         </p>
 
-        <div className="mt-2 flex items-center gap-2">
-          {feedback.assignee ? (
-            <Avatar className="size-5">
-              <AvatarImage
-                src={
-                  feedback.assignee.image
-                    ? resolveS3Url(feedback.assignee.image)
-                    : undefined
-                }
-                className="object-cover"
-              />
-              <AvatarFallback className="text-[10px]">
-                {feedback.assignee.name.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          ) : (
-            <div className="size-5 rounded-full bg-muted" />
-          )}
+        {(isWaiting || hasTracker) && (
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            {isWaiting && (
+              <WaitingChip days={getWaitingDays(feedback.createdAt, now)} />
+            )}
+            <TrackerChips feedback={feedback} />
+          </div>
+        )}
 
-          <span className="truncate text-xs text-muted-foreground">
-            {feedback.reviewer.name}
+        <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span className="min-w-0 truncate">{feedback.reviewer.name}</span>
+          <span aria-hidden>·</span>
+          <span className="shrink-0">
+            {formatDistanceToNow(feedback.createdAt, { addSuffix: true })}
           </span>
-
-          {feedback.issueLink && (
-            <GithubIcon className="size-3.5 shrink-0 text-muted-foreground" />
-          )}
-
-          <span className="ml-auto shrink-0 text-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(feedback.createdAt), {
-              addSuffix: true,
-            })}
-          </span>
+          <div className="ml-auto shrink-0">
+            <AssigneeAvatar assignee={feedback.assignee} />
+          </div>
         </div>
       </div>
 
