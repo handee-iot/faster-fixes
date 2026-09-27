@@ -78,7 +78,7 @@ export function StopImpersonateButton() {
             <AlertDialogAction
               onClick={handleStopImpersonate}
               disabled={stopImpersonateMutation.isPending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              variant="destructive"
             >
               {stopImpersonateMutation.isPending
                 ? "Stopping..."
