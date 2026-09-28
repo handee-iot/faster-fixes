@@ -1,0 +1,145 @@
+---
+title: Control the Widget
+description: Show, hide and read the state of the widget from your own code, with any embed.
+---
+
+Every embed exposes the same control contract: four actions and three values. The React embed returns them from the `useFeedback` hook. The script embed returns them on the instance from `init`.
+
+## Contract
+
+| Member            | Type             | Description                                     |
+| ----------------- | ---------------- | ----------------------------------------------- |
+| `show`            | `() => void`     | Shows the widget after `hide`                   |
+| `hide`            | `() => void`     | Removes the widget from the page until `show`   |
+| `isVisible`       | `boolean`        | `true` while the widget is on the page          |
+| `startAnnotation` | `() => void`     | Shows the widget and enters annotation mode     |
+| `feedbackItems`   | `FeedbackItem[]` | The Feedback items of the Project loaded so far |
+| `togglePins`      | `() => void`     | Hides or shows every feedback pin on the page   |
+| `showPins`        | `boolean`        | `true` while pins are shown                     |
+
+Without a Reviewer token the widget does not mount: the values stay at `isVisible: false`, `feedbackItems: []` and `showPins: true`, and the actions do nothing.
+
+## Access the contract
+
+<Tabs groupId="embed" items={["React", "Script embed"]} persist>
+<Tab value="React">
+
+Call `useFeedback` in any component inside the `FeedbackProvider`. Components that read `isVisible`, `feedbackItems` or `showPins` re-render when the value changes. During server rendering and the first client render, the hook returns the unmounted values above. Outside the provider, the hook throws.
+
+```tsx
+import { useFeedback } from "@fasterfixes/react";
+
+function ReportButton() {
+  const { startAnnotation } = useFeedback();
+
+  return <button onClick={() => startAnnotation()}>Report an issue</button>;
+}
+```
+
+</Tab>
+<Tab value="Script embed">
+
+`init` returns the instance. With the CDN script, `window.FasterFixes.instance` also holds the current instance.
+
+```html
+<button type="button" onclick="window.FasterFixes.instance?.startAnnotation()">
+  Report an issue
+</button>
+```
+
+The instance does not re-render anything on its own. Call `subscribe` to run a listener after `isVisible`, `feedbackItems` or `showPins` changes. The listener receives no arguments: read the current values from the instance. `subscribe` returns a function that removes the listener.
+
+```js
+const widget = window.FasterFixes.init({ projectId: "proj_your_project_id" });
+
+const unsubscribe = widget.subscribe(() => {
+  counter.textContent = String(widget.feedbackItems.length);
+});
+```
+
+`destroy()` removes the widget, stops the Diagnostic Trail, restores patched globals and removes every listener.
+
+</Tab>
+</Tabs>
+
+## Custom trigger button
+
+Start annotation from your own UI. The floating button stays on the page.
+
+<Tabs groupId="embed" items={["React", "Script embed"]} persist>
+<Tab value="React">
+
+```tsx
+import { useFeedback } from "@fasterfixes/react";
+
+function FeedbackTrigger() {
+  const { startAnnotation, feedbackItems } = useFeedback();
+
+  return (
+    <button onClick={() => startAnnotation()}>
+      Leave feedback ({feedbackItems.length})
+    </button>
+  );
+}
+```
+
+</Tab>
+<Tab value="Script embed">
+
+```html
+<button type="button" id="feedback-trigger">Leave feedback (0)</button>
+
+<script>
+  const widget = window.FasterFixes.init({ projectId: "proj_your_project_id" });
+  const trigger = document.getElementById("feedback-trigger");
+
+  trigger.addEventListener("click", () => widget.startAnnotation());
+  widget.subscribe(() => {
+    trigger.textContent = `Leave feedback (${widget.feedbackItems.length})`;
+  });
+</script>
+```
+
+</Tab>
+</Tabs>
+
+## Toggle pins
+
+Let users show or hide feedback pins on the page.
+
+<Tabs groupId="embed" items={["React", "Script embed"]} persist>
+<Tab value="React">
+
+```tsx
+import { useFeedback } from "@fasterfixes/react";
+
+function PinToggle() {
+  const { togglePins, showPins } = useFeedback();
+
+  return (
+    <button onClick={togglePins}>
+      {showPins ? "Hide" : "Show"} feedback pins
+    </button>
+  );
+}
+```
+
+</Tab>
+<Tab value="Script embed">
+
+```html
+<button type="button" id="pin-toggle">Hide feedback pins</button>
+
+<script>
+  const widget = window.FasterFixes.init({ projectId: "proj_your_project_id" });
+  const toggle = document.getElementById("pin-toggle");
+
+  toggle.addEventListener("click", () => widget.togglePins());
+  widget.subscribe(() => {
+    toggle.textContent = `${widget.showPins ? "Hide" : "Show"} feedback pins`;
+  });
+</script>
+```
+
+</Tab>
+</Tabs>

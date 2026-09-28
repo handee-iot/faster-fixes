@@ -37,7 +37,7 @@ import { init } from "@fasterfixes/widget";
 const widget = init({ projectId: "proj_your_project_id" });
 ```
 
-The [options](#option-object) and the [instance](#instance) below apply to both entry points. `window.FasterFixes` is only defined by the CDN script.
+The [options](#option-object) and the [instance](/docs/widget/control-the-widget) apply to both entry points. `window.FasterFixes` is only defined by the CDN script.
 
 ## Setup
 
@@ -132,38 +132,9 @@ The same pattern applies to `ngOnInit` and `ngOnDestroy` in Angular, and to `onM
 
 ## Instance
 
-`init` returns the widget instance. Its members match the [`useFeedback` hook](/docs/widget/use-feedback-hook) of the React package:
-
-| Member                | Description                                                                                                       |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `show()`              | Shows the widget after `hide()`                                                                                   |
-| `hide()`              | Removes the widget from the page until `show()`                                                                   |
-| `isVisible`           | `true` while the widget is on the page                                                                            |
-| `startAnnotation()`   | Shows the widget and enters annotation mode                                                                       |
-| `feedbackItems`       | The Feedback items of the Project loaded so far                                                                   |
-| `togglePins()`        | Hides or shows every pin on the page                                                                              |
-| `showPins`            | `true` while pins are shown                                                                                       |
-| `subscribe(listener)` | Calls `listener` after `isVisible`, `feedbackItems` or `showPins` changes, and returns a function that removes it |
-| `destroy()`           | Removes the widget, stops the Diagnostic Trail, and restores patched globals                                      |
-
-Use the instance to drive the widget from your own controls:
-
-```html
-<button type="button" onclick="window.FasterFixes.instance?.startAnnotation()">
-  Report an issue
-</button>
-```
-
-To keep your own UI in sync with the widget, subscribe to the instance. The listener receives no arguments: read the current values from the instance. `destroy()` removes every listener.
-
-```js
-const widget = window.FasterFixes.init({ projectId: "proj_your_project_id" });
-const unsubscribe = widget.subscribe(() => {
-  counter.textContent = String(widget.feedbackItems.length);
-});
-```
+`init` returns the widget instance. It exposes the control contract shared by every embed (`show`, `hide`, `isVisible`, `startAnnotation`, `feedbackItems`, `togglePins`, `showPins`), plus `subscribe(listener)` to follow state changes and `destroy()` to remove the widget. See [Control the Widget](/docs/widget/control-the-widget).
 
 ## Next steps
 
-- Drive the widget from your own controls with the [instance](#instance) returned by `init`.
+- Drive the widget from your own controls in [Control the Widget](/docs/widget/control-the-widget).
 - Theme the widget and replace its strings in [Customization](/docs/widget/customization).

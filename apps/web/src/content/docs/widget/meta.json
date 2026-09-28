@@ -4,7 +4,7 @@
   "pages": [
     "overview",
     "install",
-    "use-feedback-hook",
+    "control-the-widget",
     "customization",
     "headless-client"
   ]

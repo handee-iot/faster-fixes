@@ -26,6 +26,11 @@ const nextConfig = {
         destination: "/docs/widget/install/script-embed",
         permanent: true,
       },
+      {
+        source: "/docs/widget/use-feedback-hook",
+        destination: "/docs/widget/control-the-widget",
+        permanent: true,
+      },
     ];
   },
 

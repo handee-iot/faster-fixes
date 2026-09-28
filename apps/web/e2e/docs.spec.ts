@@ -12,6 +12,19 @@ test.describe("docs", () => {
     expect(response.headers()["location"]).toBe("/docs/widget/install/react");
   });
 
+  test("the useFeedback hook page redirects permanently to Control the Widget", async ({
+    request,
+  }) => {
+    const response = await request.get("/docs/widget/use-feedback-hook", {
+      maxRedirects: 0,
+    });
+
+    expect(response.status()).toBe(308);
+    expect(response.headers()["location"]).toBe(
+      "/docs/widget/control-the-widget",
+    );
+  });
+
   test("the widget overview links to every install page", async ({ page }) => {
     await page.goto("/docs/widget/overview");
 
