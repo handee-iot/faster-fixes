@@ -3,12 +3,12 @@ title: Customization
 description: Customize the widget's text labels and theme it with CSS custom properties.
 ---
 
-The React embed and the script embed share one contract. Both mount the same widget from `@fasterfixes/widget`, so everything on this page applies to both:
+The React embed, the Vue embed and the script embed share one contract. All three mount the same widget from `@fasterfixes/widget`, so everything on this page applies to each of them:
 
-- The same options: `projectId`, `apiOrigin`, `color`, `position`, `labels` and `captureDiagnostics`, passed as props to `FeedbackProvider` or as options to `init`.
+- The same options: `projectId`, `apiOrigin`, `color`, `position`, `labels` and `captureDiagnostics`, passed as props to `FeedbackProvider`, as options to `createFasterFixes` or as options to `init`.
 - The same `labels` keys and defaults.
 - The same CSS custom properties and `::part()` selectors.
-- The same instance methods and values, returned by `init` and by the `useFeedback` hook. See [Control the Widget](/docs/widget/control-the-widget).
+- The same instance methods and values, returned by `init`, by the React `useFeedback` hook and by the Vue `useFeedback` composable. See [Control the Widget](/docs/widget/control-the-widget).
 
 ## Labels
 
@@ -27,6 +27,21 @@ With the React embed:
 >
   {children}
 </FeedbackProvider>
+```
+
+With the Vue embed:
+
+```ts
+app.use(
+  createFasterFixes({
+    projectId: "proj_your_project_id",
+    labels: {
+      submitButton: "Send",
+      cancelButton: "Discard",
+      textareaPlaceholder: "What should change?",
+    },
+  }),
+);
 ```
 
 With the script embed:

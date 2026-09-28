@@ -48,4 +48,17 @@ test.describe("docs", () => {
       page.getByRole("heading", { level: 1, name: "Script Embed" }),
     ).toBeVisible();
   });
+
+  test("the widget overview links to the Vue install page", async ({
+    page,
+  }) => {
+    await page.goto("/docs/widget/overview");
+
+    await page.getByRole("link", { name: /^Vue/ }).click();
+
+    await expect(page).toHaveURL("/docs/widget/install/vue");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Vue" }),
+    ).toBeVisible();
+  });
 });

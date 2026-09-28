@@ -1,0 +1,97 @@
+---
+title: Vue
+description: Install and configure the Faster Fixes widget in your Vue or Nuxt application.
+---
+
+`@fasterfixes/vue` is the Vue embed of the widget. It mounts the same widget as the [script embed](/docs/widget/install/script-embed), from `@fasterfixes/widget`, and exposes it through a Vue plugin and the [`useFeedback` composable](/docs/widget/control-the-widget).
+
+## Installation
+
+```package-install
+@fasterfixes/vue
+```
+
+The package requires Vue 3.5 or later, declared as a peer dependency, so it uses the Vue instance of your app.
+
+## Setup
+
+Install the plugin on your app in the entry file, next to your router and store:
+
+```ts title="src/main.ts"
+import { createFasterFixes } from "@fasterfixes/vue";
+import { createApp } from "vue";
+import App from "./App.vue";
+import { router } from "./router";
+
+createApp(App)
+  .use(router)
+  .use(createFasterFixes({ projectId: "proj_your_project_id" }))
+  .mount("#app");
+```
+
+Get your Project ID in [Project Settings](https://faster-fixes.com/settings). For Nuxt, see [Where to mount](#where-to-mount).
+
+The widget mounts on the client only. During server rendering the plugin does nothing, and `useFeedback` returns the unmounted values, so server rendering is unaffected.
+
+When the app unmounts, the plugin removes the widget and restores the `console`, `fetch` and `XMLHttpRequest` functions it patched to record the Diagnostic Trail. Installing the plugin twice on the same app keeps the first widget, so hot module replacement never mounts a second one. Development builds log a console warning.
+
+## Options
+
+`createFasterFixes` accepts the option object of the script embed's `init` and passes it to the widget unchanged:
+
+| Option               | Type              | Required | Description                                                                                                 |
+| -------------------- | ----------------- | -------- | ----------------------------------------------------------------------------------------------------------- |
+| `projectId`          | `string`          | Yes      | Your Faster Fixes Project ID (found in project settings)                                                    |
+| `apiOrigin`          | `string`          | No       | API base URL. Defaults to `https://www.faster-fixes.com`                                                    |
+| `color`              | `string`          | No       | Accent color. Accepts any CSS color value. Defaults to `#02527E`                                            |
+| `position`           | `WidgetPosition`  | No       | Floating button placement. Defaults to `bottom-right`. See [Position](/docs/widget/install/react#position). |
+| `labels`             | `Partial<Labels>` | No       | Replaces any visible or announced string. See [Customization](/docs/widget/customization#labels).           |
+| `captureDiagnostics` | `boolean`         | No       | Records the console and network history leading to a report. Defaults to `true`                             |
+
+The options are read once, when the plugin is installed. To change them, reload the app.
+
+The `WidgetOptions`, `WidgetPosition` and `Labels` types are exported by `@fasterfixes/vue`.
+
+### Theming
+
+The widget renders inside an open Shadow DOM, so your site's styles, including `<style scoped>` blocks, do not reach it. Theme it with the CSS custom properties shared with every embed, set on its host element, `[data-ff-widget]`:
+
+```css title="src/style.css"
+[data-ff-widget] {
+  --ff-background: #ffffff;
+  --ff-foreground: #18181b;
+  --ff-radius: 4px;
+  --ff-font-family: "Inter", sans-serif;
+}
+```
+
+The full list of properties and the `::part()` selectors is on the [Customization](/docs/widget/customization#css-custom-properties) page.
+
+## Where to mount
+
+Install the plugin once, on the app that renders every page, so the widget stays mounted across client-side navigation.
+
+### Vue
+
+Call `app.use` in the entry file that creates the app, usually `src/main.ts`, as shown in [Setup](#setup). Any component of that app can then call `useFeedback`.
+
+### Nuxt
+
+Add a client plugin that installs the Vue plugin on the Nuxt Vue app:
+
+```ts title="plugins/faster-fixes.client.ts"
+import { createFasterFixes } from "@fasterfixes/vue";
+
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.vueApp.use(createFasterFixes({ projectId: "proj_your_project_id" }));
+});
+```
+
+The `.client` suffix runs the plugin in the browser only. Without it, the plugin also runs during server rendering, where it does not mount the widget, so a universal plugin is safe too.
+
+If a server-rendered component calls `useFeedback`, name the file `plugins/faster-fixes.ts`, without the suffix. A client plugin is not installed on the server, so `useFeedback` throws there. A universal plugin provides the unmounted values during server rendering instead.
+
+## Next steps
+
+- Build your own trigger or read the widget state in [Control the Widget](/docs/widget/control-the-widget).
+- Theme the widget and replace its strings in [Customization](/docs/widget/customization).

@@ -1,6 +1,6 @@
 ---
 title: Script Embed
-description: "Install the widget on any site: WordPress, Webflow, static HTML, or an app built with Vue, Angular, Svelte or another framework."
+description: "Install the widget on any site: WordPress, Webflow, static HTML, or an app built with Angular, Svelte or another framework."
 ---
 
 ## Installation
@@ -112,23 +112,20 @@ Paste the tag into the site-wide head or footer: the theme header or a code snip
 
 ### Framework apps
 
-In a Vue, Angular or Svelte app, place the tag before your application bundle so `window.FasterFixes` exists when your components mount. Initialize the widget in the mount hook and destroy it when the component unmounts:
+In a Vue or Nuxt app, install the [Vue embed](/docs/widget/install/vue) instead.
 
-```js title="Vue"
-import { onMounted, onUnmounted } from "vue";
+In an Angular or Svelte app, place the tag before your application bundle so `window.FasterFixes` exists when your components mount. Initialize the widget in the mount hook and destroy it when the component unmounts:
 
-let widget;
+```js title="Svelte"
+import { onMount } from "svelte";
 
-onMounted(() => {
-  widget = window.FasterFixes.init({ projectId: "proj_your_project_id" });
-});
-
-onUnmounted(() => {
-  widget?.destroy();
+onMount(() => {
+  const widget = window.FasterFixes.init({ projectId: "proj_your_project_id" });
+  return () => widget.destroy();
 });
 ```
 
-The same pattern applies to `ngOnInit` and `ngOnDestroy` in Angular, and to `onMount` in Svelte.
+The same pattern applies to `ngOnInit` and `ngOnDestroy` in Angular.
 
 ## Instance
 

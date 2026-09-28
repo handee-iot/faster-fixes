@@ -3,7 +3,7 @@ title: Control the Widget
 description: Show, hide and read the state of the widget from your own code, with any embed.
 ---
 
-Every embed exposes the same control contract: four actions and three values. The React embed returns them from the `useFeedback` hook. The script embed returns them on the instance from `init`.
+Every embed exposes the same control contract: four actions and three values. The React embed returns them from the `useFeedback` hook, and the Vue embed from the `useFeedback` composable. The script embed returns them on the instance from `init`.
 
 ## Contract
 
@@ -21,7 +21,7 @@ Without a Reviewer token the widget does not mount: the values stay at `isVisibl
 
 ## Access the contract
 
-<Tabs groupId="embed" items={["React", "Script embed"]} persist>
+<Tabs groupId="embed" items={["React", "Vue", "Script embed"]} persist>
 <Tab value="React">
 
 Call `useFeedback` in any component inside the `FeedbackProvider`. Components that read `isVisible`, `feedbackItems` or `showPins` re-render when the value changes. During server rendering and the first client render, the hook returns the unmounted values above. Outside the provider, the hook throws.
@@ -35,6 +35,25 @@ function ReportButton() {
   return <button onClick={() => startAnnotation()}>Report an issue</button>;
 }
 ```
+
+</Tab>
+<Tab value="Vue">
+
+Call `useFeedback` in any component of an app that installed `createFasterFixes`. The four actions are plain functions. `isVisible`, `feedbackItems` and `showPins` are readonly refs, so templates re-render when the value changes. During server rendering, the refs hold the unmounted values above. In an app without the plugin, the composable throws.
+
+```vue
+<script setup lang="ts">
+import { useFeedback } from "@fasterfixes/vue";
+
+const { startAnnotation } = useFeedback();
+</script>
+
+<template>
+  <button type="button" @click="startAnnotation">Report an issue</button>
+</template>
+```
+
+In `<script setup>`, read a value through `.value`, for example `feedbackItems.value.length`. Templates unwrap the refs.
 
 </Tab>
 <Tab value="Script embed">
@@ -66,7 +85,7 @@ const unsubscribe = widget.subscribe(() => {
 
 Start annotation from your own UI. The floating button stays on the page.
 
-<Tabs groupId="embed" items={["React", "Script embed"]} persist>
+<Tabs groupId="embed" items={["React", "Vue", "Script embed"]} persist>
 <Tab value="React">
 
 ```tsx
@@ -81,6 +100,23 @@ function FeedbackTrigger() {
     </button>
   );
 }
+```
+
+</Tab>
+<Tab value="Vue">
+
+```vue
+<script setup lang="ts">
+import { useFeedback } from "@fasterfixes/vue";
+
+const { startAnnotation, feedbackItems } = useFeedback();
+</script>
+
+<template>
+  <button type="button" @click="startAnnotation">
+    Leave feedback ({{ feedbackItems.length }})
+  </button>
+</template>
 ```
 
 </Tab>
@@ -107,7 +143,7 @@ function FeedbackTrigger() {
 
 Let users show or hide feedback pins on the page.
 
-<Tabs groupId="embed" items={["React", "Script embed"]} persist>
+<Tabs groupId="embed" items={["React", "Vue", "Script embed"]} persist>
 <Tab value="React">
 
 ```tsx
@@ -122,6 +158,23 @@ function PinToggle() {
     </button>
   );
 }
+```
+
+</Tab>
+<Tab value="Vue">
+
+```vue
+<script setup lang="ts">
+import { useFeedback } from "@fasterfixes/vue";
+
+const { togglePins, showPins } = useFeedback();
+</script>
+
+<template>
+  <button type="button" @click="togglePins">
+    {{ showPins ? "Hide" : "Show" }} feedback pins
+  </button>
+</template>
 ```
 
 </Tab>
