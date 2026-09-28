@@ -1,3 +1,5 @@
+import { URL_PARAM_TOKEN } from "@fasterfixes/core";
+
 // Same key as the React Embed, so a pending item survives a switch between Embeds.
 export const PENDING_FEEDBACK_KEY = "ff_pending_feedback";
 
@@ -34,13 +36,27 @@ export function takePendingFeedback(storage: StorageGetter) {
   }
 }
 
+// `init` strips the Reviewer token from the URL, but a router that finishes its
+// first navigation afterwards (Vue Router does) writes back the URL it read at
+// load. Left there, it leaks into every created item's page URL and hides the
+// page's pins. The router's history state is kept so it can still restore it.
+function stripTokenParam() {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has(URL_PARAM_TOKEN)) return;
+  url.searchParams.delete(URL_PARAM_TOKEN);
+  window.history.replaceState(window.history.state, "", url.toString());
+}
+
 /**
  * Calls `onChange` with the new URL whenever the location changes without a
- * reload. Returns a function that stops watching.
+ * reload, never with a URL that still carries the Reviewer token. Returns a
+ * function that stops watching.
  */
 export function watchLocation(onChange: (href: string) => void) {
+  stripTokenParam();
   let current = window.location.href;
   function check() {
+    stripTokenParam();
     const href = window.location.href;
     if (href === current) return;
     current = href;
