@@ -111,11 +111,13 @@ export const markerIoFaqs: RichFaqItem[] = [
         wrap your app in {"<FeedbackProvider>"}. Both embeds share the same
         widget, options, and captured context. On React sites, every report also
         carries the component path. See the{" "}
-        <DocLink href={"/docs/widget/script-embed" as Route}>
+        <DocLink href={"/docs/widget/install/script-embed" as Route}>
           script embed docs
         </DocLink>
         , the{" "}
-        <DocLink href={"/docs/widget/react" as Route}>React embed docs</DocLink>
+        <DocLink href={"/docs/widget/install/react" as Route}>
+          React embed docs
+        </DocLink>
         , and the{" "}
         <DocLink href={"/docs/getting-started/quickstart" as Route}>
           quickstart
@@ -137,7 +139,7 @@ export const markerIoFaqs: RichFaqItem[] = [
         does need to be installed on the site. If reviewers must leave feedback
         on sites you cannot edit, Marker.io&apos;s browser extension is a better
         fit. See the{" "}
-        <DocLink href={"/docs/widget/script-embed" as Route}>
+        <DocLink href={"/docs/widget/install/script-embed" as Route}>
           script embed docs
         </DocLink>
         .

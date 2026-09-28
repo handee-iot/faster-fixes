@@ -5,7 +5,7 @@ const points = [
   {
     title: "One widget, any stack",
     body: "Paste one script tag on any site, from WordPress and Webflow to Vue, Angular, or Svelte apps, or run npm install @fasterfixes/react and wrap your React app in FeedbackProvider. Same widget, same options, same captured context either way.",
-    href: "/docs/widget/script-embed" as Route,
+    href: "/docs/widget/install/script-embed" as Route,
     linkLabel: "Script embed docs",
   },
   {

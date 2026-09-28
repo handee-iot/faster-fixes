@@ -58,7 +58,7 @@ export function LaunchBanner() {
           <span aria-hidden="true">🎉</span> Faster Fixes now works on any
           website, whatever your framework or CMS.{" "}
           <Link
-            href="/docs/widget/script-embed"
+            href="/docs/widget/install/script-embed"
             className="font-medium underline underline-offset-2"
           >
             See how to install

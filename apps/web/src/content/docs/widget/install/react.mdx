@@ -3,7 +3,7 @@ title: React
 description: Install and configure the Faster Fixes widget in your React application.
 ---
 
-`@fasterfixes/react` is the React embed of the widget. It mounts the same widget as the [script embed](/docs/widget/script-embed), from `@fasterfixes/widget`, and exposes it through a provider and the [`useFeedback` hook](/docs/widget/use-feedback-hook).
+`@fasterfixes/react` is the React embed of the widget. It mounts the same widget as the [script embed](/docs/widget/install/script-embed), from `@fasterfixes/widget`, and exposes it through a provider and the [`useFeedback` hook](/docs/widget/use-feedback-hook).
 
 ## Installation
 
@@ -13,37 +13,34 @@ description: Install and configure the Faster Fixes widget in your React applica
 
 The `projectId` prop requires `@fasterfixes/react` version 0.0.9 or later. This page documents version 1.0.0. To upgrade from 0.0.x, read [Upgrading to 1.0.0](#upgrading-to-100).
 
-## Provider setup
+## Setup
 
-Wrap your application with `FeedbackProvider`:
+Wrap your application with `FeedbackProvider`, as high in the tree as possible:
 
-```tsx title="app/layout.tsx"
+```tsx title="src/main.tsx"
 import { FeedbackProvider } from "@fasterfixes/react";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { App } from "./app";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html>
-      <body>
-        <FeedbackProvider projectId="proj_your_project_id">
-          {children}
-        </FeedbackProvider>
-      </body>
-    </html>
-  );
-}
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <FeedbackProvider projectId="proj_your_project_id">
+      <App />
+    </FeedbackProvider>
+  </StrictMode>,
+);
 ```
 
-Get your Project ID in [Project Settings](https://faster-fixes.com/settings).
+Get your Project ID in [Project Settings](https://faster-fixes.com/settings). For the root file of your meta-framework, see [Where to mount](#where-to-mount).
 
-The widget mounts on the client, after hydration. On the server, and on the first client render, `FeedbackProvider` renders only its `children`, so server rendering with the Next.js App Router is unaffected. You can place the provider in a Server Component layout: the package is marked `"use client"`.
+The widget mounts on the client, after hydration. On the server, and on the first client render, `FeedbackProvider` renders only its `children`, so server rendering is unaffected. The package is marked `"use client"`, so the provider can sit in a Server Component.
 
 When `FeedbackProvider` unmounts, it removes the widget and restores the `console`, `fetch` and `XMLHttpRequest` functions it patched to record the Diagnostic Trail. React Strict Mode mounts it twice in development and leaves one widget on the page.
 
-## Props
+## Options
+
+`FeedbackProvider` accepts the following props:
 
 | Prop                 | Type              | Required | Description                                                                                            |
 | -------------------- | ----------------- | -------- | ------------------------------------------------------------------------------------------------------ |
@@ -71,7 +68,7 @@ The props match the options of the script embed's `init`. Changing `projectId`, 
 
 Both props will be removed in version 2.
 
-## Color
+### Color
 
 The `color` prop accepts any CSS color value, including CSS variables:
 
@@ -81,7 +78,7 @@ The `color` prop accepts any CSS color value, including CSS variables:
 
 Default: `#02527E`. The color is applied as the CSS custom property `--ff-accent`.
 
-## Position
+### Position
 
 The `position` prop controls where the floating button appears. Default: `bottom-right`.
 
@@ -96,7 +93,7 @@ The `position` prop controls where the floating button appears. Default: `bottom
 
 The `WidgetPosition` and `Labels` types are exported by `@fasterfixes/widget`, which `@fasterfixes/react` installs as a dependency.
 
-## Theming
+### Theming
 
 The widget renders inside an open Shadow DOM, so your site's styles, resets and `!important` rules do not reach it. Theme it with the CSS custom properties shared with the script embed, set on its host element, `[data-ff-widget]`:
 
@@ -110,6 +107,95 @@ The widget renders inside an open Shadow DOM, so your site's styles, resets and 
 ```
 
 The full list of properties and the `::part()` selectors is on the [Customization](/docs/widget/customization#css-custom-properties) page.
+
+## Where to mount
+
+Place the provider in the file that renders every page, so the widget stays mounted across client-side navigation.
+
+### Next.js App Router
+
+Wrap `children` in the root layout, `app/layout.tsx`. The layout can stay a Server Component.
+
+```tsx title="app/layout.tsx"
+import { FeedbackProvider } from "@fasterfixes/react";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <FeedbackProvider projectId="proj_your_project_id">
+          {children}
+        </FeedbackProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### Next.js Pages Router
+
+Wrap the page component in the custom App, `pages/_app.tsx`.
+
+```tsx title="pages/_app.tsx"
+import { FeedbackProvider } from "@fasterfixes/react";
+import type { AppProps } from "next/app";
+
+export default function App({ Component, pageProps }: AppProps) {
+  return (
+    <FeedbackProvider projectId="proj_your_project_id">
+      <Component {...pageProps} />
+    </FeedbackProvider>
+  );
+}
+```
+
+### Remix / React Router
+
+Wrap the `Outlet` in the root route, `app/root.tsx`. The same file works for Remix 2 and React Router 7 in framework mode.
+
+```tsx title="app/root.tsx"
+import { FeedbackProvider } from "@fasterfixes/react";
+import { Outlet } from "react-router";
+
+export default function App() {
+  return (
+    <FeedbackProvider projectId="proj_your_project_id">
+      <Outlet />
+    </FeedbackProvider>
+  );
+}
+```
+
+With Remix 2, import `Outlet` from `@remix-run/react`.
+
+### TanStack Start
+
+Wrap `children` in the shell component of the root route, `src/routes/__root.tsx`.
+
+```tsx title="src/routes/__root.tsx"
+import { FeedbackProvider } from "@fasterfixes/react";
+import { HeadContent, Scripts } from "@tanstack/react-router";
+
+function RootDocument({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <FeedbackProvider projectId="proj_your_project_id">
+          {children}
+        </FeedbackProvider>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+```
 
 ## Upgrading to 1.0.0
 
@@ -126,3 +212,8 @@ The package [changelog](https://github.com/manucoffin/faster-fixes/blob/main/pac
 ## Dashboard toggle
 
 You can enable or disable the widget from [Project Settings](https://faster-fixes.com/settings) without deploying code changes.
+
+## Next steps
+
+- Build your own trigger or read the widget state with the [`useFeedback` hook](/docs/widget/use-feedback-hook).
+- Theme the widget and replace its strings in [Customization](/docs/widget/customization).

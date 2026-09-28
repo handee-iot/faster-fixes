@@ -1,6 +1,6 @@
 # @fasterfixes/react
 
-> **[Documentation](https://faster-fixes.com/docs/widget/react)** · [Website](https://faster-fixes.com)
+> **[Documentation](https://faster-fixes.com/docs/widget/install/react)** · [Website](https://faster-fixes.com)
 
 React embed of the [FasterFixes](https://faster-fixes.com) feedback widget. Reviewers click an element of your site, describe the issue, and submit it with a screenshot and the browser context.
 

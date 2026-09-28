@@ -5,7 +5,7 @@ const points = [
   {
     title: "One widget, any stack",
     body: "Add one script tag to any site, including WordPress, Webflow, or static HTML, or run npm install @fasterfixes/react in a React app. The widget captures DOM selector, URL, browser, and viewport on every feedback item automatically, plus the React component path on React sites. No manual annotation needed.",
-    href: "/docs/widget/script-embed" as Route,
+    href: "/docs/widget/install/script-embed" as Route,
     linkLabel: "Widget setup guide",
   },
   {

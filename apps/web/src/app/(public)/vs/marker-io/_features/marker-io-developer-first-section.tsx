@@ -5,7 +5,7 @@ const points = [
   {
     title: "One widget, any stack",
     body: "Paste one script tag on any site, or run npm install @fasterfixes/react and wrap your React app in FeedbackProvider. Both embeds capture the same context, and on React sites every report also carries the component path. No browser extension for reviewers to install.",
-    href: "/docs/widget/react" as Route,
+    href: "/docs/widget/install/react" as Route,
     linkLabel: "Widget setup guide",
   },
   {

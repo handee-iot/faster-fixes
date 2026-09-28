@@ -64,7 +64,7 @@ function App() {
 }
 ```
 
-Clients click anywhere on the page to leave feedback. The widget captures the screenshot, element selector, browser info, and the React component tree on React sites automatically, with no setup required from the client. See the [script embed](https://faster-fixes.com/docs/widget/script-embed) and [React](https://faster-fixes.com/docs/widget/react) docs.
+Clients click anywhere on the page to leave feedback. The widget captures the screenshot, element selector, browser info, and the React component tree on React sites automatically, with no setup required from the client. See the [script embed](https://faster-fixes.com/docs/widget/install/script-embed) and [React](https://faster-fixes.com/docs/widget/install/react) docs.
 
 ### 2. Review feedback on the dashboard
 

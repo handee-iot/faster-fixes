@@ -110,11 +110,13 @@ export const usersnapFaqs: RichFaqItem[] = [
         wrap your app in {"<FeedbackProvider>"}. Both embeds share the same
         widget, options, and captured context. On React sites, every report also
         carries the component path. See the{" "}
-        <DocLink href={"/docs/widget/script-embed" as Route}>
+        <DocLink href={"/docs/widget/install/script-embed" as Route}>
           script embed docs
         </DocLink>
         , the{" "}
-        <DocLink href={"/docs/widget/react" as Route}>React embed docs</DocLink>
+        <DocLink href={"/docs/widget/install/react" as Route}>
+          React embed docs
+        </DocLink>
         , and the{" "}
         <DocLink href={"/docs/getting-started/quickstart" as Route}>
           quickstart
@@ -136,7 +138,7 @@ export const usersnapFaqs: RichFaqItem[] = [
         network logs. The React component path is added when the site runs
         React. Unlike Usersnap, FasterFixes has no browser extension, so the
         widget must be installed on the site. See the{" "}
-        <DocLink href={"/docs/widget/script-embed" as Route}>
+        <DocLink href={"/docs/widget/install/script-embed" as Route}>
           script embed docs
         </DocLink>
         .

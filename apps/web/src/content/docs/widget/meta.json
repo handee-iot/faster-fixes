@@ -2,9 +2,9 @@
   "title": "Widget",
   "defaultOpen": true,
   "pages": [
-    "react",
+    "overview",
+    "install",
     "use-feedback-hook",
-    "script-embed",
     "customization",
     "headless-client"
   ]
