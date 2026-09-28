@@ -3,8 +3,8 @@ import { act, cleanup, render, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { init } from "@fasterfixes/widget";
 import type { Widget } from "@fasterfixes/widget";
-import { createFakeWidget } from "./fake-widget.js";
-import type { FakeWidget } from "./fake-widget.js";
+import { createFakeWidget } from "@fasterfixes/widget/testing";
+import type { FakeWidget } from "@fasterfixes/widget/testing";
 import { FeedbackProvider } from "./feedback-provider.js";
 import { useFeedback } from "./use-feedback.js";
 
@@ -92,10 +92,10 @@ describe("useFeedback", () => {
     result.current.startAnnotation();
     result.current.togglePins();
 
-    expect(widget.show).toHaveBeenCalledTimes(1);
-    expect(widget.hide).toHaveBeenCalledTimes(1);
-    expect(widget.startAnnotation).toHaveBeenCalledTimes(1);
-    expect(widget.togglePins).toHaveBeenCalledTimes(1);
+    expect(widget.calls.show).toHaveLength(1);
+    expect(widget.calls.hide).toHaveLength(1);
+    expect(widget.calls.startAnnotation).toHaveLength(1);
+    expect(widget.calls.togglePins).toHaveLength(1);
   });
 
   it("stops listening to an instance once the provider unmounts", () => {

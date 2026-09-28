@@ -13,7 +13,7 @@ const IIFE_MAX_BYTES = 95_000;
 
 export default defineConfig([
   {
-    entry: ["./src/index.ts", "./src/internal.ts"],
+    entry: ["./src/index.ts", "./src/internal.ts", "./src/testing.ts"],
     format: "esm",
     dts: true,
     clean: true,
