@@ -23,7 +23,7 @@ The in-page reporting UI a Reviewer uses to submit and browse Feedback on a cust
 _Avoid_: Plugin, SDK, Snippet (the install code of an Embed, not the Widget itself).
 
 **Embed**:
-A way of installing the **Widget** on a site: the **script embed** (a script tag, no build step) or a **framework embed** (a package for React, later Vue and others). Every Embed exposes the same customization and behaviour; an Embed changes how the Widget is installed, never what it does.
+A way of installing the **Widget** on a site: the **script embed** (a script tag, no build step) or a **framework embed** (a package for one rendering runtime: React, Vue, later Angular and Svelte). A framework embed exists per runtime, never per meta-framework: a Nuxt site installs the Vue embed, a Next.js or Remix site installs the React embed. Every Embed exposes the same customization and behaviour; an Embed changes how the Widget is installed, never what it does.
 _Avoid_: Integration (reserved for external systems), Adapter, Wrapper (implementation vocabulary).
 
 ### Identity & access
