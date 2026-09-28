@@ -13,7 +13,7 @@ const nextConfig = {
     return [
       {
         source: "/docs/widget/other-frameworks",
-        destination: "/docs/widget/install/script-embed",
+        destination: "/docs/widget/install/other-frameworks",
         permanent: true,
       },
       {

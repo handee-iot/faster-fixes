@@ -25,6 +25,19 @@ test.describe("docs", () => {
     );
   });
 
+  test("the Other frameworks page redirects permanently into the Install folder", async ({
+    request,
+  }) => {
+    const response = await request.get("/docs/widget/other-frameworks", {
+      maxRedirects: 0,
+    });
+
+    expect(response.status()).toBe(308);
+    expect(response.headers()["location"]).toBe(
+      "/docs/widget/install/other-frameworks",
+    );
+  });
+
   test("the widget overview links to every install page", async ({ page }) => {
     await page.goto("/docs/widget/overview");
 
