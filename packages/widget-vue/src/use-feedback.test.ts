@@ -93,4 +93,18 @@ describe("useFeedback", () => {
       /useFeedback must be used in an app that installed createFasterFixes/,
     );
   });
+
+  it("shares one subscription across components and updates them all", async () => {
+    const wrapper = mount(
+      defineComponent(() => () => [h(Probe), h(Probe), h(Probe)]),
+      { global: { plugins: [createFasterFixes({ projectId: "proj_1" })] } },
+    );
+    expect(widget.listenerCount).toBe(1);
+
+    widget.emit({ isVisible: false, feedbackItems: [item] });
+    await nextTick();
+
+    const texts = wrapper.findAll("p").map((p) => p.text());
+    expect(texts).toEqual(["false-1-true", "false-1-true", "false-1-true"]);
+  });
 });

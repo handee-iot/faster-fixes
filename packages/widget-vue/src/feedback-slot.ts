@@ -14,10 +14,12 @@ export type FeedbackSlot = {
   readonly feedbackItems: Readonly<Ref<readonly FeedbackItem[]>>;
   readonly showPins: Readonly<Ref<boolean>>;
   attach: (widget: Widget) => void;
+  release: () => void;
 };
 
 export function createFeedbackSlot(): FeedbackSlot {
   let current: Widget | null = null;
+  let unsubscribe: (() => void) | null = null;
   // What an unmounted Widget reports, as in the React hook's server snapshot.
   const isVisible = shallowRef(false);
   const feedbackItems = shallowRef<readonly FeedbackItem[]>([]);
@@ -39,8 +41,13 @@ export function createFeedbackSlot(): FeedbackSlot {
     showPins: shallowReadonly(showPins),
     attach(widget) {
       current = widget;
-      widget.subscribe(sync);
+      unsubscribe = widget.subscribe(sync);
       sync();
+    },
+    release() {
+      unsubscribe?.();
+      unsubscribe = null;
+      current = null;
     },
   };
 }
