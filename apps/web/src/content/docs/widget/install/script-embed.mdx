@@ -1,6 +1,6 @@
 ---
 title: Script Embed
-description: "Install the widget on any site: WordPress, Webflow, static HTML, or an app built with Angular, Svelte or another framework."
+description: "Install the widget on any site: WordPress, Webflow, static HTML, or an app built with Svelte or another framework."
 ---
 
 ## Installation
@@ -88,11 +88,11 @@ Leave out `data-project-id` and call `window.FasterFixes.init` yourself:
 </script>
 ```
 
-## Angular and Svelte
+## Svelte
 
-For Vue or Nuxt, use the [Vue embed](/docs/widget/install/vue).
+For Vue or Nuxt, use the [Vue embed](/docs/widget/install/vue). For Angular or Analog, use the [Angular embed](/docs/widget/install/angular).
 
-In Angular or Svelte, load the script before your application bundle, without `data-project-id`. Initialize the widget when the root component mounts and destroy it when it unmounts:
+In Svelte, load the script before your application bundle, without `data-project-id`. Initialize the widget when the root component mounts and destroy it when it unmounts:
 
 ```js title="Svelte"
 import { onMount } from "svelte";
@@ -102,8 +102,6 @@ onMount(() => {
   return () => widget.destroy();
 });
 ```
-
-In Angular, use `ngOnInit` and `ngOnDestroy`.
 
 ## Next steps
 

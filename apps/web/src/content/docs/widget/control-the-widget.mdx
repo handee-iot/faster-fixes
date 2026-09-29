@@ -3,7 +3,7 @@ title: Control the Widget
 description: Show, hide and read the state of the widget from your own code, with any embed.
 ---
 
-Every embed exposes the same actions and values. React and Vue return them from `useFeedback`, called in any component inside the provider or plugin. The script embed returns them on the instance from `init`, also available as `window.FasterFixes.instance` with the CDN script.
+Every embed exposes the same actions and values. React and Vue return them from `useFeedback`, called in any component inside the provider or plugin. Angular returns them from `injectFeedback`, called in any constructor or field initializer below `provideFasterFixes`, with the three values as read-only signals. The script embed returns them on the instance from `init`, also available as `window.FasterFixes.instance` with the CDN script.
 
 ## Contract
 
@@ -25,7 +25,7 @@ The script embed instance also exposes `subscribe(listener)`, which runs the lis
 
 Start annotation from your own UI. The floating button stays on the page.
 
-<Tabs groupId="embed" items={["React", "Vue", "Script embed"]} persist>
+<Tabs groupId="embed" items={["React", "Vue", "Angular", "Script embed"]} persist>
 <Tab value="React">
 
 ```tsx
@@ -60,6 +60,26 @@ const { startAnnotation, feedbackItems } = useFeedback();
 ```
 
 </Tab>
+<Tab value="Angular">
+
+```ts
+import { Component } from "@angular/core";
+import { injectFeedback } from "@fasterfixes/angular";
+
+@Component({
+  selector: "app-feedback-trigger",
+  template: `
+    <button type="button" (click)="feedback.startAnnotation()">
+      Leave feedback ({{ feedback.feedbackItems().length }})
+    </button>
+  `,
+})
+export class FeedbackTrigger {
+  protected readonly feedback = injectFeedback();
+}
+```
+
+</Tab>
 <Tab value="Script embed">
 
 ```html
@@ -83,7 +103,7 @@ const { startAnnotation, feedbackItems } = useFeedback();
 
 Let users show or hide feedback pins on the page.
 
-<Tabs groupId="embed" items={["React", "Vue", "Script embed"]} persist>
+<Tabs groupId="embed" items={["React", "Vue", "Angular", "Script embed"]} persist>
 <Tab value="React">
 
 ```tsx
@@ -115,6 +135,26 @@ const { togglePins, showPins } = useFeedback();
     {{ showPins ? "Hide" : "Show" }} feedback pins
   </button>
 </template>
+```
+
+</Tab>
+<Tab value="Angular">
+
+```ts
+import { Component } from "@angular/core";
+import { injectFeedback } from "@fasterfixes/angular";
+
+@Component({
+  selector: "app-pin-toggle",
+  template: `
+    <button type="button" (click)="feedback.togglePins()">
+      {{ feedback.showPins() ? "Hide" : "Show" }} feedback pins
+    </button>
+  `,
+})
+export class PinToggle {
+  protected readonly feedback = injectFeedback();
+}
 ```
 
 </Tab>

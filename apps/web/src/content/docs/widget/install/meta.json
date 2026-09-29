@@ -1,5 +1,5 @@
 {
   "title": "Install",
   "defaultOpen": true,
-  "pages": ["react", "vue", "script-embed", "other-frameworks"]
+  "pages": ["react", "vue", "angular", "script-embed", "other-frameworks"]
 }
