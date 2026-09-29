@@ -41,19 +41,22 @@ test.describe("docs", () => {
   test("the widget overview links to every install page", async ({ page }) => {
     await page.goto("/docs/widget/overview");
 
-    // The sidebar links to the same pages, so target the card in the page body.
-    await page
-      .getByRole("article")
-      .getByRole("link", { name: /^Script embed/ })
-      .click();
-
-    // The dev server compiles the install page on its first request.
-    await expect(page).toHaveURL("/docs/widget/install/script-embed", {
-      timeout: 30_000,
-    });
-    await expect(
-      page.getByRole("heading", { level: 1, name: "Script Embed" }),
-    ).toBeVisible();
+    // The sidebar links to the same pages, so target the cards in the page body.
+    // Hrefs rather than clicks: on the CI dev server, a click can land before
+    // hydration and never navigate.
+    const cards = page.getByRole("article");
+    for (const [name, href] of [
+      [/^React/, "/docs/widget/install/react"],
+      [/^Vue/, "/docs/widget/install/vue"],
+      [/^Script embed/, "/docs/widget/install/script-embed"],
+      [/^Other frameworks/, "/docs/widget/install/other-frameworks"],
+    ] as const) {
+      // `first`: the footer's next-page link also starts with "React".
+      await expect(cards.getByRole("link", { name }).first()).toHaveAttribute(
+        "href",
+        href,
+      );
+    }
   });
 
   test("the widget overview links to the Vue install page", async ({
@@ -61,11 +64,11 @@ test.describe("docs", () => {
   }) => {
     await page.goto("/docs/widget/overview");
 
-    await page.getByRole("article").getByRole("link", { name: /^Vue/ }).click();
+    await expect(
+      page.getByRole("article").getByRole("link", { name: /^Vue/ }),
+    ).toHaveAttribute("href", "/docs/widget/install/vue");
 
-    await expect(page).toHaveURL("/docs/widget/install/vue", {
-      timeout: 30_000,
-    });
+    await page.goto("/docs/widget/install/vue");
     await expect(
       page.getByRole("heading", { level: 1, name: "Vue" }),
     ).toBeVisible();
