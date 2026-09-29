@@ -1,6 +1,9 @@
 import { FaqList } from "@/app/_components/mdx/faq-list";
 import { HowTo } from "@/app/_components/mdx/how-to";
 import { YoutubeEmbed } from "@/app/_components/mdx/youtube-embed";
+import { JavascriptIcon } from "@workspace/ui/components/icons/javascript-icon";
+import { ReactIcon } from "@workspace/ui/components/icons/react-icon";
+import { VueIcon } from "@workspace/ui/components/icons/vue-icon";
 import {
   Table,
   TableBody,
@@ -24,6 +27,9 @@ export function getDocsMDXComponents(
     Tab,
     Steps,
     Step,
+    ReactIcon,
+    VueIcon,
+    JavascriptIcon,
     ...components,
   };
 }
