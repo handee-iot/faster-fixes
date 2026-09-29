@@ -41,9 +41,16 @@ test.describe("docs", () => {
   test("the widget overview links to every install page", async ({ page }) => {
     await page.goto("/docs/widget/overview");
 
-    await page.getByRole("link", { name: /^Script embed/ }).click();
+    // The sidebar links to the same pages, so target the card in the page body.
+    await page
+      .getByRole("article")
+      .getByRole("link", { name: /^Script embed/ })
+      .click();
 
-    await expect(page).toHaveURL("/docs/widget/install/script-embed");
+    // The dev server compiles the install page on its first request.
+    await expect(page).toHaveURL("/docs/widget/install/script-embed", {
+      timeout: 30_000,
+    });
     await expect(
       page.getByRole("heading", { level: 1, name: "Script Embed" }),
     ).toBeVisible();
@@ -54,9 +61,11 @@ test.describe("docs", () => {
   }) => {
     await page.goto("/docs/widget/overview");
 
-    await page.getByRole("link", { name: /^Vue/ }).click();
+    await page.getByRole("article").getByRole("link", { name: /^Vue/ }).click();
 
-    await expect(page).toHaveURL("/docs/widget/install/vue");
+    await expect(page).toHaveURL("/docs/widget/install/vue", {
+      timeout: 30_000,
+    });
     await expect(
       page.getByRole("heading", { level: 1, name: "Vue" }),
     ).toBeVisible();

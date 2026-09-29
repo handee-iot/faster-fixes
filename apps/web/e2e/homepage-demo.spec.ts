@@ -63,7 +63,8 @@ test.describe("homepage demo", () => {
       .getByRole("link", { name: "Pricing" })
       .first()
       .click();
-    await expect(page).toHaveURL(/\/pricing$/);
+    // The dev server compiles the pricing page on its first request.
+    await expect(page).toHaveURL(/\/pricing$/, { timeout: 30_000 });
 
     await expect(page.locator("[data-ff-widget]")).toHaveCount(0);
   });
