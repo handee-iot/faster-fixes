@@ -1,7 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
 import { WIDGET_API_ORIGIN, WIDGET_PROJECT_ID } from "./e2e/widget-api-stub";
-import { VUE_EXAMPLE_ORIGIN } from "./e2e/widget-fixtures";
+import {
+  ANGULAR_EXAMPLE_ORIGIN,
+  VUE_EXAMPLE_ORIGIN,
+} from "./e2e/widget-fixtures";
 
 const PORT = 3100;
 
@@ -45,6 +48,19 @@ export default defineConfig({
       url: VUE_EXAMPLE_ORIGIN,
       reuseExistingServer: false,
       timeout: 60_000,
+      env: {
+        NEXT_PUBLIC_FF_API_KEY: WIDGET_PROJECT_ID,
+        NEXT_PUBLIC_FF_API_ORIGIN: WIDGET_API_ORIGIN,
+      },
+    },
+    {
+      // `serve.mjs` passes the env below to `ng serve` as `define` values. It is
+      // run without the example's `.env.local`, so only the stubbed values apply.
+      command: "pnpm --filter @workspace/example-angular exec node serve.mjs",
+      url: ANGULAR_EXAMPLE_ORIGIN,
+      reuseExistingServer: false,
+      // The first `ng serve` builds the app and prebundles Angular.
+      timeout: 120_000,
       env: {
         NEXT_PUBLIC_FF_API_KEY: WIDGET_PROJECT_ID,
         NEXT_PUBLIC_FF_API_ORIGIN: WIDGET_API_ORIGIN,
