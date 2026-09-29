@@ -13,7 +13,22 @@ const nextConfig = {
     return [
       {
         source: "/docs/widget/other-frameworks",
-        destination: "/docs/widget/script-embed",
+        destination: "/docs/widget/install/other-frameworks",
+        permanent: true,
+      },
+      {
+        source: "/docs/widget/react",
+        destination: "/docs/widget/install/react",
+        permanent: true,
+      },
+      {
+        source: "/docs/widget/script-embed",
+        destination: "/docs/widget/install/script-embed",
+        permanent: true,
+      },
+      {
+        source: "/docs/widget/use-feedback-hook",
+        destination: "/docs/widget/control-the-widget",
         permanent: true,
       },
     ];

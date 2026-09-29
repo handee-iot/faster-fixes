@@ -4,8 +4,8 @@ import { renderToString } from "react-dom/server";
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { init } from "@fasterfixes/widget";
-import { createFakeWidget } from "./fake-widget.js";
-import type { FakeWidget } from "./fake-widget.js";
+import { createFakeWidget } from "@fasterfixes/widget/testing";
+import type { FakeWidget } from "@fasterfixes/widget/testing";
 import { FeedbackProvider } from "./feedback-provider.js";
 
 vi.mock("@fasterfixes/widget", () => ({ init: vi.fn() }));
@@ -135,7 +135,7 @@ describe("FeedbackProvider", () => {
     unmount();
 
     expect(widgets).toHaveLength(1);
-    expect(widgets[0]?.destroy).toHaveBeenCalledTimes(1);
+    expect(widgets[0]?.calls.destroy).toHaveLength(1);
   });
 
   it("leaves exactly one live instance under Strict Mode", () => {
@@ -145,7 +145,7 @@ describe("FeedbackProvider", () => {
       </StrictMode>,
     );
 
-    const live = widgets.filter((widget) => !widget.destroy.mock.calls.length);
+    const live = widgets.filter((widget) => !widget.calls.destroy.length);
     expect(live).toHaveLength(1);
   });
 
@@ -176,8 +176,8 @@ describe("FeedbackProvider", () => {
 
     expect(initMock).toHaveBeenCalledTimes(2);
     expect(initMock).toHaveBeenLastCalledWith(expect.objectContaining(changed));
-    expect(widgets[0]?.destroy).toHaveBeenCalledTimes(1);
-    expect(widgets[1]?.destroy).not.toHaveBeenCalled();
+    expect(widgets[0]?.calls.destroy).toHaveLength(1);
+    expect(widgets[1]?.calls.destroy).toHaveLength(0);
   });
 
   it("keeps the instance when a re-render passes equal props", () => {
@@ -193,6 +193,6 @@ describe("FeedbackProvider", () => {
     );
 
     expect(initMock).toHaveBeenCalledTimes(1);
-    expect(widgets[0]?.destroy).not.toHaveBeenCalled();
+    expect(widgets[0]?.calls.destroy).toHaveLength(0);
   });
 });

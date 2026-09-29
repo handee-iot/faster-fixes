@@ -19,6 +19,8 @@
   &nbsp;
   <a href="https://www.npmjs.com/package/@fasterfixes/react"><img src="https://img.shields.io/npm/v/@fasterfixes/react?label=%40fasterfixes%2Freact&color=0a0a0a" alt="@fasterfixes/react on npm" /></a>
   &nbsp;
+  <a href="https://www.npmjs.com/package/@fasterfixes/vue"><img src="https://img.shields.io/npm/v/@fasterfixes/vue?label=%40fasterfixes%2Fvue&color=0a0a0a" alt="@fasterfixes/vue on npm" /></a>
+  &nbsp;
   <a href="https://www.npmjs.com/package/@fasterfixes/mcp"><img src="https://img.shields.io/npm/v/@fasterfixes/mcp?label=%40fasterfixes%2Fmcp&color=0a0a0a" alt="@fasterfixes/mcp on npm" /></a>
   &nbsp;
   <a href="https://github.com/manucoffin/faster-fixes/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-0a0a0a" alt="License" /></a>
@@ -64,7 +66,17 @@ function App() {
 }
 ```
 
-Clients click anywhere on the page to leave feedback. The widget captures the screenshot, element selector, browser info, and the React component tree on React sites automatically, with no setup required from the client. See the [script embed](https://faster-fixes.com/docs/widget/script-embed) and [React](https://faster-fixes.com/docs/widget/react) docs.
+In a Vue or Nuxt application, use the Vue embed:
+
+```ts
+import { createFasterFixes } from "@fasterfixes/vue";
+
+createApp(App)
+  .use(createFasterFixes({ projectId: "proj_your_project_id" }))
+  .mount("#app");
+```
+
+Clients click anywhere on the page to leave feedback. The widget captures the screenshot, element selector, browser info, and the React component tree on React sites automatically, with no setup required from the client. See the [script embed](https://faster-fixes.com/docs/widget/install/script-embed), [React](https://faster-fixes.com/docs/widget/install/react) and [Vue](https://faster-fixes.com/docs/widget/install/vue) docs.
 
 ### 2. Review feedback on the dashboard
 
@@ -97,12 +109,13 @@ The MCP server works with Claude Code, Cursor, VS Code, Windsurf, Codex, and Zed
 
 ## Packages
 
-This monorepo publishes four npm packages:
+This monorepo publishes five npm packages:
 
 | Package                                                                    | Description                       | Install                                         |
 | -------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------- |
 | [`@fasterfixes/widget`](https://www.npmjs.com/package/@fasterfixes/widget) | Feedback widget for any website   | Script tag or `npm install @fasterfixes/widget` |
 | [`@fasterfixes/react`](https://www.npmjs.com/package/@fasterfixes/react)   | React embed of the widget         | `npm install @fasterfixes/react`                |
+| [`@fasterfixes/vue`](https://www.npmjs.com/package/@fasterfixes/vue)       | Vue embed of the widget           | `npm install @fasterfixes/vue`                  |
 | [`@fasterfixes/core`](https://www.npmjs.com/package/@fasterfixes/core)     | Framework-agnostic client library | `npm install @fasterfixes/core`                 |
 | [`@fasterfixes/mcp`](https://www.npmjs.com/package/@fasterfixes/mcp)       | MCP server for AI coding agents   | `npx -y @fasterfixes/mcp`                       |
 
@@ -256,4 +269,4 @@ You can find your agent token and project ID in [Organization Settings](https://
 
 This repository is licensed under the [GNU AGPLv3 License](./LICENSE).
 
-The widget packages (`@fasterfixes/widget`, `@fasterfixes/react`, `@fasterfixes/core`) and the MCP server (`@fasterfixes/mcp`) are licensed under MIT for unrestricted use in your applications.
+The widget packages (`@fasterfixes/widget`, `@fasterfixes/react`, `@fasterfixes/vue`, `@fasterfixes/core`) and the MCP server (`@fasterfixes/mcp`) are licensed under MIT for unrestricted use in your applications.

@@ -98,3 +98,7 @@ Reading of the change:
 - **`@fasterfixes/react` stops importing `@fasterfixes/core` directly.** Everything it needs comes through `@fasterfixes/widget`. The app keeps importing core for utilities and types.
 - **The app's second import site of the React package moves.** The marketing demo ([ADR-0001](./0001-marketing-demo-uses-internal-widget-core.md)) consumes `@fasterfixes/widget/internal` instead of `@fasterfixes/react/internal`, which is removed at the React 1.0.0 release.
 - **The "which response fields the published clients read" audit gains a rule.** ADR-0016 makes the widget HTTP API additive only, so the audit above is no longer only a checklist before an error-body change: removing or renaming any field of a widget API response is out of bounds while a shipped client may read it.
+
+## Amendment 2026-09-28: framework Embeds sit at layer 2
+
+Every framework Embed on [ADR-0016](./0016-one-vanilla-widget-framework-embeds-are-wrappers.md)'s closed list (`@fasterfixes/vue` now, Angular and Svelte later) sits at layer 2 next to `@fasterfixes/react`, depends on `@fasterfixes/widget` only, and never imports `@fasterfixes/core` directly.

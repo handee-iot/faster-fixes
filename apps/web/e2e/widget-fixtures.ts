@@ -1,9 +1,13 @@
+/** Where Playwright serves `examples/vue`, next to the web app. */
+export const VUE_EXAMPLE_ORIGIN = "http://localhost:3200";
+
 /**
  * A page that installs the Widget. Every scenario in `widget.spec.ts` runs
  * once per fixture, so a new Embed is covered by adding an entry here.
  */
 type WidgetFixture = {
   name: string;
+  /** A path on the web app, or an absolute URL for a page served elsewhere. */
   path: string;
   /** A second page, and the name of the link that reaches it without a reload. */
   otherPage: { path: string; linkName: string };
@@ -23,5 +27,14 @@ export const WIDGET_FIXTURES: WidgetFixture[] = [
     name: "static page (script embed)",
     path: "/e2e/script-embed",
     otherPage: { path: "/e2e/script-embed/second", linkName: "Second page" },
+  },
+  // The Vue example app, installing the Widget with the Vue Embed plugin.
+  {
+    name: "example app (Vue Embed)",
+    path: `${VUE_EXAMPLE_ORIGIN}/`,
+    otherPage: {
+      path: `${VUE_EXAMPLE_ORIGIN}/second`,
+      linkName: "Second page",
+    },
   },
 ];

@@ -1,6 +1,9 @@
 import { FaqList } from "@/app/_components/mdx/faq-list";
 import { HowTo } from "@/app/_components/mdx/how-to";
 import { YoutubeEmbed } from "@/app/_components/mdx/youtube-embed";
+import { JavascriptIcon } from "@workspace/ui/components/icons/javascript-icon";
+import { ReactIcon } from "@workspace/ui/components/icons/react-icon";
+import { VueIcon } from "@workspace/ui/components/icons/vue-icon";
 import {
   Table,
   TableBody,
@@ -9,6 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table";
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 
@@ -18,6 +23,13 @@ export function getDocsMDXComponents(
 ): MDXComponents {
   return {
     ...defaultMdxComponents,
+    Tabs,
+    Tab,
+    Steps,
+    Step,
+    ReactIcon,
+    VueIcon,
+    JavascriptIcon,
     ...components,
   };
 }

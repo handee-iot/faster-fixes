@@ -117,11 +117,13 @@ export const atarimFaqs: RichFaqItem[] = [
         @fasterfixes/react and wrap the app in FeedbackProvider with your
         Project ID. Both embeds share the same widget, options, and captured
         context. See the{" "}
-        <DocLink href={"/docs/widget/script-embed" as Route}>
+        <DocLink href={"/docs/widget/install/script-embed" as Route}>
           script embed docs
         </DocLink>
         , the{" "}
-        <DocLink href={"/docs/widget/react" as Route}>React embed docs</DocLink>
+        <DocLink href={"/docs/widget/install/react" as Route}>
+          React embed docs
+        </DocLink>
         , and the{" "}
         <DocLink href={"/docs/getting-started/quickstart" as Route}>
           quickstart
@@ -142,7 +144,7 @@ export const atarimFaqs: RichFaqItem[] = [
         React embed. The React component path is added when the site runs React.
         Atarim still offers a dedicated WordPress plugin and a Chrome extension,
         which FasterFixes does not. See the{" "}
-        <DocLink href={"/docs/widget/script-embed" as Route}>
+        <DocLink href={"/docs/widget/install/script-embed" as Route}>
           script embed docs
         </DocLink>
         .

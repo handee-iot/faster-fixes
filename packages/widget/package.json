@@ -59,6 +59,14 @@
       },
       "types": "./dist/internal.d.ts",
       "default": "./dist/internal.js"
+    },
+    "./testing": {
+      "import": {
+        "types": "./dist/testing.d.ts",
+        "default": "./dist/testing.js"
+      },
+      "types": "./dist/testing.d.ts",
+      "default": "./dist/testing.js"
     }
   },
   "files": [
