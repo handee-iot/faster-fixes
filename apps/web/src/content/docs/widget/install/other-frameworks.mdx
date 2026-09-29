@@ -3,11 +3,11 @@ title: Other Frameworks
 description: Install the Faster Fixes widget on Astro, Solid, Preact or any other stack.
 ---
 
-Every framework without its own embed uses the widget directly, from the [script embed](/docs/widget/install/script-embed) or from the `@fasterfixes/widget` package. The widget, its options and its [control contract](/docs/widget/control-the-widget) are the same on every stack. Get your Project ID in [Project Settings](https://faster-fixes.com/settings).
+Get your Project ID in [Project Settings](https://faster-fixes.com/settings). Every snippet below accepts the options of the [script embed](/docs/widget/install/script-embed#options).
 
 ## Astro
 
-Add the script tag to the layout shared by every page. `is:inline` tells Astro to leave the tag as written instead of bundling it.
+Add the script tag to your shared layout:
 
 ```astro title="src/layouts/Layout.astro"
 <html lang="en">
@@ -25,17 +25,13 @@ Add the script tag to the layout shared by every page. `is:inline` tells Astro t
 </html>
 ```
 
-The tag accepts the same `data-*` attributes as the [script embed](/docs/widget/install/script-embed#attributes).
-
 ## Solid
-
-Install the widget package:
 
 ```package-install
 @fasterfixes/widget
 ```
 
-Call `init` in `onMount` of the root component and destroy the widget in `onCleanup`. `onMount` only runs in the browser, so this also works with SolidStart server rendering.
+Initialize the widget in the root component:
 
 ```tsx title="src/App.tsx"
 import { init } from "@fasterfixes/widget";
@@ -51,17 +47,15 @@ export function App() {
 }
 ```
 
-`init` accepts the [option object](/docs/widget/install/script-embed#option-object) and returns the widget [instance](/docs/widget/control-the-widget).
-
 ## Preact
 
-Preact 10 runs the [React embed](/docs/widget/install/react) through `preact/compat`. Install the React package:
+Use the [React embed](/docs/widget/install/react) through `preact/compat`:
 
 ```package-install
 @fasterfixes/react
 ```
 
-With Vite, `@preact/preset-vite` already aliases `react`, `react-dom` and `react/jsx-runtime` to `preact/compat`. With another bundler, add the same aliases. Then use `FeedbackProvider` and `useFeedback` as documented on the React page:
+With Vite, `@preact/preset-vite` handles the `react` aliases. With another bundler, alias `react`, `react-dom` and `react/jsx-runtime` to `preact/compat`.
 
 ```tsx title="src/main.tsx"
 import { FeedbackProvider } from "@fasterfixes/react";
@@ -76,9 +70,13 @@ render(
 );
 ```
 
-## Vanilla and any other stack
+## Vanilla JavaScript
 
-With a bundler, install `@fasterfixes/widget` and call `init` once, in the entry file that runs on every page:
+With a bundler, call `init` once in your entry file:
+
+```package-install
+@fasterfixes/widget
+```
 
 ```ts title="src/main.ts"
 import { init } from "@fasterfixes/widget";
@@ -86,7 +84,7 @@ import { init } from "@fasterfixes/widget";
 const widget = init({ projectId: "proj_your_project_id" });
 ```
 
-Call `widget.destroy()` if your app tears down its page without a full reload. Without a bundler, or on a CMS, use the [script embed](/docs/widget/install/script-embed) tag.
+Without a bundler, use the [script embed](/docs/widget/install/script-embed) tag.
 
 ## Next steps
 

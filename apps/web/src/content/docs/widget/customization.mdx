@@ -3,18 +3,12 @@ title: Customization
 description: Customize the widget's text labels and theme it with CSS custom properties.
 ---
 
-The React embed, the Vue embed and the script embed share one contract. All three mount the same widget from `@fasterfixes/widget`, so everything on this page applies to each of them:
-
-- The same options: `projectId`, `apiOrigin`, `color`, `position`, `labels` and `captureDiagnostics`, passed as props to `FeedbackProvider`, as options to `createFasterFixes` or as options to `init`.
-- The same `labels` keys and defaults.
-- The same CSS custom properties and `::part()` selectors.
-- The same instance methods and values, returned by `init`, by the React `useFeedback` hook and by the Vue `useFeedback` composable. See [Control the Widget](/docs/widget/control-the-widget).
-
 ## Labels
 
-Every string the widget displays or announces to screen readers comes from `labels`. Pass partial overrides: omitted keys keep their English default.
+`labels` changes the text of the widget: buttons, placeholders, messages and screen reader labels. Pass only the keys you want to change. The others keep their English default.
 
-With the React embed:
+<Tabs groupId="embed" items={["React", "Vue", "Script embed"]} persist>
+<Tab value="React">
 
 ```tsx
 <FeedbackProvider
@@ -29,7 +23,8 @@ With the React embed:
 </FeedbackProvider>
 ```
 
-With the Vue embed:
+</Tab>
+<Tab value="Vue">
 
 ```ts
 app.use(
@@ -44,7 +39,8 @@ app.use(
 );
 ```
 
-With the script embed:
+</Tab>
+<Tab value="Script embed">
 
 ```js
 window.FasterFixes.init({
@@ -57,6 +53,9 @@ window.FasterFixes.init({
   },
 });
 ```
+
+</Tab>
+</Tabs>
 
 ### Available `labels` keys
 
@@ -86,15 +85,30 @@ window.FasterFixes.init({
 | `pinAriaLabel`        | `` (comment) => `Feedback: ${comment}` `` | Accessible name of a pin. A function that receives an excerpt of the comment. |
 | `successMessage`      | `"Feedback sent"`                         | Not displayed. Kept so existing `labels` objects remain valid.                |
 
-Both embeds read every key except `successMessage`.
+## Color
 
-## Color and position
+`color` sets the accent color of the widget: the floating button, the submit, save and retry buttons, the highlight around the selected element and the focus rings. It accepts any CSS color value, including CSS variables. Default: `#02527E`.
 
-The `color` option sets the accent color and accepts any CSS color value, including CSS variables. The `position` option places the floating button. See [Color](/docs/widget/install/react#color) and [Position](/docs/widget/install/react#position) for the values.
+```tsx
+<FeedbackProvider projectId="proj_your_project_id" color="var(--color-blue-500)">
+```
+
+## Position
+
+`position` places the floating button. Default: `bottom-right`.
+
+| Value          | Placement                |
+| -------------- | ------------------------ |
+| `bottom-right` | Bottom-right corner      |
+| `bottom-left`  | Bottom-left corner       |
+| `top-right`    | Top-right corner         |
+| `top-left`     | Top-left corner          |
+| `middle-right` | Middle of the right edge |
+| `middle-left`  | Middle of the left edge  |
 
 ## CSS custom properties
 
-The widget renders inside an open Shadow DOM, so your site's styles, resets and `!important` rules do not reach it. Theme it by setting CSS custom properties on its host element, `[data-ff-widget]`:
+The widget renders in a Shadow DOM, so your site's styles do not apply to it. Set CSS custom properties on its host element, `[data-ff-widget]`:
 
 ```css
 [data-ff-widget] {
@@ -105,20 +119,20 @@ The widget renders inside an open Shadow DOM, so your site's styles, resets and 
 }
 ```
 
-| Property           | Default                                                             | Description                                          |
-| ------------------ | ------------------------------------------------------------------- | ---------------------------------------------------- |
-| `--ff-accent`      | The `color` option, `#02527E` when unset                            | Buttons, controls, element highlight and focus rings |
-| `--ff-background`  | `#1c1c1c`                                                           | Popover and list background                          |
-| `--ff-foreground`  | `#e4e4e7`                                                           | Text color                                           |
-| `--ff-radius`      | `8px`                                                               | Corner radius of popovers and lists                  |
-| `--ff-font-family` | `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif` | Font of every widget element                         |
-| `--ff-z-index`     | `2147483647`                                                        | Stacking level of the widget                         |
+| Property           | Default                                                             | Description                                                         |
+| ------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `--ff-accent`      | The `color` option, `#02527E` when unset                            | Floating button, primary buttons, element highlight and focus rings |
+| `--ff-background`  | `#1c1c1c`                                                           | Popover and list background                                         |
+| `--ff-foreground`  | `#e4e4e7`                                                           | Text color                                                          |
+| `--ff-radius`      | `8px`                                                               | Corner radius of popovers and lists                                 |
+| `--ff-font-family` | `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif` | Font of every widget element                                        |
+| `--ff-z-index`     | `2147483647`                                                        | Stacking level of the widget                                        |
 
-Prefer the `color` option over `--ff-accent`, so the accent stays in one place.
+Prefer the `color` option over `--ff-accent`.
 
 ## Parts
 
-To style an element beyond the custom properties, target it with `::part()`:
+To style an element further, target it with `::part()`:
 
 ```css
 [data-ff-widget]::part(button) {
@@ -135,7 +149,3 @@ To style an element beyond the custom properties, target it with `::part()`:
 | `pin`       | Each Feedback pin on the page           |
 | `list`      | The Feedback list panel                 |
 | `list-item` | Each item of the Feedback list          |
-
-## `classNames` (React only, deprecated)
-
-`FeedbackProvider` still accepts a `classNames` prop so code written for version 0.0.x keeps compiling. Since version 1.0.0 it is ignored: class names from your stylesheet cannot reach inside the Shadow DOM. Development builds log a console warning. Use CSS custom properties and `::part()` instead. The prop will be removed in version 2.

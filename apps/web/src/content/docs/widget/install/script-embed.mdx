@@ -5,11 +5,9 @@ description: "Install the widget on any site: WordPress, Webflow, static HTML, o
 
 ## Installation
 
-Load the widget from the CDN with a script tag, or install it from npm if your site has a bundler.
-
 ### CDN
 
-Paste this tag into your site, replacing the Project ID with your own:
+Add this tag to the template shared by every page:
 
 ```html
 <script
@@ -19,13 +17,13 @@ Paste this tag into your site, replacing the Project ID with your own:
 ></script>
 ```
 
-Get your Project ID in [Project Settings](https://faster-fixes.com/settings).
+Get your Project ID in [Project Settings](https://faster-fixes.com/settings). The widget only shows for Reviewers who opened your site through their review link. See [Reviewer Tokens](/docs/concepts/reviewer-tokens).
 
-The `@1` channel serves every 1.x release: you receive fixes without editing the snippet, and a breaking change only ships under a new major version.
+On WordPress, use the theme header or a code snippets plugin. On Webflow, use **Site settings → Custom code**.
 
-### Install from npm
+### npm
 
-With a bundler, install the package and import `init` instead of loading the CDN script. The package ships an ESM entry with TypeScript types.
+With a bundler, install the package and call `init`:
 
 ```package-install
 @fasterfixes/widget
@@ -37,43 +35,19 @@ import { init } from "@fasterfixes/widget";
 const widget = init({ projectId: "proj_your_project_id" });
 ```
 
-The [options](#option-object) and the [instance](/docs/widget/control-the-widget) apply to both entry points. `window.FasterFixes` is only defined by the CDN script.
-
-## Setup
-
-With `data-project-id`, the script initializes the widget as soon as it loads. No other code is needed.
-
-The widget stays hidden from your public visitors. It appears only when a Reviewer token is present and the widget is enabled for the Project. See [Reviewer Tokens](/docs/concepts/reviewer-tokens).
-
-### Manual initialization
-
-Leave out `data-project-id` to load the script without mounting the widget, then call `window.FasterFixes.init` yourself. Use this to pass the full option object, or to start the widget from a framework's mount hook.
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/@fasterfixes/widget@1/dist/widget.iife.js"></script>
-<script>
-  window.FasterFixes.init({
-    projectId: "proj_your_project_id",
-    labels: { submitButton: "Send" },
-  });
-</script>
-```
-
-Calling `init` while a widget is already mounted destroys the previous instance first, so the widget never mounts twice. After initialization, `window.FasterFixes.instance` holds the current instance.
-
 ## Options
 
-The CDN tag reads its options from `data-*` attributes. `init` accepts them as an object.
-
 ### Attributes
+
+The CDN tag reads its options from `data-*` attributes:
 
 | Attribute                  | Required | Description                                                                                                 |
 | -------------------------- | -------- | ----------------------------------------------------------------------------------------------------------- |
 | `data-project-id`          | Yes      | Your Project ID. Without it, the script loads but does not initialize the widget.                           |
 | `data-api-origin`          | No       | API base URL. Defaults to `https://www.faster-fixes.com`                                                    |
-| `data-color`               | No       | Accent color. Accepts any CSS color value. Defaults to `#02527E`                                            |
-| `data-position`            | No       | Floating button placement. Defaults to `bottom-right`. See [Position](/docs/widget/install/react#position). |
-| `data-capture-diagnostics` | No       | Set to `"false"` to disable the Diagnostic Trail. Enabled by default.                                       |
+| `data-color`               | No       | Accent color. Any CSS color value. Defaults to `#02527E`                                                    |
+| `data-position`            | No       | Floating button placement. Defaults to `bottom-right`. See [Position](/docs/widget/customization#position). |
+| `data-capture-diagnostics` | No       | Set to `"false"` to disable the Diagnostic Trail.                                                           |
 
 ```html
 <script
@@ -85,36 +59,40 @@ The CDN tag reads its options from `data-*` attributes. `init` accepts them as a
 ></script>
 ```
 
-Custom `labels` cannot be set through attributes. To set them, or to pass the full option object, see [Manual initialization](#manual-initialization) below.
+To set `labels`, use [manual initialization](#manual-initialization).
 
 ### Option object
 
 `init` accepts one option object:
 
-| Option               | Type              | Default                        | Description                                                                                       |
-| -------------------- | ----------------- | ------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `projectId`          | `string`          | Required                       | Your Project ID, `proj_...`                                                                       |
-| `apiOrigin`          | `string`          | `https://www.faster-fixes.com` | API base URL                                                                                      |
-| `color`              | `string`          | `#02527E`                      | Accent color. Accepts any CSS color value.                                                        |
-| `position`           | `WidgetPosition`  | `bottom-right`                 | Floating button placement                                                                         |
-| `labels`             | `Partial<Labels>` | English defaults               | Replaces any visible or announced string. See [Customization](/docs/widget/customization#labels). |
-| `captureDiagnostics` | `boolean`         | `true`                         | Records the console and network history leading to a report                                       |
+| Option               | Type              | Default                        | Description                                                                                |
+| -------------------- | ----------------- | ------------------------------ | ------------------------------------------------------------------------------------------ |
+| `projectId`          | `string`          | Required                       | Your Project ID, `proj_...`                                                                |
+| `apiOrigin`          | `string`          | `https://www.faster-fixes.com` | API base URL                                                                               |
+| `color`              | `string`          | `#02527E`                      | Accent color. Any CSS color value.                                                         |
+| `position`           | `WidgetPosition`  | `bottom-right`                 | Floating button placement                                                                  |
+| `labels`             | `Partial<Labels>` | English defaults               | Replaces any visible or announced string. See [Labels](/docs/widget/customization#labels). |
+| `captureDiagnostics` | `boolean`         | `true`                         | Records the console and network history leading to a report                                |
 
-An unknown `position`, a `projectId` that is not a non-empty string, or a `labels` value that is not an object prevents the widget from mounting. Development builds log a console error that names the option.
+### Manual initialization
 
-## Where to mount
+Leave out `data-project-id` and call `window.FasterFixes.init` yourself:
 
-The tag works in the `<head>` with `defer`, at the end of the `<body>`, or injected after the page has loaded. Add it to the template shared by every page, so the widget is present wherever a Reviewer navigates.
+```html
+<script src="https://cdn.jsdelivr.net/npm/@fasterfixes/widget@1/dist/widget.iife.js"></script>
+<script>
+  window.FasterFixes.init({
+    projectId: "proj_your_project_id",
+    labels: { submitButton: "Send" },
+  });
+</script>
+```
 
-### Static sites and CMS
+## Angular and Svelte
 
-Paste the tag into the site-wide head or footer: the theme header or a code snippets plugin on WordPress, **Site settings → Custom code** on Webflow, or the shared layout of a static site.
+For Vue or Nuxt, use the [Vue embed](/docs/widget/install/vue).
 
-### Framework apps
-
-In a Vue or Nuxt app, install the [Vue embed](/docs/widget/install/vue) instead.
-
-In an Angular or Svelte app, place the tag before your application bundle so `window.FasterFixes` exists when your components mount. Initialize the widget in the mount hook and destroy it when the component unmounts:
+In Angular or Svelte, load the script before your application bundle, without `data-project-id`. Initialize the widget when the root component mounts and destroy it when it unmounts:
 
 ```js title="Svelte"
 import { onMount } from "svelte";
@@ -125,11 +103,7 @@ onMount(() => {
 });
 ```
 
-The same pattern applies to `ngOnInit` and `ngOnDestroy` in Angular.
-
-## Instance
-
-`init` returns the widget instance. It exposes the control contract shared by every embed (`show`, `hide`, `isVisible`, `startAnnotation`, `feedbackItems`, `togglePins`, `showPins`), plus `subscribe(listener)` to follow state changes and `destroy()` to remove the widget. See [Control the Widget](/docs/widget/control-the-widget).
+In Angular, use `ngOnInit` and `ngOnDestroy`.
 
 ## Next steps
 

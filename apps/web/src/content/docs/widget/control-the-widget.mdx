@@ -3,7 +3,7 @@ title: Control the Widget
 description: Show, hide and read the state of the widget from your own code, with any embed.
 ---
 
-Every embed exposes the same control contract: four actions and three values. The React embed returns them from the `useFeedback` hook, and the Vue embed from the `useFeedback` composable. The script embed returns them on the instance from `init`.
+Every embed exposes the same actions and values. React and Vue return them from `useFeedback`, called in any component inside the provider or plugin. The script embed returns them on the instance from `init`, also available as `window.FasterFixes.instance` with the CDN script.
 
 ## Contract
 
@@ -17,71 +17,11 @@ Every embed exposes the same control contract: four actions and three values. Th
 | `togglePins`      | `() => void`     | Hides or shows every feedback pin on the page   |
 | `showPins`        | `boolean`        | `true` while pins are shown                     |
 
-Without a Reviewer token the widget does not mount: the values stay at `isVisible: false`, `feedbackItems: []` and `showPins: true`, and the actions do nothing.
+The script embed instance also exposes `subscribe(listener)`, which runs the listener after a value changes and returns an unsubscribe function, and `destroy()`, which removes the widget.
 
-## Access the contract
+## Examples
 
-<Tabs groupId="embed" items={["React", "Vue", "Script embed"]} persist>
-<Tab value="React">
-
-Call `useFeedback` in any component inside the `FeedbackProvider`. Components that read `isVisible`, `feedbackItems` or `showPins` re-render when the value changes. During server rendering and the first client render, the hook returns the unmounted values above. Outside the provider, the hook throws.
-
-```tsx
-import { useFeedback } from "@fasterfixes/react";
-
-function ReportButton() {
-  const { startAnnotation } = useFeedback();
-
-  return <button onClick={() => startAnnotation()}>Report an issue</button>;
-}
-```
-
-</Tab>
-<Tab value="Vue">
-
-Call `useFeedback` in any component of an app that installed `createFasterFixes`. The four actions are plain functions. `isVisible`, `feedbackItems` and `showPins` are readonly refs, so templates re-render when the value changes. During server rendering, the refs hold the unmounted values above. In an app without the plugin, the composable throws.
-
-```vue
-<script setup lang="ts">
-import { useFeedback } from "@fasterfixes/vue";
-
-const { startAnnotation } = useFeedback();
-</script>
-
-<template>
-  <button type="button" @click="startAnnotation">Report an issue</button>
-</template>
-```
-
-In `<script setup>`, read a value through `.value`, for example `feedbackItems.value.length`. Templates unwrap the refs.
-
-</Tab>
-<Tab value="Script embed">
-
-`init` returns the instance. With the CDN script, `window.FasterFixes.instance` also holds the current instance.
-
-```html
-<button type="button" onclick="window.FasterFixes.instance?.startAnnotation()">
-  Report an issue
-</button>
-```
-
-The instance does not re-render anything on its own. Call `subscribe` to run a listener after `isVisible`, `feedbackItems` or `showPins` changes. The listener receives no arguments: read the current values from the instance. `subscribe` returns a function that removes the listener.
-
-```js
-const widget = window.FasterFixes.init({ projectId: "proj_your_project_id" });
-
-const unsubscribe = widget.subscribe(() => {
-  counter.textContent = String(widget.feedbackItems.length);
-});
-```
-
-`destroy()` removes the widget, stops the Diagnostic Trail, restores patched globals and removes every listener.
-
-</Tab>
-</Tabs>
-
-## Custom trigger button
+### Custom trigger button
 
 Start annotation from your own UI. The floating button stays on the page.
 
@@ -139,7 +79,7 @@ const { startAnnotation, feedbackItems } = useFeedback();
 </Tab>
 </Tabs>
 
-## Toggle pins
+### Toggle pins
 
 Let users show or hide feedback pins on the page.
 
