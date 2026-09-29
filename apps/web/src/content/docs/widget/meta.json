@@ -6,6 +6,7 @@
     "install",
     "control-the-widget",
     "customization",
-    "headless-client"
+    "headless-client",
+    "upgrading"
   ]
 }
