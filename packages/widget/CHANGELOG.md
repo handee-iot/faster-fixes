@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- [#214](https://github.com/manucoffin/faster-fixes/pull/214) [`3e86fca`](https://github.com/manucoffin/faster-fixes/commit/3e86fcaea1d1e984aa0276182c190ee479ff9c65) Thanks [@manucoffin](https://github.com/manucoffin)! - Add `createFakeWidget` under the `@fasterfixes/widget/testing` subpath: a Widget double for testing code that drives the Widget, such as a framework Embed. It records the arguments of every call in `calls`, `emit(patch)` updates `isVisible`, `feedbackItems` or `showPins` and notifies subscribers, and `listenerCount` reports the live listeners. It depends on no test runner. The subpath is unstable, like `@fasterfixes/widget/internal`: it may change in any release.
+
+### Patch Changes
+
+- [#214](https://github.com/manucoffin/faster-fixes/pull/214) [`195b1aa`](https://github.com/manucoffin/faster-fixes/commit/195b1aaa084b64b741b092805e7d6f2450847e25) Thanks [@manucoffin](https://github.com/manucoffin)! - Keep the Reviewer token out of the URL when a router puts it back. `init` removes the `ff_token` query parameter, but a router that finishes its first navigation afterwards, such as Vue Router, wrote back the URL it read at load. The token then stayed in the address bar, was saved in the page URL of new Feedback, and hid the pins of the current page. The Widget now removes the parameter again whenever it reappears, and keeps the router's history state.
+
 ## 1.1.0
 
 ### Minor Changes
