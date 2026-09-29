@@ -64,3 +64,12 @@ The rule that a framework Embed ships only when a customer asks is withdrawn. Fa
 - **The install shape follows the framework's idiom; the option object does not.** A Vue plugin, an Angular provider or a React provider is fine; the options they take are the `@fasterfixes/widget` option object, forwarded unchanged, with no renamed keys and no defaults of the wrapper's own.
 
 ADR-0013's second-consumer gate still governs extraction from the app; it no longer gates publishing a framework Embed from this list. ADR-0013 is amended to place these packages in the graph.
+
+## Amendment 2026-09-29: the Angular Embed
+
+`@fasterfixes/angular` fills Angular's place on the closed list, next to `@fasterfixes/react` and `@fasterfixes/vue`.
+
+- **Install with a provider function, control with an inject function.** `provideFasterFixes(options)` returns environment providers for the application config, like `provideRouter`; it works in an NgModule's providers too, so there is no `forRoot`. `injectFeedback()` returns the seven members. The names follow ecosystem convention: `provideX` for the install, `injectX` for a function that needs an injection context.
+- **Signals are the reactive form.** `isVisible`, `feedbackItems` and `showPins` are read-only signals; the four actions are plain functions. No RxJS.
+- **No decorators, therefore no ng-packagr.** The package holds no component, directive, pipe, injectable class or NgModule. The Angular linker only rewrites files with partial-compilation declarations, which a decorator-free package never emits, so it is built with tsdown as plain ESM like the Vue Embed, and installs in any build setup, Vite-based ones included. A decorator in the package would move the build to ng-packagr and the Angular Package Format; do not add one to "make it more Angular".
+- **Peer `@angular/core` and `@angular/common` at `>=19.0.0`, open upward.** Angular 19 is the first major with `provideEnvironmentInitializer`. `@angular/common` is a peer for `isPlatformBrowser`: the provider does nothing on the server. Only the current major is tested.

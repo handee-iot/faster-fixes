@@ -619,6 +619,9 @@ importers:
       "@angular/platform-browser":
         specifier: ^22.2.0
         version: 22.2.0(@angular/common@22.2.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))
+      "@angular/platform-server":
+        specifier: ^22.2.0
+        version: 22.2.0(@angular/common@22.2.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/compiler@22.2.0)(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))(@angular/platform-browser@22.2.0(@angular/common@22.2.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)))(rxjs@7.8.2)
       "@workspace/eslint-config":
         specifier: workspace:*
         version: link:../eslint-config
@@ -830,6 +833,19 @@ packages:
     peerDependenciesMeta:
       "@angular/animations":
         optional: true
+
+  "@angular/platform-server@22.2.0":
+    resolution:
+      {
+        integrity: sha512-Ppb0Zqr0lLubAW2UvjsNYDuoh+WX8ZeKdrmEMa8qhpVIxD1UL6CAQnKSlQQabWfuCQOphzBi7u7QeotGsTajKQ==,
+      }
+    engines: { node: ^22.22.3 || ^24.15.0 || >=26.0.0 }
+    peerDependencies:
+      "@angular/common": 22.2.0
+      "@angular/compiler": 22.2.0
+      "@angular/core": 22.2.0
+      "@angular/platform-browser": 22.2.0
+      rxjs: ^6.5.3 || ^7.4.0
 
   "@asamuzakjp/css-color@7.1.0":
     resolution:
@@ -15039,6 +15055,13 @@ packages:
       utf-8-validate:
         optional: true
 
+  xhr2@0.2.1:
+    resolution:
+      {
+        integrity: sha512-sID0rrVCqkVNUn8t6xuv9+6FViXjUVXq8H5rWOH2rz9fDNQEd4g0EA2XlcEdJXRz5BMEn4O1pJFdT+z4YHhoWw==,
+      }
+    engines: { node: ">= 6" }
+
   xlsx@0.18.5:
     resolution:
       {
@@ -15238,6 +15261,16 @@ snapshots:
       "@angular/common": 22.2.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))(rxjs@7.8.2)
       "@angular/core": 22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)
       tslib: 2.8.1
+
+  "@angular/platform-server@22.2.0(@angular/common@22.2.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/compiler@22.2.0)(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))(@angular/platform-browser@22.2.0(@angular/common@22.2.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)))(rxjs@7.8.2)":
+    dependencies:
+      "@angular/common": 22.2.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      "@angular/compiler": 22.2.0
+      "@angular/core": 22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)
+      "@angular/platform-browser": 22.2.0(@angular/common@22.2.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2))
+      rxjs: 7.8.2
+      tslib: 2.8.1
+      xhr2: 0.2.1
 
   "@asamuzakjp/css-color@7.1.0":
     dependencies:
@@ -25042,6 +25075,8 @@ snapshots:
 
   ws@8.19.0:
     optional: true
+
+  xhr2@0.2.1: {}
 
   xlsx@0.18.5:
     dependencies:
