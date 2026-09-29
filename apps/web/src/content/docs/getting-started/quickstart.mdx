@@ -9,17 +9,32 @@ Pick the install page for your site. Each one covers installation, setup and whe
 
 <Cards>
   <Card
-    title="React"
+    title={
+      <span className="flex items-center gap-2">
+        <ReactIcon className="size-4" />
+        React
+      </span>
+    }
     description="A provider and a hook for React, Next.js, Remix and TanStack Start."
     href="/docs/widget/install/react"
   />
   <Card
-    title="Vue"
+    title={
+      <span className="flex items-center gap-2">
+        <VueIcon className="size-4" />
+        Vue
+      </span>
+    }
     description="A plugin and a composable for Vue and Nuxt."
     href="/docs/widget/install/vue"
   />
   <Card
-    title="Script embed"
+    title={
+      <span className="flex items-center gap-2">
+        <JavascriptIcon className="size-4" />
+        Script embed
+      </span>
+    }
     description="One script tag for WordPress, Webflow, static HTML or any other stack."
     href="/docs/widget/install/script-embed"
   />
