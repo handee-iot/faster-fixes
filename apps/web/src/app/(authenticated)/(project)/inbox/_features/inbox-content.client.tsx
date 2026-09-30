@@ -42,7 +42,7 @@ export function InboxContent() {
   }
 
   return (
-    <DashboardPageContent breadcrumbs={[{ label: "Inbox" }]}>
+    <DashboardPageContent breadcrumbs={[{ label: "Task board" }]}>
       <InboxTabs />
     </DashboardPageContent>
   );
