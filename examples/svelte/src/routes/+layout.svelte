@@ -1,6 +1,7 @@
 <script lang="ts">
   import { env } from "$env/dynamic/public";
   import { initFasterFixes } from "@fasterfixes/svelte";
+  import ControlBar from "$lib/ControlBar.svelte";
 
   let { children } = $props();
 
@@ -17,4 +18,11 @@
   });
 </script>
 
-{@render children()}
+<nav>
+  <a href="/">Home</a>
+  <a href="/second">Second page</a>
+</nav>
+<ControlBar />
+<main>
+  {@render children()}
+</main>
