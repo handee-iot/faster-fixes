@@ -18,7 +18,9 @@ export const dashboardRouter = router({
   getCollectedRevenue: adminProcedure.query(() =>
     getCollectedRevenue({ now: new Date() }),
   ),
-  getFeedbackOverview: adminProcedure.query(() => getFeedbackOverview()),
+  getFeedbackOverview: adminProcedure.query(() =>
+    getFeedbackOverview({ now: new Date() }),
+  ),
   getMonthlyStats: adminProcedure
     .input(GetMonthlyStatsSchema)
     .query(({ input }) => getMonthlyStats({ from: input.from, to: input.to })),

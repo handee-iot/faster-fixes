@@ -2,10 +2,12 @@ import { DashboardPageContent } from "@/app/_components/dashboard/dashboard-page
 import { DashboardRow } from "./_components/dashboard-row";
 import { EngagedOrganizationsCard } from "./_features/engaged-organizations-card/engaged-organizations-card.client";
 import { ChurnCard } from "./_features/churn-card/churn-card.client";
-import { FeedbackOverviewCard } from "./_features/feedback-overview-card/feedback-overview-card.client";
+import { FeedbackReceivedCard } from "./_features/feedback-received-card/feedback-received-card.client";
 import { CollectedRevenueCard } from "./_features/collected-revenue-card/collected-revenue-card.client";
 import { MrrCard } from "./_features/mrr-card/mrr-card.client";
+import { PendingFeedbackCard } from "./_features/pending-feedback-card/pending-feedback-card.client";
 import { PayingOrganizationsCard } from "./_features/paying-organizations-card/paying-organizations-card.client";
+import { ResolvedFeedbackCard } from "./_features/resolved-feedback-card/resolved-feedback-card.client";
 import { SignupsCard } from "./_features/signups-card/signups-card.client";
 import { SubscriptionsChart } from "./_features/subscriptions-chart/subscriptions-chart.client";
 
@@ -28,7 +30,9 @@ export default async function AdminDashboardPage() {
         </DashboardRow>
 
         <DashboardRow label="Feedback">
-          <FeedbackOverviewCard />
+          <FeedbackReceivedCard />
+          <PendingFeedbackCard />
+          <ResolvedFeedbackCard />
         </DashboardRow>
 
         <SubscriptionsChart />
