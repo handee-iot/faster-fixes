@@ -3,6 +3,7 @@ import {
   nonInternalOrganizationWhere,
   nonInternalSignupWhere,
 } from "../_helpers/internal-accounts";
+import { getEngagedOrganizationWhere } from "../_helpers/engaged-organization-where";
 
 const WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -25,7 +26,7 @@ export async function getUsageOverview({ now }: GetUsageOverviewInput) {
     prisma.organization.count({
       where: {
         ...nonInternalOrganizationWhere,
-        projects: { some: { feedback: { some: { createdAt: { gte, lt } } } } },
+        ...getEngagedOrganizationWhere(gte, lt),
       },
     });
 

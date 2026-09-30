@@ -1,4 +1,5 @@
 import { adminProcedure, router } from "@/server/trpc/trpc";
+import { getActivationOverview } from "./_services/get-activation-overview";
 import { getBillingMetrics } from "./_services/get-billing-metrics";
 import { getFeedbackOverview } from "./_services/get-feedback-overview";
 import { getMonthlyStats } from "./_services/get-monthly-stats";
@@ -10,6 +11,9 @@ import { getUsageOverview } from "./_services/get-usage-overview";
 export const dashboardRouter = router({
   getUsageOverview: adminProcedure.query(() =>
     getUsageOverview({ now: new Date() }),
+  ),
+  getActivationOverview: adminProcedure.query(() =>
+    getActivationOverview({ now: new Date() }),
   ),
   getBillingMetrics: adminProcedure.query(() =>
     getBillingMetrics({ now: new Date() }),
