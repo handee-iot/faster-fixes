@@ -5,15 +5,20 @@ import {
   WAITING_THRESHOLD_DAYS,
 } from "../../_helpers/board-summary";
 import { getBoardStatusAppearance } from "./board-status-appearance";
+import { ColumnSelectCheckbox } from "./column-select-checkbox.client";
 
 type BoardSummaryStripProps = {
   columns: readonly { id: string; title: string }[];
   feedback: ListFeedbackOutput;
+  selectedIds: Set<string>;
+  onToggleSelectAll: (columnId: string, itemIds: string[]) => void;
 };
 
 export function BoardSummaryStrip({
   columns,
   feedback,
+  selectedIds,
+  onToggleSelectAll,
 }: BoardSummaryStripProps) {
   const summary = getBoardSummary(feedback, new Date());
   const counts: Record<string, number> = {
@@ -28,10 +33,20 @@ export function BoardSummaryStrip({
         {columns.map((col) => {
           const appearance = getBoardStatusAppearance(col.id);
           const StatusIcon = appearance.icon;
+          const itemIds = feedback
+            .filter((f) => f.status === col.id)
+            .map((f) => f.id);
 
           return (
             <div key={col.id} className="flex flex-col gap-1 px-4 py-3">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <ColumnSelectCheckbox
+                  className="mr-1"
+                  columnTitle={col.title}
+                  itemIds={itemIds}
+                  selectedIds={selectedIds}
+                  onToggle={() => onToggleSelectAll(col.id, itemIds)}
+                />
                 <StatusIcon
                   className={cn("size-3.5", appearance.iconClassName)}
                 />

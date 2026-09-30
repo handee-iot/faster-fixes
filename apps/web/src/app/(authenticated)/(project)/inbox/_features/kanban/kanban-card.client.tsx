@@ -14,7 +14,6 @@ type FeedbackItem = ListFeedbackOutput[number];
 type KanbanCardProps = {
   feedback: FeedbackItem;
   isSelected: boolean;
-  selectionMode: boolean;
   isDraggable: boolean;
   onToggleSelect: (id: string) => void;
   onSelect: (id: string) => void;
@@ -32,7 +31,6 @@ function formatPagePath(url: string) {
 type KanbanCardViewProps = {
   feedback: FeedbackItem;
   isSelected: boolean;
-  selectionMode: boolean;
   isDraggable?: boolean;
   isOverlay?: boolean;
   isDragging?: boolean;
@@ -44,7 +42,6 @@ type KanbanCardViewProps = {
 function KanbanCardView({
   feedback,
   isSelected,
-  selectionMode,
   isDraggable,
   isOverlay,
   isDragging,
@@ -70,26 +67,26 @@ function KanbanCardView({
         isOverlay && "cursor-grabbing shadow-lg",
         // Source stays in flow but invisible; DragOverlay shows the moving copy.
         isDragging && "invisible",
+        isSelected && "border-primary/40 bg-primary/5 hover:border-primary/60",
       )}
       onClick={() => {
         if (isOverlay) return;
         onSelect?.(feedback.id);
       }}
     >
-      {selectionMode && (
-        <div
-          className="flex items-start pt-0.5"
-          onClick={(e) => e.stopPropagation()}
-          // Keeps a press on the checkbox from starting a drag of the card.
-          onMouseDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-        >
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={() => onToggleSelect?.(feedback.id)}
-          />
-        </div>
-      )}
+      <div
+        className="flex items-start pt-0.5"
+        onClick={(e) => e.stopPropagation()}
+        // Keeps a press on the checkbox from starting a drag of the card.
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+      >
+        <Checkbox
+          checked={isSelected}
+          onCheckedChange={() => onToggleSelect?.(feedback.id)}
+          aria-label="Select feedback"
+        />
+      </div>
 
       <StatusIcon
         className={cn("mt-0.5 size-4 shrink-0", appearance.iconClassName)}
@@ -129,7 +126,6 @@ function KanbanCardView({
 export function KanbanCard({
   feedback,
   isSelected,
-  selectionMode,
   isDraggable,
   onToggleSelect,
   onSelect,
@@ -145,7 +141,6 @@ export function KanbanCard({
       <KanbanCardView
         feedback={feedback}
         isSelected={isSelected}
-        selectionMode={selectionMode}
         isDraggable={isDraggable}
         isDragging={isDragging}
         onToggleSelect={onToggleSelect}
@@ -158,20 +153,13 @@ export function KanbanCard({
 type KanbanCardOverlayProps = {
   feedback: FeedbackItem;
   isSelected: boolean;
-  selectionMode: boolean;
 };
 
 export function KanbanCardOverlay({
   feedback,
   isSelected,
-  selectionMode,
 }: KanbanCardOverlayProps) {
   return (
-    <KanbanCardView
-      feedback={feedback}
-      isSelected={isSelected}
-      selectionMode={selectionMode}
-      isOverlay
-    />
+    <KanbanCardView feedback={feedback} isSelected={isSelected} isOverlay />
   );
 }
