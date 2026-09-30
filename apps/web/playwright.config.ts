@@ -3,6 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 import { WIDGET_API_ORIGIN, WIDGET_PROJECT_ID } from "./e2e/widget-api-stub";
 import {
   ANGULAR_EXAMPLE_ORIGIN,
+  SVELTE_EXAMPLE_ORIGIN,
   VUE_EXAMPLE_ORIGIN,
 } from "./e2e/widget-fixtures";
 
@@ -61,6 +62,19 @@ export default defineConfig({
       reuseExistingServer: false,
       // The first `ng serve` builds the app and prebundles Angular.
       timeout: 120_000,
+      env: {
+        NEXT_PUBLIC_FF_API_KEY: WIDGET_PROJECT_ID,
+        NEXT_PUBLIC_FF_API_ORIGIN: WIDGET_API_ORIGIN,
+      },
+    },
+    {
+      // Server rendering stays on, so the suite covers the Embed's server path.
+      // `$env/dynamic/public` reads the process env, which wins over any
+      // `.env.local` in the example.
+      command: "pnpm --filter @workspace/example-svelte exec vite dev",
+      url: SVELTE_EXAMPLE_ORIGIN,
+      reuseExistingServer: false,
+      timeout: 60_000,
       env: {
         NEXT_PUBLIC_FF_API_KEY: WIDGET_PROJECT_ID,
         NEXT_PUBLIC_FF_API_ORIGIN: WIDGET_API_ORIGIN,
