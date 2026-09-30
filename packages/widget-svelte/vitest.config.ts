@@ -5,9 +5,10 @@ import { defineConfig } from "vitest/config";
 // source stays compiler-free.
 export default defineConfig({
   plugins: [svelte()],
+  // Svelte's client runtime, for `mount` under jsdom.
+  resolve: { conditions: ["browser"] },
   test: {
     include: ["src/**/*.test.ts"],
     environment: "jsdom",
-    passWithNoTests: true,
   },
 });
