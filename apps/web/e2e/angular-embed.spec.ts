@@ -105,13 +105,15 @@ test.describe("Angular Embed", () => {
     // The example stays free of test hooks, so its provider call is patched to
     // merge the options above. Vite serves the Vue entry as its own module, so the
     // Vue spec patches `src/main.ts`; the Angular dev server bundles the app into
-    // `main.js` first, so the served bundle is patched here instead.
+    // `main.js` first, so the served bundle is patched here instead. Every match is
+    // replaced: without the dev server's cache (as in CI) the Embed is inlined into
+    // `main.js`, and its `injectFeedback` error message comes before the app's call.
     await page.route(`${ANGULAR_EXAMPLE_ORIGIN}/main.js*`, async (route) => {
       const response = await route.fetch();
       const source = await response.text();
       await route.fulfill({
         response,
-        body: source.replace(
+        body: source.replaceAll(
           "provideFasterFixes({",
           "provideFasterFixes({ ...window.__ffE2eOptions,",
         ),
