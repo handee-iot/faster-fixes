@@ -1,28 +1,47 @@
-import { FeedbackStatusEnum } from "@/app/_domains/feedback";
+import {
+  FeedbackStatusEnum,
+  type FeedbackStatus,
+} from "@/app/_domains/feedback";
 import { prisma } from "@workspace/db";
+import { nonInternalOrganizationWhere } from "../_helpers/internal-accounts";
 
-// "resolved" and "closed" (rendered as "Archived") are both terminal states;
-// see CONTEXT.md glossary. Counted together as the resolved metric.
-const resolvedStatuses = [
-  FeedbackStatusEnum.enum.resolved,
-  FeedbackStatusEnum.enum.closed,
-];
+const WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 
-export async function getFeedbackOverview() {
-  const [totalCount, resolvedCount, userCount] = await Promise.all([
-    prisma.feedback.count(),
-    prisma.feedback.count({ where: { status: { in: resolvedStatuses } } }),
-    prisma.user.count(),
-  ]);
+const nonInternalFeedbackWhere = {
+  project: { organization: nonInternalOrganizationWhere },
+};
+
+type GetFeedbackOverviewInput = {
+  now: Date;
+};
+
+export async function getFeedbackOverview({ now }: GetFeedbackOverviewInput) {
+  const windowStart = new Date(now.getTime() - WINDOW_MS);
+  const previousWindowStart = new Date(now.getTime() - 2 * WINDOW_MS);
+
+  const countReceived = (gte: Date, lt: Date) =>
+    prisma.feedback.count({
+      where: { ...nonInternalFeedbackWhere, createdAt: { gte, lt } },
+    });
+
+  const countByStatus = (status: FeedbackStatus) =>
+    prisma.feedback.count({ where: { ...nonInternalFeedbackWhere, status } });
+
+  const [received, previousReceived, pending, resolved, archived] =
+    await Promise.all([
+      countReceived(windowStart, now),
+      countReceived(previousWindowStart, windowStart),
+      countByStatus(FeedbackStatusEnum.enum.new),
+      countByStatus(FeedbackStatusEnum.enum.resolved),
+      // Archived is stored as `closed` (see CONTEXT.md).
+      countByStatus(FeedbackStatusEnum.enum.closed),
+    ]);
 
   return {
-    totalCount,
-    resolvedCount,
-    resolvedPercentage:
-      totalCount > 0 ? Math.round((resolvedCount / totalCount) * 100) : 0,
-    // Average submissions per platform user — proxy for product usage.
-    avgPerUser:
-      userCount > 0 ? Math.round((totalCount / userCount) * 10) / 10 : 0,
+    received: { current: received, previous: previousReceived },
+    pending,
+    resolved,
+    archived,
   };
 }
 

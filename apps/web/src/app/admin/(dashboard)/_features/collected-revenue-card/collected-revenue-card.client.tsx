@@ -11,7 +11,7 @@ import {
   HeadlineFigureSkeleton,
 } from "../../_components/headline-figure";
 
-const LABEL = "MRR, excluding VAT";
+const LABEL = "Collected in the last 30 days";
 
 const formatEur = (value: number) =>
   new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(
@@ -21,9 +21,11 @@ const formatEur = (value: number) =>
 const formatSignedEur = (value: number) =>
   `${value > 0 ? "+" : ""}${formatEur(value)}`;
 
-export function MrrCard() {
+export function CollectedRevenueCard() {
   const trpc = useTRPC();
-  const query = useQuery(trpc.admin.dashboard.getBillingMetrics.queryOptions());
+  const query = useQuery(
+    trpc.admin.dashboard.getCollectedRevenue.queryOptions(),
+  );
 
   return matchQueryStatus(query, {
     Loading: <HeadlineFigureSkeleton label={LABEL} />,
@@ -38,23 +40,24 @@ export function MrrCard() {
       </HeadlineFigureFrame>
     ),
     Success: ({ data }) => {
-      // Rounded to the cent so float noise never shows as a tiny change.
-      const delta = Math.round((data.mrr - data.previous.mrr) * 100) / 100;
+      const delta = data.current - data.previous;
 
       return (
         <HeadlineFigure
           label={LABEL}
-          value={formatEur(data.mrr)}
+          value={formatEur(data.current)}
           delta={delta}
           deltaLabel={formatSignedEur(delta)}
-          comparison="vs 30 days ago"
-          hint={`${formatEur(data.arr)} ARR`}
+          comparison="vs previous 30 days"
+          hint="Net of refunds and fees, excluding VAT"
         >
-          {data.unpricedItemCount > 0 && (
+          {data.nonEurTransactionCount > 0 && (
             <p className="text-xs text-destructive">
-              {data.unpricedItemCount} subscription{" "}
-              {data.unpricedItemCount === 1 ? "item" : "items"} without a flat
-              EUR price, not counted
+              {data.nonEurTransactionCount}{" "}
+              {data.nonEurTransactionCount === 1
+                ? "transaction"
+                : "transactions"}{" "}
+              in a currency other than EUR, not counted
             </p>
           )}
         </HeadlineFigure>

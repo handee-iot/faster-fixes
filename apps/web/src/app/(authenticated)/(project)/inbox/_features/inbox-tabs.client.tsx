@@ -18,7 +18,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
-import { AlertCircle, Archive, Inbox } from "lucide-react";
+import { AlertCircle, Archive, Inbox, SquareKanban } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
 import { ArchiveTab } from "./archive/archive-tab.client";
@@ -73,7 +73,7 @@ export function InboxTabs() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <TabsList>
             <TabsTrigger value="board">
-              <Inbox className="mr-1.5 size-4" />
+              <SquareKanban className="mr-1.5 size-4" />
               Board
             </TabsTrigger>
             <TabsTrigger value="archive">

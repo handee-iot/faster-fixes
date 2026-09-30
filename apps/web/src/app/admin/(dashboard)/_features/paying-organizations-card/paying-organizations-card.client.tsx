@@ -11,17 +11,9 @@ import {
   HeadlineFigureSkeleton,
 } from "../../_components/headline-figure";
 
-const LABEL = "MRR, excluding VAT";
+const LABEL = "Paying organizations";
 
-const formatEur = (value: number) =>
-  new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(
-    value,
-  );
-
-const formatSignedEur = (value: number) =>
-  `${value > 0 ? "+" : ""}${formatEur(value)}`;
-
-export function MrrCard() {
+export function PayingOrganizationsCard() {
   const trpc = useTRPC();
   const query = useQuery(trpc.admin.dashboard.getBillingMetrics.queryOptions());
 
@@ -38,26 +30,18 @@ export function MrrCard() {
       </HeadlineFigureFrame>
     ),
     Success: ({ data }) => {
-      // Rounded to the cent so float noise never shows as a tiny change.
-      const delta = Math.round((data.mrr - data.previous.mrr) * 100) / 100;
+      const { total, pro, agency } = data.payingOrganizations;
+      const delta = total - data.previous.payingOrganizationCount;
 
       return (
         <HeadlineFigure
           label={LABEL}
-          value={formatEur(data.mrr)}
+          value={String(total)}
           delta={delta}
-          deltaLabel={formatSignedEur(delta)}
+          deltaLabel={`${delta > 0 ? "+" : ""}${delta}`}
           comparison="vs 30 days ago"
-          hint={`${formatEur(data.arr)} ARR`}
-        >
-          {data.unpricedItemCount > 0 && (
-            <p className="text-xs text-destructive">
-              {data.unpricedItemCount} subscription{" "}
-              {data.unpricedItemCount === 1 ? "item" : "items"} without a flat
-              EUR price, not counted
-            </p>
-          )}
-        </HeadlineFigure>
+          hint={`${pro} Pro, ${agency} Agency`}
+        />
       );
     },
   });

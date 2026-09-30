@@ -1,7 +1,6 @@
 "use client";
 
 import { DndContext } from "@dnd-kit/core";
-import { Checkbox } from "@workspace/ui/components/checkbox";
 import {
   Tabs,
   TabsContent,
@@ -13,7 +12,7 @@ import * as React from "react";
 import type { ListFeedbackOutput } from "../../_services/list-feedback";
 import { KanbanCard } from "./kanban-card.client";
 import { getBoardStatusAppearance } from "./board-status-appearance";
-import { getColumnSelectionState } from "./column-selection-state";
+import { ColumnSelectCheckbox } from "./column-select-checkbox.client";
 
 type FeedbackItem = ListFeedbackOutput[number];
 
@@ -66,6 +65,9 @@ export function KanbanMobile({
       {columns.map((col) => {
         const items = grouped[col.id] ?? [];
         const itemIds = items.map((i) => i.id);
+        const selectedCount = itemIds.filter((id) =>
+          selectedIds.has(id),
+        ).length;
 
         return (
           <TabsContent
@@ -73,13 +75,22 @@ export function KanbanMobile({
             value={col.id}
             className="flex flex-col gap-4"
           >
-            <div className="flex items-center gap-2">
-              <Checkbox
-                checked={getColumnSelectionState(itemIds, selectedIds)}
-                onCheckedChange={() => onToggleSelectAll(col.id, itemIds)}
-              />
-              <span className="text-xs text-muted-foreground">Select all</span>
-            </div>
+            {items.length > 0 && (
+              // pl-3 lines this checkbox up with the ones inside the cards.
+              <label className="flex h-7 items-center gap-2 pl-3 text-xs text-muted-foreground">
+                <ColumnSelectCheckbox
+                  columnTitle={col.title}
+                  itemIds={itemIds}
+                  selectedIds={selectedIds}
+                  onToggle={() => onToggleSelectAll(col.id, itemIds)}
+                />
+                <span className="tabular-nums">
+                  {selectedCount === 0
+                    ? `Select all ${items.length}`
+                    : `${selectedCount} of ${items.length} selected`}
+                </span>
+              </label>
+            )}
 
             {toolbar}
 
@@ -95,7 +106,8 @@ export function KanbanMobile({
                       key={item.id}
                       feedback={item}
                       isSelected={selectedIds.has(item.id)}
-                      selectionMode={selectedIds.size > 0}
+                      // No drop target on mobile: status changes go through the panel or the bulk toolbar.
+                      isDraggable={false}
                       onToggleSelect={onToggleSelect}
                       onSelect={onSelectFeedback}
                     />
