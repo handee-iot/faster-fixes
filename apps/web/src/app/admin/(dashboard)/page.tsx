@@ -9,7 +9,7 @@ import { PendingFeedbackCard } from "./_features/pending-feedback-card/pending-f
 import { PayingOrganizationsCard } from "./_features/paying-organizations-card/paying-organizations-card.client";
 import { ResolvedFeedbackCard } from "./_features/resolved-feedback-card/resolved-feedback-card.client";
 import { SignupsCard } from "./_features/signups-card/signups-card.client";
-import { SubscriptionsChart } from "./_features/subscriptions-chart/subscriptions-chart.client";
+import { MonthlyGrowthChart } from "./_features/monthly-growth-chart/monthly-growth-chart.client";
 
 export default async function AdminDashboardPage() {
   return (
@@ -35,7 +35,7 @@ export default async function AdminDashboardPage() {
           <ResolvedFeedbackCard />
         </DashboardRow>
 
-        <SubscriptionsChart />
+        <MonthlyGrowthChart />
       </div>
     </DashboardPageContent>
   );

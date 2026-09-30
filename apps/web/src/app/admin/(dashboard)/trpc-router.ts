@@ -2,7 +2,6 @@ import { adminProcedure, router } from "@/server/trpc/trpc";
 import { getBillingMetrics } from "./_services/get-billing-metrics";
 import { getFeedbackOverview } from "./_services/get-feedback-overview";
 import { getMonthlyStats } from "./_services/get-monthly-stats";
-import { GetMonthlyStatsSchema } from "./_services/get-monthly-stats.schema";
 import { getCollectedRevenue } from "./_services/get-collected-revenue";
 import { getUsageOverview } from "./_services/get-usage-overview";
 
@@ -21,7 +20,7 @@ export const dashboardRouter = router({
   getFeedbackOverview: adminProcedure.query(() =>
     getFeedbackOverview({ now: new Date() }),
   ),
-  getMonthlyStats: adminProcedure
-    .input(GetMonthlyStatsSchema)
-    .query(({ input }) => getMonthlyStats({ from: input.from, to: input.to })),
+  getMonthlyStats: adminProcedure.query(() =>
+    getMonthlyStats({ now: new Date() }),
+  ),
 });
