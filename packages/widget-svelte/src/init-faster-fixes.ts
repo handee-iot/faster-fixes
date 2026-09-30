@@ -1,6 +1,7 @@
-import { setContext } from "svelte";
+import { hasContext, onDestroy, setContext } from "svelte";
 import { init } from "@fasterfixes/widget";
 import type { WidgetOptions } from "@fasterfixes/widget";
+import { isDevelopment } from "./environment.js";
 import { FEEDBACK_SLOT_KEY, createFeedbackSlot } from "./feedback-slot.js";
 
 /**
@@ -9,10 +10,27 @@ import { FEEDBACK_SLOT_KEY, createFeedbackSlot } from "./feedback-slot.js";
  * forwarded unchanged to `init`, and read once.
  */
 export function initFasterFixes(options: WidgetOptions): void {
+  if (hasContext(FEEDBACK_SLOT_KEY)) {
+    if (isDevelopment()) {
+      console.warn(
+        "[faster-fixes] `initFasterFixes` is already called under this root. The second call is ignored.",
+      );
+    }
+    return;
+  }
+
   const slot = createFeedbackSlot();
+  // Set on the server too, so `getFeedback` renders the defaults.
   setContext(FEEDBACK_SLOT_KEY, slot);
+  if (typeof document === "undefined") return;
 
   // At the call, not in onMount: children mount before their parent, so a
   // child's onMount would otherwise find no instance.
-  slot.attach(init(options));
+  const widget = init(options);
+  slot.attach(widget);
+  onDestroy(() => {
+    // Release before destroy: destroy drops every listener, ours included.
+    slot.release();
+    widget.destroy();
+  });
 }

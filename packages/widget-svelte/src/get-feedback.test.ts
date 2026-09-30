@@ -91,4 +91,15 @@ describe("getFeedback", () => {
       /getFeedback must be called under a component that called initFasterFixes: call initFasterFixes\(\{ projectId \}\)/,
     );
   });
+
+  it("shares one subscription across components and updates them all", () => {
+    mountRoot({ probes: 2 });
+    expect(renderedTexts()).toEqual(["true-0-true", "true-0-true"]);
+
+    expect(widget.listenerCount).toBe(1);
+
+    widget.emit({ isVisible: false, feedbackItems: [item] });
+    flushSync();
+    expect(renderedTexts()).toEqual(["false-1-true", "false-1-true"]);
+  });
 });
