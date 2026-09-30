@@ -2,10 +2,16 @@
 
 import { useTRPC } from "@/lib/trpc/trpc-client";
 import { useQuery } from "@tanstack/react-query";
+import { getErrorMessage } from "@/utils/error/get-error-message";
 import { matchQueryStatus } from "@/utils/tanstack-query/match-query-status";
-import { Card, CardContent } from "@workspace/ui/components/card";
-import { Skeleton } from "@workspace/ui/components/skeleton";
-import { cn } from "@workspace/ui/lib/utils";
+import { FigureUnavailable } from "../../_components/figure-unavailable";
+import {
+  HeadlineFigure,
+  HeadlineFigureFrame,
+  HeadlineFigureSkeleton,
+} from "../../_components/headline-figure";
+
+const LABEL = "Collected in the last 30 days";
 
 const formatEur = (value: number) =>
   new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(
@@ -22,65 +28,40 @@ export function CollectedRevenueCard() {
   );
 
   return matchQueryStatus(query, {
-    Loading: <CollectedRevenueCardLoading />,
-    Errored: <CollectedRevenueCardError />,
-    Empty: <CollectedRevenueCardLoading />,
+    Loading: <HeadlineFigureSkeleton label={LABEL} />,
+    Errored: (error) => (
+      <HeadlineFigureFrame label={LABEL}>
+        <FigureUnavailable description={getErrorMessage(error)} />
+      </HeadlineFigureFrame>
+    ),
+    Empty: (
+      <HeadlineFigureFrame label={LABEL}>
+        <FigureUnavailable description="No billing figures were returned." />
+      </HeadlineFigureFrame>
+    ),
     Success: ({ data }) => {
       const delta = data.current - data.previous;
 
       return (
-        <Card>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatEur(data.current)}</div>
-            <p className="text-xs text-muted-foreground">
-              Collected in the last 30 days, net, excluding VAT
+        <HeadlineFigure
+          label={LABEL}
+          value={formatEur(data.current)}
+          delta={delta}
+          deltaLabel={formatSignedEur(delta)}
+          comparison="vs previous 30 days"
+          hint="Net of refunds and fees, excluding VAT"
+        >
+          {data.nonEurTransactionCount > 0 && (
+            <p className="text-xs text-destructive">
+              {data.nonEurTransactionCount}{" "}
+              {data.nonEurTransactionCount === 1
+                ? "transaction"
+                : "transactions"}{" "}
+              in a currency other than EUR, not counted
             </p>
-            <p
-              className={cn(
-                "text-xs font-medium",
-                delta > 0 && "text-success",
-                delta < 0 && "text-destructive",
-                delta === 0 && "text-muted-foreground",
-              )}
-            >
-              {formatSignedEur(delta)} vs previous 30 days
-            </p>
-            {data.nonEurTransactionCount > 0 && (
-              <p className="mt-2 text-xs text-destructive">
-                {data.nonEurTransactionCount}{" "}
-                {data.nonEurTransactionCount === 1
-                  ? "transaction"
-                  : "transactions"}{" "}
-                in a currency other than EUR, not counted
-              </p>
-            )}
-          </CardContent>
-        </Card>
+          )}
+        </HeadlineFigure>
       );
     },
   });
-}
-
-function CollectedRevenueCardLoading() {
-  return (
-    <Card>
-      <CardContent>
-        <Skeleton className="h-8 w-24" />
-        <p className="text-xs text-muted-foreground">
-          Collected in the last 30 days, net, excluding VAT
-        </p>
-        <Skeleton className="mt-1 h-4 w-20" />
-      </CardContent>
-    </Card>
-  );
-}
-
-function CollectedRevenueCardError() {
-  return (
-    <Card className="border-destructive/50">
-      <CardContent className="pt-6">
-        <p className="text-sm text-destructive">Failed to load statistics</p>
-      </CardContent>
-    </Card>
-  );
 }
