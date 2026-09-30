@@ -11,48 +11,45 @@ const formatEur = (value: number) =>
     value,
   );
 
-export function MrrCard() {
+export function LifetimeRevenueCard() {
   const trpc = useTRPC();
-  const query = useQuery(trpc.admin.dashboard.getBillingMetrics.queryOptions());
+  const query = useQuery(
+    trpc.admin.dashboard.getLifetimeRevenue.queryOptions(),
+  );
 
   return matchQueryStatus(query, {
-    Loading: <MrrCardLoading />,
-    Errored: <MrrCardError />,
-    Empty: <MrrCardLoading />,
+    Loading: <LifetimeRevenueCardLoading />,
+    Errored: <LifetimeRevenueCardError />,
+    Empty: <LifetimeRevenueCardLoading />,
     Success: ({ data }) => (
       <Card>
         <CardContent>
-          <div className="text-2xl font-bold">{formatEur(data.mrr)}</div>
-          <p className="text-xs text-muted-foreground">MRR, excluding VAT</p>
+          <div className="text-2xl font-bold">
+            {formatEur(data.grossRevenue)}
+          </div>
+          <p className="text-xs text-muted-foreground">Gross revenue</p>
           <p className="text-xs text-muted-foreground">
-            {formatEur(data.arr)} ARR
+            {formatEur(data.netRevenue)} net
           </p>
-          {data.unpricedItemCount > 0 && (
-            <p className="mt-2 text-xs text-destructive">
-              {data.unpricedItemCount} subscription{" "}
-              {data.unpricedItemCount === 1 ? "item" : "items"} without a flat
-              EUR price, not counted
-            </p>
-          )}
         </CardContent>
       </Card>
     ),
   });
 }
 
-function MrrCardLoading() {
+function LifetimeRevenueCardLoading() {
   return (
     <Card>
       <CardContent>
         <Skeleton className="h-8 w-24" />
-        <p className="text-xs text-muted-foreground">MRR, excluding VAT</p>
+        <p className="text-xs text-muted-foreground">Gross revenue</p>
         <Skeleton className="mt-1 h-4 w-20" />
       </CardContent>
     </Card>
   );
 }
 
-function MrrCardError() {
+function LifetimeRevenueCardError() {
   return (
     <Card className="border-destructive/50">
       <CardContent className="pt-6">
