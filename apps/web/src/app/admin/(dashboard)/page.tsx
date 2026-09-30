@@ -1,4 +1,5 @@
 import { DashboardPageContent } from "@/app/_components/dashboard/dashboard-page-content";
+import { DashboardRow } from "./_components/dashboard-row";
 import { ActiveSubscriptionsCard } from "./_features/active-subscriptions-card/active-subscriptions-card.client";
 import { FeedbackOverviewCard } from "./_features/feedback-overview-card/feedback-overview-card.client";
 import { MrrCard } from "./_features/mrr-card/mrr-card.client";
@@ -8,16 +9,21 @@ import { UsersOverviewCard } from "./_features/users-overview-card/users-overvie
 export default async function AdminDashboardPage() {
   return (
     <DashboardPageContent
-      title="Dashboard"
       breadcrumbs={[{ label: "Dashboard", link: "/admin" }]}
     >
       <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <UsersOverviewCard />
-          <ActiveSubscriptionsCard />
+        <DashboardRow label="Revenue">
           <MrrCard />
+          <ActiveSubscriptionsCard />
+        </DashboardRow>
+
+        <DashboardRow label="Orgs">
+          <UsersOverviewCard />
+        </DashboardRow>
+
+        <DashboardRow label="Feedback">
           <FeedbackOverviewCard />
-        </div>
+        </DashboardRow>
 
         <SubscriptionsChart />
       </div>
