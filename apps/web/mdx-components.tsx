@@ -4,6 +4,7 @@ import { YoutubeEmbed } from "@/app/_components/mdx/youtube-embed";
 import { AngularIcon } from "@workspace/ui/components/icons/angular-icon";
 import { JavascriptIcon } from "@workspace/ui/components/icons/javascript-icon";
 import { ReactIcon } from "@workspace/ui/components/icons/react-icon";
+import { SvelteIcon } from "@workspace/ui/components/icons/svelte-icon";
 import { VueIcon } from "@workspace/ui/components/icons/vue-icon";
 import {
   Table,
@@ -31,6 +32,7 @@ export function getDocsMDXComponents(
     ReactIcon,
     VueIcon,
     AngularIcon,
+    SvelteIcon,
     JavascriptIcon,
     ...components,
   };

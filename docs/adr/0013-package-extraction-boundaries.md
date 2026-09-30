@@ -101,4 +101,4 @@ Reading of the change:
 
 ## Amendment 2026-09-28: framework Embeds sit at layer 2
 
-Every framework Embed on [ADR-0016](./0016-one-vanilla-widget-framework-embeds-are-wrappers.md)'s closed list (`@fasterfixes/vue` and `@fasterfixes/angular` now, Svelte later) sits at layer 2 next to `@fasterfixes/react`, depends on `@fasterfixes/widget` only, and never imports `@fasterfixes/core` directly.
+Every framework Embed on [ADR-0016](./0016-one-vanilla-widget-framework-embeds-are-wrappers.md)'s closed list (`@fasterfixes/vue`, `@fasterfixes/angular` and `@fasterfixes/svelte`) sits at layer 2 next to `@fasterfixes/react`, depends on `@fasterfixes/widget` only, and never imports `@fasterfixes/core` directly.

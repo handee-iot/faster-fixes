@@ -2,6 +2,8 @@
 export const VUE_EXAMPLE_ORIGIN = "http://localhost:3200";
 /** Where Playwright serves `examples/angular`. */
 export const ANGULAR_EXAMPLE_ORIGIN = "http://localhost:3300";
+/** Where Playwright serves `examples/svelte`. */
+export const SVELTE_EXAMPLE_ORIGIN = "http://localhost:3400";
 
 /**
  * A page that installs the Widget. Every scenario in `widget.spec.ts` runs
@@ -45,6 +47,16 @@ export const WIDGET_FIXTURES: WidgetFixture[] = [
     path: `${ANGULAR_EXAMPLE_ORIGIN}/`,
     otherPage: {
       path: `${ANGULAR_EXAMPLE_ORIGIN}/second`,
+      linkName: "Second page",
+    },
+  },
+  // The SvelteKit example app, server rendered, installing the Widget with
+  // `initFasterFixes` in its root layout.
+  {
+    name: "example app (Svelte Embed)",
+    path: `${SVELTE_EXAMPLE_ORIGIN}/`,
+    otherPage: {
+      path: `${SVELTE_EXAMPLE_ORIGIN}/second`,
       linkName: "Second page",
     },
   },

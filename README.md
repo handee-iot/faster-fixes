@@ -23,6 +23,8 @@
   &nbsp;
   <a href="https://www.npmjs.com/package/@fasterfixes/angular"><img src="https://img.shields.io/npm/v/@fasterfixes/angular?label=%40fasterfixes%2Fangular&color=0a0a0a" alt="@fasterfixes/angular on npm" /></a>
   &nbsp;
+  <a href="https://www.npmjs.com/package/@fasterfixes/svelte"><img src="https://img.shields.io/npm/v/@fasterfixes/svelte?label=%40fasterfixes%2Fsvelte&color=0a0a0a" alt="@fasterfixes/svelte on npm" /></a>
+  &nbsp;
   <a href="https://www.npmjs.com/package/@fasterfixes/mcp"><img src="https://img.shields.io/npm/v/@fasterfixes/mcp?label=%40fasterfixes%2Fmcp&color=0a0a0a" alt="@fasterfixes/mcp on npm" /></a>
   &nbsp;
   <a href="https://github.com/manucoffin/faster-fixes/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-0a0a0a" alt="License" /></a>
@@ -88,7 +90,17 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-Clients click anywhere on the page to leave feedback. The widget captures the screenshot, element selector, browser info, and the React component tree on React sites automatically, with no setup required from the client. See the [script embed](https://faster-fixes.com/docs/widget/install/script-embed), [React](https://faster-fixes.com/docs/widget/install/react), [Vue](https://faster-fixes.com/docs/widget/install/vue) and [Angular](https://faster-fixes.com/docs/widget/install/angular) docs.
+In a Svelte or SvelteKit application, use the Svelte embed in the root component or layout:
+
+```svelte
+<script lang="ts">
+  import { initFasterFixes } from "@fasterfixes/svelte";
+
+  initFasterFixes({ projectId: "proj_your_project_id" });
+</script>
+```
+
+Clients click anywhere on the page to leave feedback. The widget captures the screenshot, element selector, browser info, and the React component tree on React sites automatically, with no setup required from the client. See the [script embed](https://faster-fixes.com/docs/widget/install/script-embed), [React](https://faster-fixes.com/docs/widget/install/react), [Vue](https://faster-fixes.com/docs/widget/install/vue), [Angular](https://faster-fixes.com/docs/widget/install/angular) and [Svelte](https://faster-fixes.com/docs/widget/install/svelte) docs.
 
 ### 2. Review feedback on the dashboard
 
@@ -121,7 +133,7 @@ The MCP server works with Claude Code, Cursor, VS Code, Windsurf, Codex, and Zed
 
 ## Packages
 
-This monorepo publishes six npm packages:
+This monorepo publishes seven npm packages:
 
 | Package                                                                      | Description                       | Install                                         |
 | ---------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------- |
@@ -129,6 +141,7 @@ This monorepo publishes six npm packages:
 | [`@fasterfixes/react`](https://www.npmjs.com/package/@fasterfixes/react)     | React embed of the widget         | `npm install @fasterfixes/react`                |
 | [`@fasterfixes/vue`](https://www.npmjs.com/package/@fasterfixes/vue)         | Vue embed of the widget           | `npm install @fasterfixes/vue`                  |
 | [`@fasterfixes/angular`](https://www.npmjs.com/package/@fasterfixes/angular) | Angular embed of the widget       | `npm install @fasterfixes/angular`              |
+| [`@fasterfixes/svelte`](https://www.npmjs.com/package/@fasterfixes/svelte)   | Svelte embed of the widget        | `npm install @fasterfixes/svelte`               |
 | [`@fasterfixes/core`](https://www.npmjs.com/package/@fasterfixes/core)       | Framework-agnostic client library | `npm install @fasterfixes/core`                 |
 | [`@fasterfixes/mcp`](https://www.npmjs.com/package/@fasterfixes/mcp)         | MCP server for AI coding agents   | `npx -y @fasterfixes/mcp`                       |
 
@@ -282,4 +295,4 @@ You can find your agent token and project ID in [Organization Settings](https://
 
 This repository is licensed under the [GNU AGPLv3 License](./LICENSE).
 
-The widget packages (`@fasterfixes/widget`, `@fasterfixes/react`, `@fasterfixes/vue`, `@fasterfixes/angular`, `@fasterfixes/core`) and the MCP server (`@fasterfixes/mcp`) are licensed under MIT for unrestricted use in your applications.
+The widget packages (`@fasterfixes/widget`, `@fasterfixes/react`, `@fasterfixes/vue`, `@fasterfixes/angular`, `@fasterfixes/svelte`, `@fasterfixes/core`) and the MCP server (`@fasterfixes/mcp`) are licensed under MIT for unrestricted use in your applications.
