@@ -59,6 +59,11 @@ type SubscriptionOptions = {
   discounts?: Array<ReturnType<typeof discount>>;
   referenceId?: string;
   customerOrganizationId?: string;
+  startDate?: number;
+  trialEnd?: number | null;
+  endedAt?: number | null;
+  canceledAt?: number | null;
+  cancelAtPeriodEnd?: boolean;
 };
 
 function subscription({
@@ -67,9 +72,20 @@ function subscription({
   discounts = [],
   referenceId,
   customerOrganizationId,
+  startDate = nowSeconds - 365 * DAY,
+  trialEnd = null,
+  endedAt = null,
+  canceledAt = null,
+  cancelAtPeriodEnd = false,
 }: SubscriptionOptions = {}) {
   return {
     status,
+    start_date: startDate,
+    trial_end: trialEnd,
+    ended_at: endedAt,
+    canceled_at: canceledAt,
+    cancel_at_period_end: cancelAtPeriodEnd,
+    cancel_at: null,
     metadata: referenceId ? { referenceId } : {},
     customer: {
       deleted: undefined,
@@ -323,6 +339,122 @@ describe("getBillingMetrics", () => {
         "org_customer",
         "org_reference",
       ]);
+    });
+  });
+
+  describe("30 days ago", () => {
+    it("rebuilds MRR and Paying organizations from start and end dates", async () => {
+      const stripe = stripeStub([
+        subscription(),
+        subscription({ startDate: nowSeconds - 10 * DAY }),
+        subscription({
+          status: "canceled",
+          endedAt: nowSeconds - 5 * DAY,
+          items: [{ price: price({ unitAmount: 9900 }) }],
+        }),
+        subscription({ status: "canceled", endedAt: nowSeconds - 40 * DAY }),
+        subscription({ trialEnd: nowSeconds - 20 * DAY }),
+      ]);
+
+      await expect(getBillingMetrics({ now }, stripe)).resolves.toMatchObject({
+        mrr: 60,
+        payingOrganizations: { total: 3 },
+        previous: { mrr: 20 + 99, payingOrganizationCount: 2 },
+      });
+    });
+
+    it("applies the discounts that were in effect 30 days ago", async () => {
+      const stripe = stripeStub([
+        subscription({
+          discounts: [
+            discount(coupon({ duration: "repeating", percent_off: 50 }), {
+              start: nowSeconds - 60 * DAY,
+              end: nowSeconds - DAY,
+            }),
+          ],
+        }),
+      ]);
+
+      await expect(getBillingMetrics({ now }, stripe)).resolves.toMatchObject({
+        mrr: 20,
+        previous: { mrr: 10 },
+      });
+    });
+  });
+
+  describe("Churn", () => {
+    it("counts a paying Subscription that ended inside the window, not one that ended before", async () => {
+      const stripe = stripeStub([
+        subscription(),
+        subscription(),
+        subscription({ status: "canceled", endedAt: nowSeconds - 5 * DAY }),
+        subscription({ status: "canceled", endedAt: nowSeconds - 31 * DAY }),
+      ]);
+
+      await expect(getBillingMetrics({ now }, stripe)).resolves.toMatchObject({
+        churn: { churnedCount: 1, base: 3, rate: 1 / 3 },
+      });
+    });
+
+    it("dates churn by the effective end, not by the cancellation request", async () => {
+      const stripe = stripeStub([
+        subscription(),
+        subscription({
+          status: "canceled",
+          canceledAt: nowSeconds - 200 * DAY,
+          endedAt: nowSeconds - 2 * DAY,
+        }),
+      ]);
+
+      await expect(getBillingMetrics({ now }, stripe)).resolves.toMatchObject({
+        churn: { churnedCount: 1, base: 2, rate: 0.5 },
+      });
+    });
+
+    it("counts a scheduled cancellation that has not ended yet as scheduled, not churned", async () => {
+      const stripe = stripeStub([
+        subscription({
+          cancelAtPeriodEnd: true,
+          canceledAt: nowSeconds - 3 * DAY,
+        }),
+      ]);
+
+      await expect(getBillingMetrics({ now }, stripe)).resolves.toMatchObject({
+        churn: { churnedCount: 0, base: 1, rate: 0 },
+        scheduledCancellationCount: 1,
+        payingOrganizations: { total: 1 },
+      });
+    });
+
+    it("does not count a trial that ended as churn", async () => {
+      const stripe = stripeStub([
+        subscription(),
+        subscription({
+          status: "canceled",
+          startDate: nowSeconds - 20 * DAY,
+          trialEnd: nowSeconds - 6 * DAY,
+          endedAt: nowSeconds - 6 * DAY,
+        }),
+      ]);
+
+      await expect(getBillingMetrics({ now }, stripe)).resolves.toMatchObject({
+        churn: { churnedCount: 0, base: 1, rate: 0 },
+      });
+    });
+
+    it("returns no rate when nothing was paying 30 days ago", async () => {
+      const stripe = stripeStub([
+        subscription({ startDate: nowSeconds - 10 * DAY }),
+        subscription({
+          status: "canceled",
+          startDate: nowSeconds - 20 * DAY,
+          endedAt: nowSeconds - 2 * DAY,
+        }),
+      ]);
+
+      await expect(getBillingMetrics({ now }, stripe)).resolves.toMatchObject({
+        churn: { churnedCount: 1, base: 0, rate: null },
+      });
     });
   });
 

@@ -1,5 +1,6 @@
 import { DashboardPageContent } from "@/app/_components/dashboard/dashboard-page-content";
 import { DashboardRow } from "./_components/dashboard-row";
+import { ChurnCard } from "./_features/churn-card/churn-card.client";
 import { FeedbackOverviewCard } from "./_features/feedback-overview-card/feedback-overview-card.client";
 import { CollectedRevenueCard } from "./_features/collected-revenue-card/collected-revenue-card.client";
 import { MrrCard } from "./_features/mrr-card/mrr-card.client";
@@ -17,6 +18,7 @@ export default async function AdminDashboardPage() {
           <MrrCard />
           <CollectedRevenueCard />
           <PayingOrganizationsCard />
+          <ChurnCard />
         </DashboardRow>
 
         <DashboardRow label="Orgs">

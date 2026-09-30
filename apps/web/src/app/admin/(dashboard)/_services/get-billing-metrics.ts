@@ -5,6 +5,7 @@ import {
 import { SUBSCRIPTION_PLANS } from "@/server/auth/config/subscription-plans";
 import { stripeApi } from "@/server/stripe";
 import type Stripe from "stripe";
+import { wasPayingAt } from "../_helpers/was-paying-at";
 
 // A Paying organization is one whose Subscription is `active` or `past_due` in
 // Stripe (CONTEXT.md). Trialing, unpaid, paused, incomplete and canceled
@@ -174,20 +175,12 @@ function getSubscriptionOrganizationId(
   return null;
 }
 
-export async function getBillingMetrics(
-  { now }: { now: Date },
-  stripe: Stripe = stripeApi,
-) {
-  const nowSeconds = Math.floor(now.getTime() / 1000);
-  const resolveCoupon = createCouponResolver(stripe);
+const WINDOW_SECONDS = 30 * 24 * 60 * 60;
 
-  let mrrCents = 0;
-  let unpricedItemCount = 0;
-  const payingOrganizations = { total: 0, pro: 0, agency: 0, pastDue: 0 };
-  const payingOrganizationIds = new Set<string>();
-
-  // Stripe's expansion depth limit is four levels: the subscription-level
-  // coupon fits, the item-level one does not (see createCouponResolver).
+// Stripe's expansion depth limit is four levels: the subscription-level
+// coupon fits, the item-level one does not (see createCouponResolver).
+async function listBillingSubscriptions(stripe: Stripe) {
+  const subscriptions: Stripe.Subscription[] = [];
   for await (const subscription of stripe.subscriptions.list({
     status: "all",
     expand: [
@@ -197,20 +190,33 @@ export async function getBillingMetrics(
     ],
     limit: 100,
   })) {
-    if (!PAYING_STATUSES.has(subscription.status)) continue;
+    subscriptions.push(subscription);
+  }
+  return subscriptions;
+}
 
+// MRR and Paying organizations over the given paying Subscriptions, with the
+// discounts in effect at `atSeconds`.
+async function getPayingSnapshot(
+  subscriptions: Stripe.Subscription[],
+  resolveCoupon: CouponResolver,
+  atSeconds: number,
+) {
+  let mrrCents = 0;
+  let unpricedItemCount = 0;
+  const payingOrganizations = { total: 0, pro: 0, agency: 0 };
+  const payingOrganizationIds = new Set<string>();
+
+  for (const subscription of subscriptions) {
     const monthly = await getSubscriptionMonthlyCents(
       subscription,
       resolveCoupon,
-      nowSeconds,
+      atSeconds,
     );
     mrrCents += monthly.monthlyCents;
     unpricedItemCount += monthly.unpricedItemCount;
 
     payingOrganizations.total += 1;
-    if (subscription.status === SubscriptionStatus.PastDue) {
-      payingOrganizations.pastDue += 1;
-    }
     const planName = getSubscriptionPlanName(subscription);
     if (planName === SubscriptionPlanName.Pro) payingOrganizations.pro += 1;
     if (planName === SubscriptionPlanName.Agency) {
@@ -221,14 +227,78 @@ export async function getBillingMetrics(
     if (organizationId) payingOrganizationIds.add(organizationId);
   }
 
-  const mrr = Math.round(mrrCents) / 100;
-
   return {
-    mrr,
-    arr: Math.round(mrrCents * 12) / 100,
+    mrrCents,
     unpricedItemCount,
     payingOrganizations,
-    payingOrganizationIds: [...payingOrganizationIds],
+    payingOrganizationIds,
+  };
+}
+
+const toEuros = (cents: number) => Math.round(cents) / 100;
+
+export async function getBillingMetrics(
+  { now }: { now: Date },
+  stripe: Stripe = stripeApi,
+) {
+  const nowSeconds = Math.floor(now.getTime() / 1000);
+  const windowStartSeconds = nowSeconds - WINDOW_SECONDS;
+  const resolveCoupon = createCouponResolver(stripe);
+  const subscriptions = await listBillingSubscriptions(stripe);
+
+  // The current state reads the live status; only the past one is rebuilt.
+  const paying = subscriptions.filter((subscription) =>
+    PAYING_STATUSES.has(subscription.status),
+  );
+  const current = await getPayingSnapshot(paying, resolveCoupon, nowSeconds);
+  const previous = await getPayingSnapshot(
+    subscriptions.filter((subscription) =>
+      wasPayingAt(subscription, windowStartSeconds),
+    ),
+    resolveCoupon,
+    windowStartSeconds,
+  );
+
+  // Churned: paying right up to an effective end inside the window. A trial
+  // that ended was never paying, so it is not churn.
+  const churnedCount = subscriptions.filter((subscription) => {
+    const endedAt = subscription.ended_at;
+    return (
+      endedAt != null &&
+      endedAt > windowStartSeconds &&
+      endedAt <= nowSeconds &&
+      wasPayingAt(subscription, endedAt - 1)
+    );
+  }).length;
+  const churnBase = previous.payingOrganizations.total;
+
+  return {
+    mrr: toEuros(current.mrrCents),
+    arr: toEuros(current.mrrCents * 12),
+    unpricedItemCount: current.unpricedItemCount,
+    payingOrganizations: {
+      ...current.payingOrganizations,
+      pastDue: paying.filter(
+        (subscription) => subscription.status === SubscriptionStatus.PastDue,
+      ).length,
+    },
+    payingOrganizationIds: [...current.payingOrganizationIds],
+    previous: {
+      mrr: toEuros(previous.mrrCents),
+      payingOrganizationCount: churnBase,
+    },
+    churn: {
+      churnedCount,
+      base: churnBase,
+      // No base means no rate, not a division by zero.
+      rate: churnBase > 0 ? churnedCount / churnBase : null,
+    },
+    // Newer API versions schedule the end through `cancel_at` as well as
+    // `cancel_at_period_end`.
+    scheduledCancellationCount: paying.filter(
+      (subscription) =>
+        subscription.cancel_at_period_end || subscription.cancel_at != null,
+    ).length,
   };
 }
 

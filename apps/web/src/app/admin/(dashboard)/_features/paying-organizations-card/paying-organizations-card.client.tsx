@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { matchQueryStatus } from "@/utils/tanstack-query/match-query-status";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Skeleton } from "@workspace/ui/components/skeleton";
+import { cn } from "@workspace/ui/lib/utils";
 
 const getShare = (count: number, total: number) =>
   total > 0 ? Math.round((count / total) * 100) : 0;
@@ -19,6 +20,7 @@ export function PayingOrganizationsCard() {
     Empty: <PayingOrganizationsCardLoading />,
     Success: ({ data }) => {
       const { total, pro, agency, pastDue } = data.payingOrganizations;
+      const delta = total - data.previous.payingOrganizationCount;
 
       return (
         <Card>
@@ -26,6 +28,17 @@ export function PayingOrganizationsCard() {
             <div className="text-2xl font-bold">{total}</div>
             <p className="text-xs text-muted-foreground">
               Paying organizations
+            </p>
+            <p
+              className={cn(
+                "text-xs font-medium",
+                delta > 0 && "text-success",
+                delta < 0 && "text-destructive",
+                delta === 0 && "text-muted-foreground",
+              )}
+            >
+              {delta > 0 ? "+" : ""}
+              {delta} vs 30 days ago
             </p>
             {pastDue > 0 && (
               <p className="text-xs text-destructive">{pastDue} past due</p>
