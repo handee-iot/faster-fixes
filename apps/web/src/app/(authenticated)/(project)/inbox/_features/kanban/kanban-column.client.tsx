@@ -83,6 +83,7 @@ export function KanbanColumnBody({
             feedback={feedback}
             isSelected={selectedIds.has(feedback.id)}
             selectionMode={selectedIds.size > 0}
+            isDraggable
             onToggleSelect={onToggleSelect}
             onSelect={onSelectFeedback}
           />

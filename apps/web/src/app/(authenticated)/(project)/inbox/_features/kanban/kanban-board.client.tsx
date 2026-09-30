@@ -8,7 +8,8 @@ import {
   DragOverlay,
   type DragStartEvent,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -65,9 +66,12 @@ export function KanbanBoard({
   const [activeId, setActiveId] = React.useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      // Slightly higher distance so a quick click never starts a drag.
-      activationConstraint: { distance: 6 },
+    // The whole card is the drag source, so a click must still open it: the
+    // mouse drags only after moving, touch only after a long press (so the
+    // board still scrolls).
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
     }),
     useSensor(KeyboardSensor),
   );

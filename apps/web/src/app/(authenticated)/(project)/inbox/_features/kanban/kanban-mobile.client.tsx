@@ -96,6 +96,8 @@ export function KanbanMobile({
                       feedback={item}
                       isSelected={selectedIds.has(item.id)}
                       selectionMode={selectedIds.size > 0}
+                      // No drop target on mobile: status changes go through the panel or the bulk toolbar.
+                      isDraggable={false}
                       onToggleSelect={onToggleSelect}
                       onSelect={onSelectFeedback}
                     />

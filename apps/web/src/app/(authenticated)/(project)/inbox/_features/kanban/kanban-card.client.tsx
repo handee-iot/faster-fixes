@@ -4,7 +4,6 @@ import { useDraggable } from "@dnd-kit/core";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { cn } from "@workspace/ui/lib/utils";
 import { formatDistanceToNow } from "date-fns";
-import { GripVertical } from "lucide-react";
 import { getWaitingDays, isWaitingTooLong } from "../../_helpers/board-summary";
 import type { ListFeedbackOutput } from "../../_services/list-feedback";
 import { getBoardStatusAppearance } from "./board-status-appearance";
@@ -16,6 +15,7 @@ type KanbanCardProps = {
   feedback: FeedbackItem;
   isSelected: boolean;
   selectionMode: boolean;
+  isDraggable: boolean;
   onToggleSelect: (id: string) => void;
   onSelect: (id: string) => void;
 };
@@ -33,9 +33,9 @@ type KanbanCardViewProps = {
   feedback: FeedbackItem;
   isSelected: boolean;
   selectionMode: boolean;
+  isDraggable?: boolean;
   isOverlay?: boolean;
   isDragging?: boolean;
-  dragHandle?: React.ReactNode;
   onToggleSelect?: (id: string) => void;
   onSelect?: (id: string) => void;
 };
@@ -45,9 +45,9 @@ function KanbanCardView({
   feedback,
   isSelected,
   selectionMode,
+  isDraggable,
   isOverlay,
   isDragging,
-  dragHandle,
   onToggleSelect,
   onSelect,
 }: KanbanCardViewProps) {
@@ -64,7 +64,9 @@ function KanbanCardView({
   return (
     <div
       className={cn(
-        "group flex cursor-pointer gap-2 rounded-lg border border-border bg-card p-3 transition-shadow hover:shadow-sm",
+        "flex gap-2 rounded-lg border border-border bg-card p-3 transition-[box-shadow,border-color] hover:border-foreground/20 hover:shadow-sm",
+        // The open hand says the card moves; the hover lift says it opens.
+        isDraggable ? "cursor-grab active:cursor-grabbing" : "cursor-pointer",
         isOverlay && "cursor-grabbing shadow-lg",
         // Source stays in flow but invisible; DragOverlay shows the moving copy.
         isDragging && "invisible",
@@ -78,6 +80,9 @@ function KanbanCardView({
         <div
           className="flex items-start pt-0.5"
           onClick={(e) => e.stopPropagation()}
+          // Keeps a press on the checkbox from starting a drag of the card.
+          onMouseDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
         >
           <Checkbox
             checked={isSelected}
@@ -117,8 +122,6 @@ function KanbanCardView({
           </div>
         </div>
       </div>
-
-      {dragHandle}
     </div>
   );
 }
@@ -127,32 +130,24 @@ export function KanbanCard({
   feedback,
   isSelected,
   selectionMode,
+  isDraggable,
   onToggleSelect,
   onSelect,
 }: KanbanCardProps) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: feedback.id,
     data: { feedback },
+    disabled: !isDraggable,
   });
 
-  const handle = (
-    <div
-      className="hidden shrink-0 cursor-grab items-center text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 lg:flex"
-      {...listeners}
-      {...attributes}
-    >
-      <GripVertical className="size-4" />
-    </div>
-  );
-
   return (
-    <div ref={setNodeRef}>
+    <div ref={setNodeRef} {...listeners} {...attributes}>
       <KanbanCardView
         feedback={feedback}
         isSelected={isSelected}
         selectionMode={selectionMode}
+        isDraggable={isDraggable}
         isDragging={isDragging}
-        dragHandle={handle}
         onToggleSelect={onToggleSelect}
         onSelect={onSelect}
       />
