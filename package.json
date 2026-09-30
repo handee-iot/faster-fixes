@@ -6,6 +6,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "dev:example-vue": "turbo run dev --filter=@workspace/example-vue",
+    "dev:example-angular": "turbo run dev --filter=@workspace/example-angular",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",

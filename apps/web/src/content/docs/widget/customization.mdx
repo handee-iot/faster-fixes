@@ -7,7 +7,7 @@ description: Customize the widget's text labels and theme it with CSS custom pro
 
 `labels` changes the text of the widget: buttons, placeholders, messages and screen reader labels. Pass only the keys you want to change. The others keep their English default.
 
-<Tabs groupId="embed" items={["React", "Vue", "Script embed"]} persist>
+<Tabs groupId="embed" items={["React", "Vue", "Angular", "Script embed"]} persist>
 <Tab value="React">
 
 ```tsx
@@ -37,6 +37,20 @@ app.use(
     },
   }),
 );
+```
+
+</Tab>
+<Tab value="Angular">
+
+```ts
+provideFasterFixes({
+  projectId: "proj_your_project_id",
+  labels: {
+    submitButton: "Send",
+    cancelButton: "Discard",
+    textareaPlaceholder: "What should change?",
+  },
+});
 ```
 
 </Tab>

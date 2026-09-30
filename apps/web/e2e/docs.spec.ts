@@ -48,6 +48,7 @@ test.describe("docs", () => {
     for (const [name, href] of [
       [/^React/, "/docs/widget/install/react"],
       [/^Vue/, "/docs/widget/install/vue"],
+      [/^Angular/, "/docs/widget/install/angular"],
       [/^Script embed/, "/docs/widget/install/script-embed"],
       [/^Other frameworks/, "/docs/widget/install/other-frameworks"],
     ] as const) {
@@ -71,6 +72,26 @@ test.describe("docs", () => {
     await page.goto("/docs/widget/install/vue");
     await expect(
       page.getByRole("heading", { level: 1, name: "Vue" }),
+    ).toBeVisible();
+  });
+
+  test("the overview and the quickstart link to the Angular install page", async ({
+    page,
+  }) => {
+    await page.goto("/docs/widget/overview");
+
+    await expect(
+      page.getByRole("article").getByRole("link", { name: /^Angular/ }),
+    ).toHaveAttribute("href", "/docs/widget/install/angular");
+
+    await page.goto("/docs/getting-started/quickstart");
+    await expect(
+      page.getByRole("article").getByRole("link", { name: /^Angular/ }),
+    ).toHaveAttribute("href", "/docs/widget/install/angular");
+
+    await page.goto("/docs/widget/install/angular");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Angular" }),
     ).toBeVisible();
   });
 });

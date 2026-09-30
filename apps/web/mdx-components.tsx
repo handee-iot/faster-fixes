@@ -1,6 +1,7 @@
 import { FaqList } from "@/app/_components/mdx/faq-list";
 import { HowTo } from "@/app/_components/mdx/how-to";
 import { YoutubeEmbed } from "@/app/_components/mdx/youtube-embed";
+import { AngularIcon } from "@workspace/ui/components/icons/angular-icon";
 import { JavascriptIcon } from "@workspace/ui/components/icons/javascript-icon";
 import { ReactIcon } from "@workspace/ui/components/icons/react-icon";
 import { VueIcon } from "@workspace/ui/components/icons/vue-icon";
@@ -29,6 +30,7 @@ export function getDocsMDXComponents(
     Step,
     ReactIcon,
     VueIcon,
+    AngularIcon,
     JavascriptIcon,
     ...components,
   };

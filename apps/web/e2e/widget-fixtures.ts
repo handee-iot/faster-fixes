@@ -1,5 +1,7 @@
 /** Where Playwright serves `examples/vue`, next to the web app. */
 export const VUE_EXAMPLE_ORIGIN = "http://localhost:3200";
+/** Where Playwright serves `examples/angular`. */
+export const ANGULAR_EXAMPLE_ORIGIN = "http://localhost:3300";
 
 /**
  * A page that installs the Widget. Every scenario in `widget.spec.ts` runs
@@ -34,6 +36,15 @@ export const WIDGET_FIXTURES: WidgetFixture[] = [
     path: `${VUE_EXAMPLE_ORIGIN}/`,
     otherPage: {
       path: `${VUE_EXAMPLE_ORIGIN}/second`,
+      linkName: "Second page",
+    },
+  },
+  // The Angular example app, installing the Widget with `provideFasterFixes`.
+  {
+    name: "example app (Angular Embed)",
+    path: `${ANGULAR_EXAMPLE_ORIGIN}/`,
+    otherPage: {
+      path: `${ANGULAR_EXAMPLE_ORIGIN}/second`,
       linkName: "Second page",
     },
   },

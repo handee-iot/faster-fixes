@@ -2,7 +2,7 @@
 
 > **[Documentation](https://faster-fixes.com/docs/widget/install/script-embed)** · [Website](https://faster-fixes.com)
 
-The [FasterFixes](https://faster-fixes.com) feedback Widget for any website, with no framework required. Reviewers annotate elements on the page and submit visual feedback to your Project. It works on WordPress, Webflow, static HTML and apps built with Vue, Angular, Svelte or any other framework. React and Vue applications can also use [`@fasterfixes/react`](https://www.npmjs.com/package/@fasterfixes/react) and [`@fasterfixes/vue`](https://www.npmjs.com/package/@fasterfixes/vue).
+The [FasterFixes](https://faster-fixes.com) feedback Widget for any website, with no framework required. Reviewers annotate elements on the page and submit visual feedback to your Project. It works on WordPress, Webflow, static HTML and apps built with Svelte or any other framework. React, Vue and Angular applications can also use [`@fasterfixes/react`](https://www.npmjs.com/package/@fasterfixes/react), [`@fasterfixes/vue`](https://www.npmjs.com/package/@fasterfixes/vue) and [`@fasterfixes/angular`](https://www.npmjs.com/package/@fasterfixes/angular).
 
 The Widget ships no framework runtime and renders inside an open Shadow DOM, so your site's CSS does not affect it.
 
@@ -85,7 +85,7 @@ An unknown `position`, a `projectId` that is not a non-empty string or a `labels
 
 ## Instance
 
-`init` returns a `Widget`. Its members match the `useFeedback` hook of `@fasterfixes/react` and the `useFeedback` composable of `@fasterfixes/vue`:
+`init` returns a `Widget`. Its members match the `useFeedback` hook of `@fasterfixes/react`, the `useFeedback` composable of `@fasterfixes/vue` and `injectFeedback` of `@fasterfixes/angular`:
 
 | Member                | Description                                                                                                              |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------ |
