@@ -49,6 +49,7 @@ test.describe("docs", () => {
       [/^React/, "/docs/widget/install/react"],
       [/^Vue/, "/docs/widget/install/vue"],
       [/^Angular/, "/docs/widget/install/angular"],
+      [/^Svelte/, "/docs/widget/install/svelte"],
       [/^Script embed/, "/docs/widget/install/script-embed"],
       [/^Other frameworks/, "/docs/widget/install/other-frameworks"],
     ] as const) {
@@ -92,6 +93,26 @@ test.describe("docs", () => {
     await page.goto("/docs/widget/install/angular");
     await expect(
       page.getByRole("heading", { level: 1, name: "Angular" }),
+    ).toBeVisible();
+  });
+
+  test("the overview and the quickstart link to the Svelte install page", async ({
+    page,
+  }) => {
+    await page.goto("/docs/widget/overview");
+
+    await expect(
+      page.getByRole("article").getByRole("link", { name: /^Svelte/ }),
+    ).toHaveAttribute("href", "/docs/widget/install/svelte");
+
+    await page.goto("/docs/getting-started/quickstart");
+    await expect(
+      page.getByRole("article").getByRole("link", { name: /^Svelte/ }),
+    ).toHaveAttribute("href", "/docs/widget/install/svelte");
+
+    await page.goto("/docs/widget/install/svelte");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Svelte" }),
     ).toBeVisible();
   });
 });
