@@ -57,7 +57,7 @@ export const faqs: {
   {
     question: "Which frameworks are supported?",
     answer:
-      "The widget works on any website: WordPress, Webflow, static HTML, and apps built with React, Next.js, Vue, Nuxt, Angular, Svelte or any other framework. Add it with one script tag, install @fasterfixes/react in a React app, @fasterfixes/vue in a Vue app, or @fasterfixes/angular in an Angular app. Every embed shares the same widget and captures the same context.",
+      "The widget works on any website: WordPress, Webflow, static HTML, and apps built with React, Next.js, Vue, Nuxt, Angular, Svelte or any other framework. Add it with one script tag, install @fasterfixes/react in a React app, @fasterfixes/vue in a Vue app, @fasterfixes/angular in an Angular app, or @fasterfixes/svelte in a Svelte app. Every embed shares the same widget and captures the same context.",
   },
 ];
 
