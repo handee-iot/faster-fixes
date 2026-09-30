@@ -70,6 +70,14 @@ An Organization's billing relationship, mirrored from Stripe. At most one active
 **Plan**:
 The tier a Subscription grants (`free`, `pro`, `agency`), defining limits (projects, members) and feature access. An Organization without an active Subscription is on the free Plan; a self-hosted instance always resolves to the top Plan.
 
+**Paying organization**:
+An Organization whose Subscription is `active` or `past_due` in Stripe. Trialing, unpaid, paused and incomplete Subscriptions do not count. The unit for MRR, conversion and churn.
+_Avoid_: Customer, Subscriber, Paying user (billing belongs to the Organization, never to a User).
+
+**Engaged organization**:
+An Organization that received at least one Feedback in the last 30 days, meaning its Widget is installed and used by Reviewers. The unit for usage and adoption metrics.
+_Avoid_: Active organization (reserved for the Organization selected in a User's session), Active user.
+
 ### Feedback lifecycle
 
 **Status**:
