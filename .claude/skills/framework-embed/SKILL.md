@@ -1,13 +1,13 @@
 ---
 name: framework-embed
-description: Checklist for adding a framework Embed (`@fasterfixes/angular`, `@fasterfixes/svelte`) to the closed list in ADR-0016. Use when building, scaffolding or planning a new framework package that wraps `@fasterfixes/widget`.
+description: Checklist for a framework Embed on the closed list in ADR-0016, now complete (React, Vue, Angular, Svelte). Use when rebuilding, auditing or extending one of those packages, or when asked for a new framework package that wraps `@fasterfixes/widget`, which first needs an ADR amendment.
 ---
 
 ADR-0016 (its 2026-09-28 amendment) is the what and why: the closed list of framework Embeds, one package per rendering runtime, the seven-member control contract, options forwarded unchanged. This skill is the how. The **worked example** is the Vue Embed: `packages/widget-vue`, `examples/vue`, `apps/web/e2e/vue-embed.spec.ts`, `apps/web/src/content/docs/widget/install/vue.mdx`. At every step, open the Vue file first and mirror it; diverge only where the framework's idiom forces it.
 
-Before step 1, confirm the framework is on ADR-0016's closed list. A framework outside it needs a new amendment first: stop and ask. The package shape (install entry, accessor name, peer range) is decided with the user before code, since the ADR leaves it open.
+Every framework on ADR-0016's closed list has its Embed. A framework outside it needs a new amendment first: stop and ask. The package shape (install entry, accessor name, peer range) is decided with the user before code, since the ADR leaves it open.
 
-`<fw>` below is the framework slug (`angular`, `svelte`).
+`<fw>` below is the framework slug (`vue`, `angular`, `svelte`).
 
 ## 1. Package skeleton and metadata
 
@@ -60,7 +60,7 @@ Done when all eight pass under `pnpm --filter @fasterfixes/<fw> test`.
 
 - Depends on `@fasterfixes/<fw>` through `workspace:*`; `turbo.json` makes `dev` depend on `^build`; add a root `dev:example-<fw>` script and a `.lintstagedrc` entry.
 - Reads `NEXT_PUBLIC_FF_API_KEY` and `NEXT_PUBLIC_FF_API_ORIGIN`, the names Playwright sets, and throws with a hint when the Project ID is missing. Ship `.env.example`.
-- A fixed port with `strictPort`, one not taken by another fixture (Vue is 3200).
+- A fixed port with `strictPort`, one not taken by another fixture (Vue is 3200, Svelte 3400).
 - Page content matching the other fixtures: one `h1`, Home and Second page links reached without a reload, a `#pricing-card` element.
 - A control bar calling the four actions and showing `isVisible` and the feedback count under `data-testid="widget-visible"` and `data-testid="feedback-count"`. Button labels avoid the Widget's own accessible names ("Start feedback", "Hide markers", "Show markers", "Submit").
 
@@ -79,7 +79,7 @@ Run `pnpm build:packages` before the suite: the example resolves the Embed from 
 - `apps/web/src/content/docs/widget/install/<fw>.mdx` with the skeleton of `vue.mdx`: Installation, Setup, Options (with Theming), Where to mount (one subsection per meta-framework, e.g. Analog for Angular, SvelteKit for Svelte, with the root file and any SSR nuance), Next steps.
 - `install/meta.json`: the page after the existing framework Embeds, before `script-embed`.
 - A card on `widget/overview.mdx` and `getting-started/quickstart.mdx`, and a click-through test for it in `apps/web/e2e/docs.spec.ts`.
-- `widget/control-the-widget.mdx`: the framework in the intro sentence, and a tab in every `<Tabs groupId="embed">` block, after Vue and before Script embed.
+- `widget/control-the-widget.mdx`: the framework in the intro sentence, and a tab in every `<Tabs groupId="embed">` block, in closed-list order: React, Vue, Angular, Svelte, then Script embed.
 - `widget/install/script-embed.mdx` "Framework apps": point the framework to its install page and drop it from the hand-wired example.
 - `widget/customization.mdx`: name the Embed where it lists them.
 - Framework lists: `apps/web/src/content/docs/index.mdx`, the homepage FAQ in `apps/web/src/app/(public)/(home)/_features/faq-section.tsx`, `packages/widget/README.md`, and the root `README.md` (npm badge, quick start snippet, packages table, licence line).
