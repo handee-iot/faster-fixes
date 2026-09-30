@@ -1,7 +1,7 @@
 import { DashboardPageContent } from "@/app/_components/dashboard/dashboard-page-content";
 import { DashboardRow } from "./_components/dashboard-row";
 import { FeedbackOverviewCard } from "./_features/feedback-overview-card/feedback-overview-card.client";
-import { LifetimeRevenueCard } from "./_features/lifetime-revenue-card/lifetime-revenue-card.client";
+import { CollectedRevenueCard } from "./_features/collected-revenue-card/collected-revenue-card.client";
 import { MrrCard } from "./_features/mrr-card/mrr-card.client";
 import { PayingOrganizationsCard } from "./_features/paying-organizations-card/paying-organizations-card.client";
 import { SubscriptionsChart } from "./_features/subscriptions-chart/subscriptions-chart.client";
@@ -15,7 +15,7 @@ export default async function AdminDashboardPage() {
       <div className="space-y-6">
         <DashboardRow label="Revenue">
           <MrrCard />
-          <LifetimeRevenueCard />
+          <CollectedRevenueCard />
           <PayingOrganizationsCard />
         </DashboardRow>
 

@@ -1,2 +1,2 @@
-// Retired: MRR and ARR come from get-billing-metrics.ts, the all-time revenue from get-lifetime-revenue.ts. Safe to delete.
+// Retired: MRR and ARR come from get-billing-metrics.ts, collected revenue from get-collected-revenue.ts. Safe to delete.
 export {};

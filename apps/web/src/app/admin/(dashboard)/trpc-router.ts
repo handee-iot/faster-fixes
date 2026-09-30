@@ -3,7 +3,7 @@ import { getBillingMetrics } from "./_services/get-billing-metrics";
 import { getFeedbackOverview } from "./_services/get-feedback-overview";
 import { getMonthlyStats } from "./_services/get-monthly-stats";
 import { GetMonthlyStatsSchema } from "./_services/get-monthly-stats.schema";
-import { getLifetimeRevenue } from "./_services/get-lifetime-revenue";
+import { getCollectedRevenue } from "./_services/get-collected-revenue";
 import { getUsersOverview } from "./_services/get-users-overview";
 
 // The admin role check stays on `adminProcedure`: it is answerable from the
@@ -13,7 +13,9 @@ export const dashboardRouter = router({
   getBillingMetrics: adminProcedure.query(() =>
     getBillingMetrics({ now: new Date() }),
   ),
-  getLifetimeRevenue: adminProcedure.query(() => getLifetimeRevenue()),
+  getCollectedRevenue: adminProcedure.query(() =>
+    getCollectedRevenue({ now: new Date() }),
+  ),
   getFeedbackOverview: adminProcedure.query(() => getFeedbackOverview()),
   getMonthlyStats: adminProcedure
     .input(GetMonthlyStatsSchema)
