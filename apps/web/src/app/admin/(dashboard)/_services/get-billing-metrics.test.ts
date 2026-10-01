@@ -18,7 +18,7 @@ function price({
   unitAmount = 2000,
   interval = "month",
   lookupKey = "pro_monthly",
-  currency = "eur",
+  currency = "usd",
   billingScheme = "per_unit",
 }: PriceOptions = {}) {
   return {
@@ -288,13 +288,13 @@ describe("getBillingMetrics", () => {
       });
     });
 
-    it("counts items without a flat EUR unit amount instead of dropping them silently", async () => {
+    it("counts items without a flat USD unit amount instead of dropping them silently", async () => {
       const stripe = stripeStub([
         subscription({
           items: [
             {},
             { price: price({ billingScheme: "tiered", unitAmount: null }) },
-            { price: price({ currency: "usd" }) },
+            { price: price({ currency: "eur" }) },
           ],
         }),
       ]);
