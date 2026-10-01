@@ -13,13 +13,13 @@ import {
 
 const LABEL = "MRR, excluding VAT";
 
-const formatEur = (value: number) =>
-  new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(
+const formatUsd = (value: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
     value,
   );
 
-const formatSignedEur = (value: number) =>
-  `${value > 0 ? "+" : ""}${formatEur(value)}`;
+const formatSignedUsd = (value: number) =>
+  `${value > 0 ? "+" : ""}${formatUsd(value)}`;
 
 export function MrrCard() {
   const trpc = useTRPC();
@@ -44,17 +44,17 @@ export function MrrCard() {
       return (
         <HeadlineFigure
           label={LABEL}
-          value={formatEur(data.mrr)}
+          value={formatUsd(data.mrr)}
           delta={delta}
-          deltaLabel={formatSignedEur(delta)}
+          deltaLabel={formatSignedUsd(delta)}
           comparison="vs 30 days ago"
-          hint={`${formatEur(data.arr)} ARR`}
+          hint={`${formatUsd(data.arr)} ARR`}
         >
           {data.unpricedItemCount > 0 && (
             <p className="text-xs text-destructive">
               {data.unpricedItemCount} subscription{" "}
               {data.unpricedItemCount === 1 ? "item" : "items"} without a flat
-              EUR price, not counted
+              USD price, not counted
             </p>
           )}
         </HeadlineFigure>

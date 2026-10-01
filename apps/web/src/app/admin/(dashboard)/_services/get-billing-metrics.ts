@@ -15,7 +15,9 @@ const PAYING_STATUSES = new Set<Stripe.Subscription.Status>([
   SubscriptionStatus.PastDue,
 ]);
 
-const BILLING_CURRENCY = "eur";
+// Plan prices are set in USD. Collected revenue settles in EUR instead (see
+// `_collected-net.ts`), so the two figures use different currencies.
+const PRICE_CURRENCY = "usd";
 
 // Number of months in one billing period, used to normalise any cadence
 // (annual, quarterly, weekly...) to a monthly figure.
@@ -39,7 +41,7 @@ function getMonthsPerPeriod(price: Stripe.Price): number {
 // field, and for tiered prices, which carry neither.
 function getFlatUnitCents(price: Stripe.Price): number | null {
   if (price.billing_scheme !== "per_unit") return null;
-  if (price.currency !== BILLING_CURRENCY) return null;
+  if (price.currency !== PRICE_CURRENCY) return null;
   if (price.unit_amount_decimal != null) {
     return Number(price.unit_amount_decimal);
   }
@@ -235,7 +237,7 @@ async function getPayingSnapshot(
   };
 }
 
-const toEuros = (cents: number) => Math.round(cents) / 100;
+const fromCents = (cents: number) => Math.round(cents) / 100;
 
 export async function getBillingMetrics(
   { now }: { now: Date },
@@ -273,8 +275,8 @@ export async function getBillingMetrics(
   const churnBase = previous.payingOrganizations.total;
 
   return {
-    mrr: toEuros(current.mrrCents),
-    arr: toEuros(current.mrrCents * 12),
+    mrr: fromCents(current.mrrCents),
+    arr: fromCents(current.mrrCents * 12),
     unpricedItemCount: current.unpricedItemCount,
     payingOrganizations: {
       ...current.payingOrganizations,
@@ -284,7 +286,7 @@ export async function getBillingMetrics(
     },
     payingOrganizationIds: [...current.payingOrganizationIds],
     previous: {
-      mrr: toEuros(previous.mrrCents),
+      mrr: fromCents(previous.mrrCents),
       payingOrganizationCount: churnBase,
     },
     churn: {
