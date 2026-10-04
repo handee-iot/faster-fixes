@@ -6,77 +6,78 @@ import { requireEnv } from "@/utils/environment/require-env";
 import { stripe } from "@better-auth/stripe";
 import { prisma } from "@workspace/db";
 
-// Billing is cloud-only: self-hosted instances never register the Stripe plugin
-// and must not be forced to provide Stripe env vars.
-if (
-  isCloud() &&
-  process.env.NODE_ENV === "production" &&
-  !process.env.STRIPE_WEBHOOK_SIGNING_SECRET
-) {
-  throw new Error("STRIPE_WEBHOOK_SIGNING_SECRET is required in production");
-}
+export function getStripePlugin() {
+  if (!isCloud()) return undefined;
 
-export const stripePlugin = stripe({
-  stripeClient: stripeApi,
-  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SIGNING_SECRET ?? "",
-  createCustomerOnSignUp: true,
-  organization: {
-    enabled: true,
-    getCustomerCreateParams: async (organization) => {
-      const owner = await prisma.member.findFirst({
-        where: { organizationId: organization.id, role: "owner" },
-        select: {
-          user: {
-            select: {
-              email: true,
+  if (
+    process.env.NODE_ENV === "production" &&
+    !process.env.STRIPE_WEBHOOK_SIGNING_SECRET
+  ) {
+    throw new Error("STRIPE_WEBHOOK_SIGNING_SECRET is required in production");
+  }
+
+  return stripe({
+    stripeClient: stripeApi,
+    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SIGNING_SECRET ?? "",
+    createCustomerOnSignUp: true,
+    organization: {
+      enabled: true,
+      getCustomerCreateParams: async (organization) => {
+        const owner = await prisma.member.findFirst({
+          where: { organizationId: organization.id, role: "owner" },
+          select: {
+            user: {
+              select: {
+                email: true,
+              },
             },
           },
-        },
-      });
+        });
 
-      // Set the organization's billing email to the owner's email
-      return {
-        email: owner?.user.email,
-      };
-    },
-  },
-
-  subscription: {
-    enabled: true,
-    onSubscriptionComplete: async ({ subscription, stripeSubscription }) => {
-      // Handle new subscriptions: ensure organizationId and stripeCustomerId are set
-      await prisma.subscription.update({
-        where: {
-          id: subscription.id,
-        },
-        data: {
-          organizationId: subscription.referenceId,
-          stripeCustomerId: stripeSubscription.customer as string,
-        },
-      });
-    },
-    authorizeReference: ({ user, referenceId, action }) =>
-      authorizeBillingReference({
-        userId: user.id,
-        organizationId: referenceId,
-        action,
-      }),
-    plans: SUBSCRIPTION_PLANS,
-    getCheckoutSessionParams: async ({ plan }) => ({
-      params: {
-        allow_promotion_codes: true,
-        subscription_data: {
-          default_tax_rates: [
-            requireEnv(
-              "STRIPE_DEFAULT_TAX_RATE_ID",
-              process.env.STRIPE_DEFAULT_TAX_RATE_ID,
-            ),
-          ],
-          ...(plan.freeTrial?.days && {
-            trial_period_days: plan.freeTrial.days,
-          }),
-        },
+        // Set the organization's billing email to the owner's email
+        return {
+          email: owner?.user.email,
+        };
       },
-    }),
-  },
-});
+    },
+
+    subscription: {
+      enabled: true,
+      onSubscriptionComplete: async ({ subscription, stripeSubscription }) => {
+        // Handle new subscriptions: ensure organizationId and stripeCustomerId are set
+        await prisma.subscription.update({
+          where: {
+            id: subscription.id,
+          },
+          data: {
+            organizationId: subscription.referenceId,
+            stripeCustomerId: stripeSubscription.customer as string,
+          },
+        });
+      },
+      authorizeReference: ({ user, referenceId, action }) =>
+        authorizeBillingReference({
+          userId: user.id,
+          organizationId: referenceId,
+          action,
+        }),
+      plans: SUBSCRIPTION_PLANS,
+      getCheckoutSessionParams: async ({ plan }) => ({
+        params: {
+          allow_promotion_codes: true,
+          subscription_data: {
+            default_tax_rates: [
+              requireEnv(
+                "STRIPE_DEFAULT_TAX_RATE_ID",
+                process.env.STRIPE_DEFAULT_TAX_RATE_ID,
+              ),
+            ],
+            ...(plan.freeTrial?.days && {
+              trial_period_days: plan.freeTrial.days,
+            }),
+          },
+        },
+      }),
+    },
+  });
+}
