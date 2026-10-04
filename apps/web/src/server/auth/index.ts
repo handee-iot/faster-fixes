@@ -11,7 +11,9 @@ import { emailAndPassword } from "./config/email-and-password";
 import { emailVerification } from "./config/email-verification";
 import { customSessionPlugin } from "./plugins/custom-session";
 import { organizationPlugin } from "./plugins/organization";
-import { stripePlugin } from "./plugins/stripe";
+import { getStripePlugin } from "./plugins/stripe";
+
+const cloudBillingPlugin = getStripePlugin();
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -67,7 +69,7 @@ export const auth = betterAuth({
     customSessionPlugin,
     admin(),
     organizationPlugin,
-    stripePlugin,
+    ...(cloudBillingPlugin ? [cloudBillingPlugin] : []),
     lastLoginMethod(),
     nextCookies(), // must be last plugin of the array
   ],
