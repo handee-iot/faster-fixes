@@ -1,11 +1,15 @@
 import { SUBSCRIPTION_PLANS } from "@/server/auth/config/subscription-plans";
 import { authorizeBillingReference } from "@/server/auth/subscription/authorize-billing-reference";
 import { stripeApi } from "@/server/stripe";
+import { isCloud } from "@/utils/environment/env";
 import { requireEnv } from "@/utils/environment/require-env";
 import { stripe } from "@better-auth/stripe";
 import { prisma } from "@workspace/db";
 
+// Billing is cloud-only: self-hosted instances never register the Stripe plugin
+// and must not be forced to provide Stripe env vars.
 if (
+  isCloud() &&
   process.env.NODE_ENV === "production" &&
   !process.env.STRIPE_WEBHOOK_SIGNING_SECRET
 ) {

@@ -6,6 +6,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { admin, lastLoginMethod } from "better-auth/plugins";
 import { after } from "next/server";
+import { isCloud } from "@/utils/environment/env";
 import { databaseHooks } from "./config/database-hooks";
 import { emailAndPassword } from "./config/email-and-password";
 import { emailVerification } from "./config/email-verification";
@@ -67,7 +68,8 @@ export const auth = betterAuth({
     customSessionPlugin,
     admin(),
     organizationPlugin,
-    stripePlugin,
+    // Billing is cloud-only; self-hosted instances run without the Stripe plugin.
+    ...(isCloud() ? [stripePlugin] : []),
     lastLoginMethod(),
     nextCookies(), // must be last plugin of the array
   ],
