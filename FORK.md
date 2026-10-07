@@ -18,15 +18,19 @@ Self-hosting patches:
 1. `packages/database/index.ts` — use the Neon driver only when `DATABASE_URL`
    points at Neon; plain Postgres (Railway) uses the standard `pg` adapter in
    production too.
-2. `apps/web/src/server/auth/plugins/stripe.ts` + `apps/web/src/server/auth/index.ts`
-   — Stripe is cloud-only: the plugin is registered only when
-   `NEXT_PUBLIC_IS_CLOUD=true`, and the production env check is gated on the
-   same flag. Self-hosted instances no longer need Stripe env vars.
-3. `apps/web/src/app/_domains/integration/_services/github/github-app.ts` —
-   `GITHUB_PRIVATE_KEY` is read lazily instead of at module load, so builds
-   without the GitHub App integration succeed.
-4. `apps/web/src/lib/mailer/constants.ts` — `EMAIL_FROM` overrides the
-   domain-derived sender address.
+
+Adopted from `brian-muzza/faster-fixes` (cherry-picked; candidates for upstream
+PRs):
+
+2. Deferred optional integration configuration (`4230020e`) — the Stripe plugin
+   is built lazily and only when `NEXT_PUBLIC_IS_CLOUD=true`; `GITHUB_PRIVATE_KEY`
+   is read on call; the Jira/Linear/Slack token ciphers are created on first use,
+   so self-hosted builds need no encryption keys. Supersedes our earlier
+   hand-rolled versions of these fixes.
+3. Verified mail domain (`378616b7`) — `MAIL_FROM_DOMAIN` decouples the sender
+   domain from the app domain. We added `EMAIL_FROM` on top as a full-address
+   override (e.g. Resend's onboarding sender before a domain is verified), with
+   a test case in `constants.test.ts`.
 
 Deploy artifacts:
 
@@ -36,9 +40,9 @@ Deploy artifacts:
   start command, healthcheck at `/login`.
 - `.dockerignore`.
 
-Notes for upstream PRs (see upstream issue #246): patches 1–4, plus the
-self-hosting docs correction (`migrate:prod` runs `prisma migrate deploy`, not
-`migrate:dev`).
+Notes for upstream PRs (see upstream issue #246): patch 1, the adopted
+brian-muzza fixes, and the self-hosting docs correction (`migrate:prod` runs
+`prisma migrate deploy`, not `migrate:dev`).
 
 ## Sync policy
 
