@@ -1,3 +1,4 @@
+import { updateFeedbackStatuses } from "@/app/_domains/feedback/_services/update-feedback-statuses";
 import { ForbiddenError, NotFoundError } from "@/server/errors/domain-errors";
 import { inngest } from "@/server/inngest";
 import {
@@ -34,10 +35,8 @@ export async function updateFeedbacksStatus(
     throw new ForbiddenError("Access denied.");
   }
 
-  await db.feedback.updateMany({
-    where: { id: { in: feedbackIds } },
-    data: { status },
-  });
+  // Guarded: only rows whose status actually changes reset their board column (ADR-0017).
+  await updateFeedbackStatuses(db, { id: { in: feedbackIds } }, status);
 
   // Fan-out: one event per feedback so each gets independent retries and
   // fault isolation — a single failing GitHub sync won't block the others.

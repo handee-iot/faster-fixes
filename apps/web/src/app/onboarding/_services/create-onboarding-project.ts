@@ -1,3 +1,4 @@
+import { DEFAULT_FEEDBACK_COLUMNS } from "@/app/_domains/feedback/_helpers/default-feedback-columns";
 import { generateApiKey } from "@/app/_domains/project/_helpers/generate-api-key";
 import { generatePublicId } from "@/app/_domains/project/_helpers/generate-public-id";
 import { ForbiddenError } from "@/server/errors/domain-errors";
@@ -44,6 +45,7 @@ export async function createOnboardingProject(
       apiKeyLastFour: lastFour,
       organizationId: membership.organizationId,
       widgetConfig: { create: {} },
+      feedbackColumns: { create: DEFAULT_FEEDBACK_COLUMNS },
     },
   });
 

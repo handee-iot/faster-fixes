@@ -19,6 +19,16 @@ import { regenerateApiKey } from "./settings/_services/regenerate-api-key";
 import { RegenerateApiKeySchema } from "./settings/_services/regenerate-api-key.schema";
 import { updateProject } from "./settings/_services/update-project";
 import { UpdateProjectSchema } from "./settings/_services/update-project.schema";
+import { createFeedbackColumn } from "./settings/_services/create-feedback-column";
+import { CreateFeedbackColumnSchema } from "./settings/_services/create-feedback-column.schema";
+import { deleteFeedbackColumn } from "./settings/_services/delete-feedback-column";
+import { DeleteFeedbackColumnSchema } from "./settings/_services/delete-feedback-column.schema";
+import { listFeedbackColumns } from "./settings/_services/list-feedback-columns";
+import { ListFeedbackColumnsSchema } from "./settings/_services/list-feedback-columns.schema";
+import { updateFeedbackColumn } from "./settings/_services/update-feedback-column";
+import { UpdateFeedbackColumnSchema } from "./settings/_services/update-feedback-column.schema";
+import { updateFeedbackColumnPosition } from "./settings/_services/update-feedback-column-position";
+import { UpdateFeedbackColumnPositionSchema } from "./settings/_services/update-feedback-column-position.schema";
 import { getProjectGitHubLink } from "./settings/_services/get-project-github-link";
 import { GetProjectGitHubLinkSchema } from "./settings/_services/get-project-github-link.schema";
 import { getProjectJiraLink } from "./settings/_services/get-project-jira-link";
@@ -88,6 +98,8 @@ import { updateFeedbackStatus } from "./inbox/_services/update-feedback-status";
 import { UpdateFeedbackStatusSchema } from "./inbox/_services/update-feedback-status.schema";
 import { updateFeedbacksStatus } from "./inbox/_services/update-feedbacks-status";
 import { UpdateFeedbacksStatusSchema } from "./inbox/_services/update-feedbacks-status.schema";
+import { updateFeedbacksColumn } from "./inbox/_services/update-feedbacks-column";
+import { UpdateFeedbacksColumnSchema } from "./inbox/_services/update-feedbacks-column.schema";
 
 // Every denial of the migrated operations reads a loaded row (the Project, or
 // the Feedback and its Project), so all of them live in their service;
@@ -251,6 +263,16 @@ export const projectsRouter = router({
           userId: ctx.session.user.id,
         }),
       ),
+    // The board's move path: sets each card's column and its category's status.
+    updateManyColumn: protectedProcedure
+      .input(UpdateFeedbacksColumnSchema)
+      .mutation(({ input, ctx }) =>
+        updateFeedbacksColumn({
+          feedbackIds: input.feedbackIds,
+          columnId: input.columnId,
+          userId: ctx.session.user.id,
+        }),
+      ),
     delete: protectedProcedure
       .input(DeleteFeedbackSchema)
       .mutation(({ input, ctx }) =>
@@ -292,6 +314,36 @@ export const projectsRouter = router({
           feedbackId: input.feedbackId,
           userId: ctx.session.user.id,
         }),
+      ),
+  }),
+  boardColumn: router({
+    list: protectedProcedure
+      .input(ListFeedbackColumnsSchema)
+      .query(({ input, ctx }) =>
+        listFeedbackColumns({
+          projectId: input.projectId,
+          userId: ctx.session.user.id,
+        }),
+      ),
+    create: protectedProcedure
+      .input(CreateFeedbackColumnSchema)
+      .mutation(({ input, ctx }) =>
+        createFeedbackColumn({ ...input, userId: ctx.session.user.id }),
+      ),
+    update: protectedProcedure
+      .input(UpdateFeedbackColumnSchema)
+      .mutation(({ input, ctx }) =>
+        updateFeedbackColumn({ ...input, userId: ctx.session.user.id }),
+      ),
+    updatePosition: protectedProcedure
+      .input(UpdateFeedbackColumnPositionSchema)
+      .mutation(({ input, ctx }) =>
+        updateFeedbackColumnPosition({ ...input, userId: ctx.session.user.id }),
+      ),
+    delete: protectedProcedure
+      .input(DeleteFeedbackColumnSchema)
+      .mutation(({ input, ctx }) =>
+        deleteFeedbackColumn({ ...input, userId: ctx.session.user.id }),
       ),
   }),
   // The plan-gated writes keep `enforceFeature`: a plan denial is transport

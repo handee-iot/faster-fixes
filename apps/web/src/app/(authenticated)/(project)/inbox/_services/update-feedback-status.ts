@@ -1,3 +1,4 @@
+import { updateFeedbackStatuses } from "@/app/_domains/feedback/_services/update-feedback-statuses";
 import { ForbiddenError, NotFoundError } from "@/server/errors/domain-errors";
 import { inngest } from "@/server/inngest";
 import {
@@ -34,10 +35,8 @@ export async function updateFeedbackStatus(
     throw new ForbiddenError("Access denied.");
   }
 
-  await db.feedback.update({
-    where: { id: feedbackId },
-    data: { status },
-  });
+  // Guarded: only an actual status change resets the card's board column (ADR-0017).
+  await updateFeedbackStatuses(db, { id: feedbackId }, status);
 
   // Fire-and-forget: sync status to the linked tracker if there is one. Fans
   // out even on a no-op, unlike the agent API's service, which skips it: a

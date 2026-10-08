@@ -50,22 +50,33 @@ function statusRequest(body: unknown, url = STATUS_URL) {
  * A feedback on another organization's project therefore reads as absent, which
  * is what the 404 case asserts.
  */
+let storedFeedback = { id: FEEDBACK_ID, status: "new", updatedAt: UPDATED_AT };
+
 function seedFeedback({
   projectId = PROJECT_ID,
   status = "new",
 }: { projectId?: string; status?: string } = {}) {
+  storedFeedback = { id: FEEDBACK_ID, status, updatedAt: UPDATED_AT };
   agentApiPrisma.feedback.findFirst.mockImplementation(
     async ({ where }: { where: { projectId: { in: string[] } } }) =>
       where.projectId.in.includes(projectId)
         ? { id: FEEDBACK_ID, status }
         : null,
   );
-  agentApiPrisma.feedback.update.mockImplementation(
-    async ({ data }: { data: { status: string } }) => ({
-      id: FEEDBACK_ID,
-      status: data.status,
-      updatedAt: UPDATED_AT,
-    }),
+  // The guarded write (ADR-0017): the service writes through updateMany and
+  // then re-reads the stored row for its response.
+  agentApiPrisma.feedback.updateMany.mockImplementation(
+    async ({ data }: { data: { status: string } }) => {
+      storedFeedback = {
+        id: FEEDBACK_ID,
+        status: data.status,
+        updatedAt: UPDATED_AT,
+      };
+      return { count: 1 };
+    },
+  );
+  agentApiPrisma.feedback.findUniqueOrThrow.mockImplementation(
+    async () => storedFeedback,
   );
 }
 
@@ -200,7 +211,7 @@ describe("POST /api/v1/agent/feedbacks/[id]/status", () => {
       error: "Feedback not found",
       code: "NOT_FOUND",
     });
-    expect(agentApiPrisma.feedback.update).not.toHaveBeenCalled();
+    expect(agentApiPrisma.feedback.updateMany).not.toHaveBeenCalled();
   });
 
   it("updates the status and reports the stored row", async () => {
@@ -251,7 +262,7 @@ describe("POST /api/v1/agent/feedbacks/[id]/status", () => {
       status: "resolved",
       updatedAt: "2026-01-02T03:04:05.000Z",
     });
-    expect(agentApiPrisma.feedback.update).toHaveBeenCalledTimes(1);
+    expect(agentApiPrisma.feedback.updateMany).toHaveBeenCalledTimes(1);
     expect(inngestSendDouble).not.toHaveBeenCalled();
   });
 });

@@ -7,6 +7,7 @@ import {
   formatEnvironment,
   formatPagePath,
 } from "../../_helpers/feedback-detail";
+import type { ListFeedbackColumnsOutput } from "@/app/(authenticated)/(project)/settings/_services/list-feedback-columns";
 import type { ListFeedbackOutput } from "../../_services/list-feedback";
 import { AssigneeSelect } from "./assignee-select.client";
 import { CopyFeedbackMarkdown } from "./copy-feedback-markdown.client";
@@ -19,6 +20,7 @@ type FeedbackItem = ListFeedbackOutput[number];
 type FeedbackPropertiesRailProps = {
   feedback: FeedbackItem;
   projectId: string;
+  columns: ListFeedbackColumnsOutput;
   hasGitHubLink: boolean;
   hasLinearLink: boolean;
   hasJiraLink: boolean;
@@ -27,6 +29,7 @@ type FeedbackPropertiesRailProps = {
 export function FeedbackPropertiesRail({
   feedback,
   projectId,
+  columns,
   hasGitHubLink,
   hasLinearLink,
   hasJiraLink,
@@ -36,7 +39,7 @@ export function FeedbackPropertiesRail({
   return (
     <aside className="flex flex-col gap-5 border-t bg-muted/30 p-5 md:border-t-0 md:border-l md:pt-12">
       <Property label="Status">
-        <StatusSelect feedbackId={feedback.id} value={feedback.status} />
+        <StatusSelect feedback={feedback} columns={columns} />
       </Property>
 
       <AssigneeSelect

@@ -25,6 +25,7 @@ function fakeDb({
   projectId = "project_1",
   status = "new",
 }: { projectId?: string; status?: string } = {}) {
+  let stored = { id: FEEDBACK_ID, status, updatedAt: UPDATED_AT };
   return {
     feedback: {
       findFirst: vi.fn(
@@ -33,11 +34,17 @@ function fakeDb({
             ? { id: FEEDBACK_ID, status }
             : null,
       ),
-      update: vi.fn(async ({ data }: { data: { status: string } }) => ({
-        id: FEEDBACK_ID,
-        status: data.status,
-        updatedAt: UPDATED_AT,
-      })),
+      // The guarded write (ADR-0017): the service writes through updateMany and
+      // then re-reads the stored row for its response.
+      updateMany: vi.fn(async ({ data }: { data: { status: string } }) => {
+        stored = {
+          id: FEEDBACK_ID,
+          status: data.status,
+          updatedAt: UPDATED_AT,
+        };
+        return { count: 1 };
+      }),
+      findUniqueOrThrow: vi.fn(async () => stored),
     },
   } as unknown as FakeDb;
 }
@@ -62,7 +69,7 @@ describe("updateFeedbackStatus", () => {
       ),
     ).rejects.toThrow(new NotFoundError("Feedback not found"));
 
-    expect(db.feedback.update).not.toHaveBeenCalled();
+    expect(db.feedback.updateMany).not.toHaveBeenCalled();
     expect(inngestSendDouble).not.toHaveBeenCalled();
   });
 
@@ -126,7 +133,7 @@ describe("updateFeedbackStatus", () => {
     );
 
     expect(result.previousStatus).toBe("resolved");
-    expect(db.feedback.update).toHaveBeenCalledTimes(1);
+    expect(db.feedback.updateMany).toHaveBeenCalledTimes(1);
     expect(inngestSendDouble).not.toHaveBeenCalled();
   });
 });
