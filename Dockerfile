@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.7
 # Handee self-host fork of Faster Fixes, deployed on Railway.
 # Divergences from upstream are logged in FORK.md.
 
@@ -6,10 +6,12 @@ FROM node:22-bookworm-slim AS base
 ENV PNPM_HOME=/pnpm \
     PATH=/pnpm:$PATH \
     HUSKY=0 \
-    COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+    COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
+    COREPACK_HOME=/opt/corepack \
+    NEXT_TELEMETRY_DISABLED=1
 RUN corepack enable \
  && apt-get update \
- && apt-get install -y --no-install-recommends openssl ca-certificates \
+ && apt-get install -y --no-install-recommends openssl ca-certificates util-linux \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
@@ -33,13 +35,23 @@ ENV DATABASE_URL=postgresql://build:build@localhost:5432/build \
     R2_ACCESS_KEY_ID=build-only \
     R2_SECRET_ACCESS_KEY=build-only
 COPY . .
-RUN pnpm install --frozen-lockfile
+# The store lives in a cache mount, so repeat builds skip the downloads.
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile --store-dir=/pnpm/store
 RUN pnpm build:packages \
  && pnpm --filter @workspace/db db:gen \
  && pnpm --filter web build
 
 FROM base AS run
 ENV NODE_ENV=production
-COPY --from=build /app /app
+# The app runs as a non-root user; the corepack cache is copied over so the
+# pnpm shim never downloads at container start.
+RUN groupadd --system --gid 1001 app \
+ && useradd --system --uid 1001 --gid app --create-home app
+COPY --from=build --chown=app:app /app /app
+COPY --from=build --chown=app:app /opt/corepack /opt/corepack
+RUN chmod 0755 /app/docker/entrypoint.sh
+USER app
 EXPOSE 3000
+ENTRYPOINT ["/app/docker/entrypoint.sh"]
 CMD ["sh", "-c", "pnpm --filter web exec next start -p ${PORT:-3000}"]

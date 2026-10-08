@@ -31,6 +31,13 @@
         "RESEND_API_KEY",
         "RESEND_SEGMENT_ID",
 
+        "MAILER_PROVIDER",
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_SECURE",
+        "SMTP_USER",
+        "SMTP_PASSWORD",
+
         "STORAGE_REGION",
         "STORAGE_BUCKET_NAME",
         "NEXT_PUBLIC_STORAGE_BASE_URL",

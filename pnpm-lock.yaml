@@ -157,6 +157,9 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      nodemailer:
+        specifier: ^9.0.5
+        version: 9.1.1
       nuqs:
         specifier: ^2.8.6
         version: 2.8.6(next@16.3.5(@opentelemetry/api@1.9.0)(@playwright/test@1.63.0)(@types/node@20.19.25)(babel-plugin-macros@3.1.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.104.1))(react@19.3.0)
@@ -215,6 +218,9 @@ importers:
       "@types/node":
         specifier: ^20.19.25
         version: 20.19.25
+      "@types/nodemailer":
+        specifier: ^8.0.1
+        version: 8.0.2
       "@types/react":
         specifier: 19.3.0
         version: 19.3.0
@@ -8570,6 +8576,12 @@ packages:
         integrity: sha512-/rpCXHlCWeqClNBwUhDcusJxXYDjZTyE8v5oTO7WbL8eij2nKhUeU89/6xgjU7N4/Vh3He0BtyhJdQbDyhiXAw==,
       }
 
+  "@types/nodemailer@8.0.2":
+    resolution:
+      {
+        integrity: sha512-c7M5ox8p0nEOfbJ2E9Qcmt8/QCu/VzsiAhzBiZbvky2PhKZDHpKB3sQHBM5MEZNkCfBOaS6S9//AGPRTNB7IaA==,
+      }
+
   "@types/oracledb@6.5.2":
     resolution:
       {
@@ -13892,6 +13904,13 @@ packages:
       }
     engines: { node: ">=18" }
 
+  nodemailer@9.1.1:
+    resolution:
+      {
+        integrity: sha512-izw9mVKFix6YSnC9eLgV6g1opl9DUlRio9ZNcq+Wu9Ujn2UwF+8Nl0B8nz22kEC+CTZCvinkxwJ0DeFbb6NwcQ==,
+      }
+    engines: { node: ">=6.0.0" }
+
   nopt@10.0.1:
     resolution:
       {
@@ -19155,7 +19174,7 @@ snapshots:
     dependencies:
       string-width: 5.1.2
       string-width-cjs: string-width@4.2.3
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
       strip-ansi-cjs: strip-ansi@6.0.1
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
@@ -22481,6 +22500,10 @@ snapshots:
   "@types/node@25.0.9":
     dependencies:
       undici-types: 7.16.0
+
+  "@types/nodemailer@8.0.2":
+    dependencies:
+      "@types/node": 20.19.25
 
   "@types/oracledb@6.5.2":
     dependencies:
@@ -26306,6 +26329,8 @@ snapshots:
 
   node-releases@2.0.57: {}
 
+  nodemailer@9.1.1: {}
+
   nopt@10.0.1:
     dependencies:
       abbrev: 5.0.0
@@ -27610,7 +27635,7 @@ snapshots:
     dependencies:
       eastasianwidth: 0.2.0
       emoji-regex: 9.2.2
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   string-width@7.2.0:
     dependencies:
@@ -28498,7 +28523,7 @@ snapshots:
     dependencies:
       ansi-styles: 6.2.3
       string-width: 5.1.2
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   wrap-ansi@9.0.2:
     dependencies:

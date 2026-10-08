@@ -15,7 +15,7 @@ You will need:
 - A **PostgreSQL database**: Neon, Supabase, Railway, or self-managed.
 - An **Inngest** account for background jobs (screenshot processing, GitHub sync, etc.). The free tier is enough to get started.
 - An **S3-compatible object store** for screenshots: Cloudflare R2 is the recommended default; AWS S3 works identically.
-- A **Resend** or **Plunk** account for transactional email: required to send sign-up confirmations and password resets.
+- A **Resend** or **Plunk** account for transactional email, or any **SMTP** server: required to send sign-up confirmations and password resets.
 - (Optional) A **GitHub App** if you want the GitHub integration.
 
 Stripe is not needed for self-hosted installs. The billing code only runs on the hosted cloud version.
@@ -59,8 +59,15 @@ INNGEST_EVENT_KEY="..."
 INNGEST_SIGNING_KEY="..."
 
 # Transactional email: required for sign-up confirmations and password resets.
-# Use either Resend or Plunk.
+# Use Resend, Plunk, or any SMTP server (MAILER_PROVIDER=smtp).
 RESEND_API_KEY="re_..."
+# PLUNK_SECRET_KEY="sk_..."
+# MAILER_PROVIDER="smtp"
+# SMTP_HOST="smtp.your-provider.com"
+# SMTP_PORT="587"
+# SMTP_SECURE="false"
+# SMTP_USER="..."
+# SMTP_PASSWORD="..."
 # PLUNK_SECRET_KEY="sk_..."
 
 # Widget API (points clients' widgets at your instance)

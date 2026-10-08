@@ -32,10 +32,27 @@ PRs):
    override (e.g. Resend's onboarding sender before a domain is verified), with
    a test case in `constants.test.ts`.
 
+Adopted from `ongrowww/faster-fixes` (evaluated against our Dockerfile and
+ported selectively; candidates for upstream PRs):
+
+4. SMTP mailer — `MAILER_PROVIDER=smtp` sends through any SMTP server, so a
+   self-hosted install no longer needs a Resend or Plunk account. Contact
+   management is a provider concept and throws for SMTP.
+5. `/api/health` — a database round-trip health endpoint for platforms and
+   uptime checks.
+6. `docker/entrypoint.sh` — loads `VAR_FILE` Docker secrets before start and
+   can drop privileges (`RUN_AS_UID`/`RUN_AS_GID`) for compose deployments.
+7. Dockerfile hardening — the runtime runs as a non-root `app` user with the
+   corepack cache pre-seeded (no download at container start) and a pnpm store
+   cache mount for faster rebuilds. Their Next standalone runner and separate
+   migrator container were not ported: Railway's pre-deploy command already
+   runs `prisma migrate deploy` in the app image.
+
 Deploy artifacts:
 
 - `Dockerfile` — multi-stage build (pnpm install, `build:packages`, prisma
-  generate, `next build`; runtime runs `next start`).
+  generate, `next build`; runtime runs `next start` as a non-root user behind
+  `docker/entrypoint.sh`).
 - `railway.json` — Dockerfile builder, pre-deploy `prisma migrate deploy`,
   start command, healthcheck at `/login`.
 - `.dockerignore`.
