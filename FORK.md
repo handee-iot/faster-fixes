@@ -63,14 +63,21 @@ fixes upstream so they disappear from this list.
 
 ## Deploy (Railway, Handee workspace)
 
-- Project: `faster-fixes` (Handee workspace), service from this repo.
+- Project: `faster-fixes` (Handee workspace). Custom domain:
+  https://faster-fixes.handee.co.za (Cloudflare-proxied CNAME to Railway); the
+  Railway service domain also remains active.
 - First deploys use `railway up` from this directory; connect the GitHub repo
   later if auto-deploys are wanted.
+- **Service settings live on the Railway service, not in `railway.json`** — for
+  upload-based deploys the config-as-code file is not applied. Pre-deploy:
+  `pnpm --filter @workspace/db exec prisma migrate deploy`; healthcheck:
+  `/login`. Keep `railway.json` only as documentation / for a future
+  repo-linked service.
 - Service variables: `DATABASE_URL` (`${{Postgres.DATABASE_URL}}`),
   `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DOMAIN_NAME`, `BASE_URL`,
   `NEXT_PUBLIC_FF_API_ORIGIN`, `NEXT_PUBLIC_STORAGE_BASE_URL`,
   `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`,
   `STORAGE_REGION`, `STORAGE_BUCKET_NAME`, `RESEND_API_KEY`, `EMAIL_FROM`,
   `INNGEST_EVENT_KEY`, `INNGEST_SIGNING_KEY`, `PORT=3000`.
-- `NEXT_PUBLIC_*` values are baked at build time: after changing them, redeploy.
-- Migrations run automatically via the Railway pre-deploy command.
+- `NEXT_PUBLIC_*` values are baked at build time: after changing them, rebuild
+  and deploy (`railway up`).
