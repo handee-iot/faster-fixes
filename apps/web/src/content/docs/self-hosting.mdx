@@ -93,10 +93,10 @@ Create an app at [inngest.com](https://www.inngest.com). Copy the event key and 
 From the repo root:
 
 ```bash
-pnpm --filter @workspace/db migrate:dev
+pnpm --filter @workspace/db exec prisma migrate deploy
 ```
 
-This applies all Prisma migrations and generates the client. For subsequent deploys, your host's build step should run `prisma generate`; Prisma migrations are committed to the repo and applied via `migrate:dev` in development and `migrate:deploy` in production (run this as part of your deploy pipeline).
+This applies all committed Prisma migrations to your database. (`migrate:prod` wraps the same command with a local `.env.local` loaded; `migrate:dev` is for development only, since it can create a shadow database and reset data.) For subsequent deploys, your host's build step should run `prisma generate`; Prisma migrations are committed to the repo and applied with `prisma migrate deploy` as part of your deploy pipeline.
 
 ## 5. Verify
 
