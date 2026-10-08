@@ -88,8 +88,8 @@ fixes upstream so they disappear from this list.
 - **Service settings live on the Railway service, not in `railway.json`** — for
   upload-based deploys the config-as-code file is not applied. Pre-deploy:
   `pnpm --filter @workspace/db exec prisma migrate deploy`; healthcheck:
-  `/login`. Keep `railway.json` only as documentation / for a future
-  repo-linked service.
+  `/api/health` (a database round-trip, switched from `/login` on 8 Oct). Keep
+  `railway.json` only as documentation / for a future repo-linked service.
 - Service variables: `DATABASE_URL` (`${{Postgres.DATABASE_URL}}`),
   `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DOMAIN_NAME`, `BASE_URL`,
   `NEXT_PUBLIC_FF_API_ORIGIN`, `NEXT_PUBLIC_STORAGE_BASE_URL`,
