@@ -81,7 +81,11 @@ _Avoid_: Active organization (reserved for the Organization selected in a User's
 ### Feedback lifecycle
 
 **Status**:
-The state of a Feedback. Canonical values: `new`, `in_progress`, `resolved`, `archived`.
+The state of a Feedback. Canonical values: `new`, `in_progress`, `resolved`, `archived`. Integrations, the widget, and notifications read Status, never Column.
+
+**Column**:
+A per-Project kanban lane (e.g. "In Test"). Each Column belongs to exactly one non-archived Status, its **category**; a Feedback's Column always matches its Status. See ADR-0017.
+_Avoid_: Stage, Lane (in code).
 
 **Status actor**:
 Who or what drove a Status change: a **User**, a Tracker sync, or the **Agent** (an Agent-token caller). Travels on the status-change event so a **Notification channel** can distinguish an agent-resolved Feedback from a human-resolved one.

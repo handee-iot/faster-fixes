@@ -9,3 +9,11 @@ export const FeedbackStatusEnum = z.enum([
   "resolved",
   "closed",
 ]);
+
+// A board column's category: the non-archived statuses. Archived feedback is
+// never on the board, so "closed" is deliberately excluded (ADR-0017).
+export const FeedbackColumnCategoryEnum = z.enum([
+  "new",
+  "in_progress",
+  "resolved",
+]);
