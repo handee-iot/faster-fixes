@@ -1,4 +1,5 @@
 import type { FeedbackStatus } from "@/app/_domains/feedback";
+import { updateFeedbackStatuses } from "@/app/_domains/feedback/_services/update-feedback-statuses";
 import { NotFoundError } from "@/server/errors/domain-errors";
 import { inngest } from "@/server/inngest";
 import {
@@ -38,9 +39,10 @@ export async function updateFeedbackStatus(
   }
 
   const previousStatus = feedback.status;
-  const updated = await db.feedback.update({
+  // Guarded: only an actual status change resets the card's board column (ADR-0017).
+  await updateFeedbackStatuses(db, { id: feedback.id }, status);
+  const updated = await db.feedback.findUniqueOrThrow({
     where: { id: feedback.id },
-    data: { status },
     select: { id: true, status: true, updatedAt: true },
   });
 

@@ -122,9 +122,12 @@ export const syncJiraIssueStatus = inngest.createFunction(
     }
 
     await prisma.$transaction([
-      prisma.feedback.update({
-        where: { id: issueLink.feedbackId },
-        data: { status: newStatus },
+      // Only a real status change resets the board column (ADR-0017); a
+      // same-category echo must leave the card in its lane. Inline because
+      // cross-domain service imports are not permitted.
+      prisma.feedback.updateMany({
+        where: { id: issueLink.feedbackId, status: { not: newStatus } },
+        data: { status: newStatus, columnId: null },
       }),
       prisma.feedbackJiraIssueLink.update({
         where: { id: issueLink.id },

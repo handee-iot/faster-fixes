@@ -52,6 +52,8 @@ export const agentApiPrisma = {
     count: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
+    updateMany: vi.fn(),
+    findUniqueOrThrow: vi.fn(),
   },
   reviewer: { findFirst: vi.fn(), create: vi.fn(), update: vi.fn() },
   $queryRaw: vi.fn(),

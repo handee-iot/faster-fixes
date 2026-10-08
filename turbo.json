@@ -8,7 +8,8 @@
     "VERCEL_ENV",
     "VERCEL_URL",
     "VERCEL_PROJECT_PRODUCTION_URL",
-    "MAIL_FROM_DOMAIN"
+    "MAIL_FROM_DOMAIN",
+    "EMAIL_FROM"
   ],
   "tasks": {
     "build": {
