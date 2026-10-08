@@ -1,7 +1,10 @@
 import type {
+  CreateCommentData,
   CreateFeedbackData,
   CreateFeedbackResponse,
   FeedbackClient,
+  FeedbackCommentItem,
+  FeedbackCommentListResponse,
   FeedbackItem,
   FeedbackListResponse,
   UpdateFeedbackData,
@@ -13,6 +16,7 @@ import { SEED_PINS } from "./seed-pins";
 const VISITOR_PINS_KEY = "fasterfixes:demo:visitor-pins";
 const DELETED_SEEDS_KEY = "fasterfixes:demo:deleted-seeds";
 const SEED_OVERRIDES_KEY = "fasterfixes:demo:seed-overrides";
+const COMMENTS_KEY = "fasterfixes:demo:comments";
 
 const DEMO_CONFIG: WidgetConfig = {
   enabled: true,
@@ -163,5 +167,32 @@ export class LocalStorageFeedbackClient implements FeedbackClient {
 
   async attachScreenshot(): Promise<void> {
     // Screenshots are intentionally disabled in the demo. No-op.
+  }
+
+  private readComments(): Record<string, FeedbackCommentItem[]> {
+    return safeRead<Record<string, FeedbackCommentItem[]>>(COMMENTS_KEY, {});
+  }
+
+  async listComments(feedbackId: string): Promise<FeedbackCommentListResponse> {
+    return { comments: this.readComments()[feedbackId] ?? [] };
+  }
+
+  async createComment(
+    feedbackId: string,
+    data: CreateCommentData,
+  ): Promise<FeedbackCommentItem> {
+    const comment: FeedbackCommentItem = {
+      id: generateId(),
+      createdAt: new Date().toISOString(),
+      authorType: "reviewer",
+      body: data.body,
+      author: { id: "demo-visitor", name: "You" },
+    };
+    const comments = this.readComments();
+    safeWrite(COMMENTS_KEY, {
+      ...comments,
+      [feedbackId]: [...(comments[feedbackId] ?? []), comment],
+    });
+    return comment;
   }
 }

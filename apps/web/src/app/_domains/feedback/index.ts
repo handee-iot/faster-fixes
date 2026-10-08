@@ -3,7 +3,6 @@ export {
   FeedbackColumnCategoryEnum,
   FeedbackStatusEnum,
 } from "./_helpers/feedback-status";
-export { FeedbackCommentAuthorTypeEnum } from "./_helpers/feedback-comment";
 export type {
   FeedbackColumnCategory,
   FeedbackStatus,

@@ -84,6 +84,27 @@ export type UpdateFeedbackResponse = {
   updatedAt: string;
 };
 
+export type FeedbackCommentAuthor = {
+  id: string;
+  name: string;
+};
+
+export type FeedbackCommentItem = {
+  id: string;
+  createdAt: string;
+  authorType: "reviewer" | "member";
+  body: string;
+  author: FeedbackCommentAuthor | null;
+};
+
+export type FeedbackCommentListResponse = {
+  comments: FeedbackCommentItem[];
+};
+
+export type CreateCommentData = {
+  body: string;
+};
+
 export type ApiErrorResponse = {
   error: string;
   details?: unknown;
@@ -117,4 +138,13 @@ export type FeedbackClient = {
     screenshot: Blob,
     reviewerToken: string,
   ): Promise<void>;
+  listComments(
+    feedbackId: string,
+    reviewerToken: string,
+  ): Promise<FeedbackCommentListResponse>;
+  createComment(
+    feedbackId: string,
+    data: CreateCommentData,
+    reviewerToken: string,
+  ): Promise<FeedbackCommentItem>;
 };
