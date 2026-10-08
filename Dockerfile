@@ -36,7 +36,8 @@ ENV DATABASE_URL=postgresql://build:build@localhost:5432/build \
     R2_SECRET_ACCESS_KEY=build-only
 COPY . .
 # The store lives in a cache mount, so repeat builds skip the downloads.
-RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+# Railway requires cache mount ids in the `s/<service id>-<target path>` form.
+RUN --mount=type=cache,id=s/308b652c-4b2b-4b82-b822-15102c5a53bb-/pnpm/store,target=/pnpm/store \
     pnpm install --frozen-lockfile --store-dir=/pnpm/store
 RUN pnpm build:packages \
  && pnpm --filter @workspace/db db:gen \
