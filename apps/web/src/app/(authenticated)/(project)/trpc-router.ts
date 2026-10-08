@@ -163,8 +163,9 @@ export const projectsRouter = router({
       .input(CreateReviewerSchema)
       .mutation(({ input, ctx }) =>
         createReviewer({
-          projectId: input.projectId,
-          name: input.name,
+          // Spread the whole input so a new schema field cannot be silently
+          // dropped here again (email was, once).
+          ...input,
           userId: ctx.session.user.id,
         }),
       ),
