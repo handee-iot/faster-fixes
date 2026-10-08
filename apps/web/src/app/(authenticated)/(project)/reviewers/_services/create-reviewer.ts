@@ -4,7 +4,7 @@ import crypto from "crypto";
 import type { CreateReviewerInput } from "./create-reviewer.schema";
 
 export async function createReviewer(
-  { projectId, name, userId }: CreateReviewerInput & { userId: string },
+  { projectId, name, email, userId }: CreateReviewerInput & { userId: string },
   db: typeof prisma = prisma,
 ) {
   const project = await db.project.findUnique({ where: { id: projectId } });
@@ -30,10 +30,14 @@ export async function createReviewer(
   const token = crypto.randomBytes(24).toString("hex");
   const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
+  // A blank field means "no notifications", never an empty address.
+  const reviewerEmail = email === undefined || email === "" ? null : email;
+
   const reviewer = await db.reviewer.create({
     data: {
       projectId,
       name,
+      email: reviewerEmail,
       token: tokenHash,
     },
   });

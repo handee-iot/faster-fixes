@@ -17,6 +17,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -42,7 +43,7 @@ export function CreateReviewerDialog({
 
   const form = useForm<CreateReviewerInput>({
     resolver: zodResolver(CreateReviewerSchema),
-    defaultValues: { projectId, name: "" },
+    defaultValues: { projectId, name: "", email: "" },
   });
 
   const createReviewer = useMutation(
@@ -104,6 +105,27 @@ export function CreateReviewerDialog({
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email (optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="marie@example.com"
+                      disabled={createReviewer.isPending}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Used to email them when their feedback is resolved.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

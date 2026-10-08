@@ -52,7 +52,14 @@ export function ReviewersTable({ projectId, reviewers }: ReviewersTableProps) {
       <TableBody>
         {reviewers.map((reviewer) => (
           <TableRow key={reviewer.id}>
-            <TableCell className="font-medium">{reviewer.name}</TableCell>
+            <TableCell>
+              <div className="font-medium">{reviewer.name}</div>
+              {reviewer.email && (
+                <div className="text-xs text-muted-foreground">
+                  {reviewer.email}
+                </div>
+              )}
+            </TableCell>
             <TableCell>
               {reviewer.isActive ? (
                 <Badge variant="default">Active</Badge>

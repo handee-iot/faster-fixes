@@ -70,4 +70,24 @@ describe("createReviewer", () => {
       `https://example.com?ff_token=${result.token}`,
     );
   });
+
+  it("stores a recorded email on the reviewer", async () => {
+    const db = fakeDb(project, { id: "member_1" });
+
+    await createReviewer({ ...input, email: "marie@example.com" }, db);
+
+    expect(vi.mocked(db.reviewer.create).mock.calls[0]![0].data.email).toBe(
+      "marie@example.com",
+    );
+  });
+
+  it("stores a blank email as null, never an empty address", async () => {
+    const db = fakeDb(project, { id: "member_1" });
+
+    await createReviewer({ ...input, email: "" }, db);
+
+    expect(vi.mocked(db.reviewer.create).mock.calls[0]![0].data.email).toBe(
+      null,
+    );
+  });
 });

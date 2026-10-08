@@ -1,4 +1,9 @@
 import { ForbiddenError, NotFoundError } from "@/server/errors/domain-errors";
+import { inngest } from "@/server/inngest";
+import {
+  buildEvent,
+  feedbackMemberRepliedEvent,
+} from "@/server/inngest/events";
 import { prisma } from "@workspace/db";
 import type { CreateFeedbackCommentInput } from "./create-feedback-comment.schema";
 
@@ -30,6 +35,16 @@ export async function createFeedbackComment(
   const comment = await db.feedbackComment.create({
     data: { feedbackId, authorType: "member", memberId: membership.id, body },
   });
+
+  // Fire-and-forget: the Reviewer learns about the reply by email (ADR-0019).
+  inngest
+    .send(
+      buildEvent(feedbackMemberRepliedEvent, {
+        feedbackId,
+        commentId: comment.id,
+      }),
+    )
+    .catch(() => {});
 
   return {
     id: comment.id,

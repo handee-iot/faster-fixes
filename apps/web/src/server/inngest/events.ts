@@ -31,6 +31,13 @@ export const feedbackStatusChangedEvent = eventType("feedback/status-changed", {
   }),
 });
 
+export const feedbackMemberRepliedEvent = eventType("feedback/member-replied", {
+  schema: z.object({
+    feedbackId: z.string(),
+    commentId: z.string(),
+  }),
+});
+
 export const userEmailVerifiedEvent = eventType("user/email-verified", {
   schema: z.object({ userId: z.string() }),
 });

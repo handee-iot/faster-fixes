@@ -33,6 +33,7 @@ export async function listReviewers(
   return reviewers.map((r) => ({
     id: r.id,
     name: r.name,
+    email: r.email,
     token: r.token,
     isActive: r.isActive,
     createdAt: r.createdAt,

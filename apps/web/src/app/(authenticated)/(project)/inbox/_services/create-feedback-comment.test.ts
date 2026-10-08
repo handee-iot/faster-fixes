@@ -1,7 +1,15 @@
 import { ForbiddenError, NotFoundError } from "@/server/errors/domain-errors";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createFeedbackComment } from "./create-feedback-comment";
+
+const send = vi
+  .fn<(payload: unknown) => Promise<void>>()
+  .mockResolvedValue(undefined);
+
+vi.mock("@/server/inngest", () => ({
+  inngest: { send: (payload: unknown) => send(payload) },
+}));
 
 type FakeDb = NonNullable<Parameters<typeof createFeedbackComment>[1]>;
 
@@ -38,6 +46,10 @@ function fakeDb({
 }
 
 describe("createFeedbackComment", () => {
+  beforeEach(() => {
+    send.mockClear();
+  });
+
   it("reports an unknown feedback as not found", async () => {
     const db = fakeDb({ feedback: null });
 
@@ -72,6 +84,10 @@ describe("createFeedbackComment", () => {
         memberId: "member_1",
         body: "Looking into it.",
       },
+    });
+    expect(send).toHaveBeenCalledWith({
+      name: "feedback/member-replied",
+      data: { feedbackId: "feedback_1", commentId: "comment_1" },
     });
   });
 });

@@ -48,6 +48,8 @@ model Reviewer {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   name     String
+  // Optional: the resolve email goes out only when the team recorded one.
+  email    String?
   token    String  @unique
   isActive Boolean @default(true)
 
