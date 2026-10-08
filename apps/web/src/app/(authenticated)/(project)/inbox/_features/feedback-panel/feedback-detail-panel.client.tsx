@@ -9,6 +9,7 @@ import {
 import { cn } from "@workspace/ui/lib/utils";
 import { ImageOff } from "lucide-react";
 import { getElementContext } from "../../_helpers/feedback-detail";
+import type { ListFeedbackColumnsOutput } from "@/app/(authenticated)/(project)/settings/_services/list-feedback-columns";
 import type { ListFeedbackOutput } from "../../_services/list-feedback";
 import { getBoardStatusAppearance } from "../kanban/board-status-appearance";
 import { ElementContextCard } from "./element-context-card.client";
@@ -22,6 +23,7 @@ type FeedbackDetailPanelProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   projectId: string;
+  columns: ListFeedbackColumnsOutput;
   hasGitHubLink?: boolean;
   hasLinearLink?: boolean;
   hasJiraLink?: boolean;
@@ -32,6 +34,7 @@ export function FeedbackDetailPanel({
   open,
   onOpenChange,
   projectId,
+  columns,
   hasGitHubLink = false,
   hasLinearLink = false,
   hasJiraLink = false,
@@ -76,6 +79,7 @@ export function FeedbackDetailPanel({
           <FeedbackPropertiesRail
             feedback={feedback}
             projectId={projectId}
+            columns={columns}
             hasGitHubLink={hasGitHubLink}
             hasLinearLink={hasLinearLink}
             hasJiraLink={hasJiraLink}

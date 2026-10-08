@@ -10,26 +10,40 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { cn } from "@workspace/ui/lib/utils";
 import { ChevronDown } from "lucide-react";
+import { getBoardColumnId } from "../../_helpers/get-board-column-id";
 import { getBoardStatusAppearance } from "../kanban/board-status-appearance";
 
-const STATUS_OPTIONS = [
-  { value: "new", label: "New" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "resolved", label: "Resolved" },
-  { value: "closed", label: "Archived" },
-];
+// Archive is a status, not a column, so it sits beside the board's columns
+// under a value no column id can collide with (column ids are UUIDs).
+const ARCHIVED_VALUE = "closed";
 
 type StatusSelectProps = {
-  feedbackId: string;
-  value: string;
+  feedback: { id: string; status: string; columnId: string | null };
+  columns: readonly { id: string; name: string; category: string }[];
 };
 
-export function StatusSelect({ feedbackId, value }: StatusSelectProps) {
-  const { updateStatus } = useFeedbackMutations();
-  const appearance = getBoardStatusAppearance(value);
+export function StatusSelect({ feedback, columns }: StatusSelectProps) {
+  const { updateStatus, updateColumn } = useFeedbackMutations();
+
+  const boardColumnId = getBoardColumnId(feedback, columns);
+  const currentColumn = columns.find((c) => c.id === boardColumnId) ?? null;
+  const isArchived = feedback.status === ARCHIVED_VALUE;
+  const value = isArchived ? ARCHIVED_VALUE : (boardColumnId ?? "");
+  const appearance = getBoardStatusAppearance(
+    isArchived ? ARCHIVED_VALUE : (currentColumn?.category ?? feedback.status),
+  );
   const StatusIcon = appearance.icon;
-  const label =
-    STATUS_OPTIONS.find((opt) => opt.value === value)?.label ?? value;
+  const label = isArchived ? "Archived" : (currentColumn?.name ?? "Unassigned");
+  const archivedAppearance = getBoardStatusAppearance(ARCHIVED_VALUE);
+  const ArchivedIcon = archivedAppearance.icon;
+
+  function handleChange(next: string) {
+    if (next === ARCHIVED_VALUE) {
+      updateStatus(feedback.id, ARCHIVED_VALUE);
+    } else {
+      updateColumn([feedback.id], next);
+    }
+  }
 
   return (
     <DropdownMenu>
@@ -47,22 +61,25 @@ export function StatusSelect({ feedbackId, value }: StatusSelectProps) {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        <DropdownMenuRadioGroup
-          value={value}
-          onValueChange={(status) => updateStatus(feedbackId, status)}
-        >
-          {STATUS_OPTIONS.map((opt) => {
-            const optAppearance = getBoardStatusAppearance(opt.value);
-            const OptIcon = optAppearance.icon;
+        <DropdownMenuRadioGroup value={value} onValueChange={handleChange}>
+          {columns.map((column) => {
+            const columnAppearance = getBoardStatusAppearance(column.category);
+            const ColumnIcon = columnAppearance.icon;
             return (
-              <DropdownMenuRadioItem key={opt.value} value={opt.value}>
-                <OptIcon
-                  className={cn("size-3.5", optAppearance.iconClassName)}
+              <DropdownMenuRadioItem key={column.id} value={column.id}>
+                <ColumnIcon
+                  className={cn("size-3.5", columnAppearance.iconClassName)}
                 />
-                {opt.label}
+                {column.name}
               </DropdownMenuRadioItem>
             );
           })}
+          <DropdownMenuRadioItem value={ARCHIVED_VALUE}>
+            <ArchivedIcon
+              className={cn("size-3.5", archivedAppearance.iconClassName)}
+            />
+            Archived
+          </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -50,6 +50,10 @@ export function InboxTabs() {
     trpc.authenticated.projects.feedback.list.queryOptions({ projectId }),
   );
 
+  const columnsQuery = useQuery(
+    trpc.authenticated.projects.boardColumn.list.queryOptions({ projectId }),
+  );
+
   const gitHubLinkQuery = useQuery(
     trpc.authenticated.projects.github.getLink.queryOptions({ projectId }),
   );
@@ -65,6 +69,40 @@ export function InboxTabs() {
   const selectedFeedback = React.useMemo(
     () => feedbackQuery.data?.find((f) => f.id === selectedFeedbackId) ?? null,
     [feedbackQuery.data, selectedFeedbackId],
+  );
+
+  const boardLoading = (
+    <div className="flex flex-col gap-4">
+      <Skeleton className="h-9 w-full rounded-full lg:hidden" />
+      <div className="hidden gap-4 lg:grid lg:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-2">
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-col gap-2 lg:hidden">
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+    </div>
+  );
+
+  const boardErrored = (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <AlertCircle />
+        </EmptyMedia>
+        <EmptyTitle>Failed to load feedback</EmptyTitle>
+        <EmptyDescription>
+          Something went wrong. Please try again later.
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
   );
 
   return (
@@ -95,38 +133,8 @@ export function InboxTabs() {
 
         <TabsContent value="board" className="mt-4">
           {matchQueryStatus(feedbackQuery, {
-            Loading: (
-              <div className="flex flex-col gap-4">
-                <Skeleton className="h-9 w-full rounded-full lg:hidden" />
-                <div className="hidden gap-4 lg:grid lg:grid-cols-3">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="flex flex-col gap-2">
-                      <Skeleton className="h-8 w-full" />
-                      <Skeleton className="h-24 w-full" />
-                      <Skeleton className="h-24 w-full" />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex flex-col gap-2 lg:hidden">
-                  <Skeleton className="h-24 w-full" />
-                  <Skeleton className="h-24 w-full" />
-                  <Skeleton className="h-24 w-full" />
-                </div>
-              </div>
-            ),
-            Errored: (
-              <Empty>
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <AlertCircle />
-                  </EmptyMedia>
-                  <EmptyTitle>Failed to load feedback</EmptyTitle>
-                  <EmptyDescription>
-                    Something went wrong. Please try again later.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
-            ),
+            Loading: boardLoading,
+            Errored: boardErrored,
             Empty: (
               <Empty>
                 <EmptyHeader>
@@ -140,14 +148,23 @@ export function InboxTabs() {
                 </EmptyHeader>
               </Empty>
             ),
-            Success: ({ data: feedback }) => (
-              <KanbanBoard
-                feedback={feedback}
-                pageUrlFilter={pageUrlFilter}
-                sort={sort}
-                onSelectFeedback={(id) => setSelectedFeedbackId(id)}
-              />
-            ),
+            Success: ({ data: feedback }) =>
+              matchQueryStatus(columnsQuery, {
+                Loading: boardLoading,
+                Errored: boardErrored,
+                // Every project has columns (seeded on create), so an empty
+                // list means something is wrong rather than a fresh board.
+                Empty: boardErrored,
+                Success: ({ data: columns }) => (
+                  <KanbanBoard
+                    feedback={feedback}
+                    columns={columns}
+                    pageUrlFilter={pageUrlFilter}
+                    sort={sort}
+                    onSelectFeedback={(id) => setSelectedFeedbackId(id)}
+                  />
+                ),
+              }),
           })}
         </TabsContent>
 
@@ -156,17 +173,22 @@ export function InboxTabs() {
         </TabsContent>
       </Tabs>
 
-      <FeedbackDetailPanel
-        feedback={selectedFeedback}
-        open={!!selectedFeedbackId}
-        onOpenChange={(open) => {
-          if (!open) void setSelectedFeedbackId(null);
-        }}
-        projectId={projectId}
-        hasGitHubLink={!!gitHubLinkQuery.data}
-        hasLinearLink={!!linearLinkQuery.data}
-        hasJiraLink={!!jiraLinkQuery.data}
-      />
+      {/* Columns power the panel's status control, so the panel renders once
+          they load; a failed read keeps the board usable without it. */}
+      {columnsQuery.data ? (
+        <FeedbackDetailPanel
+          feedback={selectedFeedback}
+          open={!!selectedFeedbackId}
+          onOpenChange={(open) => {
+            if (!open) void setSelectedFeedbackId(null);
+          }}
+          projectId={projectId}
+          columns={columnsQuery.data}
+          hasGitHubLink={!!gitHubLinkQuery.data}
+          hasLinearLink={!!linearLinkQuery.data}
+          hasJiraLink={!!jiraLinkQuery.data}
+        />
+      ) : null}
     </div>
   );
 }

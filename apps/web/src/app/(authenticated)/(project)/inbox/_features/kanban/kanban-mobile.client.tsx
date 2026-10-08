@@ -1,5 +1,6 @@
 "use client";
 
+import type { FeedbackColumnCategory } from "@/app/_domains/feedback";
 import { DndContext } from "@dnd-kit/core";
 import {
   Tabs,
@@ -16,10 +17,14 @@ import { ColumnSelectCheckbox } from "./column-select-checkbox.client";
 
 type FeedbackItem = ListFeedbackOutput[number];
 
-type KanbanColumn = { id: string; title: string };
+type KanbanColumn = {
+  id: string;
+  title: string;
+  category: FeedbackColumnCategory;
+};
 
 type KanbanMobileProps = {
-  columns: readonly [KanbanColumn, ...KanbanColumn[]];
+  columns: readonly KanbanColumn[];
   grouped: Record<string, FeedbackItem[]>;
   selectedIds: Set<string>;
   toolbar: React.ReactNode;
@@ -37,7 +42,9 @@ export function KanbanMobile({
   onToggleSelectAll,
   onSelectFeedback,
 }: KanbanMobileProps) {
-  const [activeColumn, setActiveColumn] = React.useState<string>(columns[0].id);
+  const [activeColumn, setActiveColumn] = React.useState<string>(
+    columns[0]?.id ?? "",
+  );
 
   return (
     <Tabs
@@ -45,13 +52,13 @@ export function KanbanMobile({
       onValueChange={setActiveColumn}
       className="lg:hidden"
     >
-      <TabsList className="w-full">
+      <TabsList className="w-full justify-start overflow-x-auto">
         {columns.map((col) => (
           <TabsTrigger key={col.id} value={col.id}>
             <span
               className={cn(
                 "mr-1.5 size-2 rounded-full",
-                getBoardStatusAppearance(col.id).swatchClassName,
+                getBoardStatusAppearance(col.category).swatchClassName,
               )}
             />
             {col.title}
