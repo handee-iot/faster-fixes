@@ -1,7 +1,10 @@
 import type {
+  CreateCommentData,
   CreateFeedbackData,
   CreateFeedbackResponse,
   FeedbackClient,
+  FeedbackCommentItem,
+  FeedbackCommentListResponse,
   FeedbackListResponse,
   UpdateFeedbackData,
   UpdateFeedbackResponse,
@@ -118,6 +121,37 @@ export class FasterFixesClient implements FeedbackClient {
       headers: this.headers(reviewerToken),
       body: formData,
     });
+  }
+
+  async listComments(
+    feedbackId: string,
+    reviewerToken: string,
+  ): Promise<FeedbackCommentListResponse> {
+    return this.request<FeedbackCommentListResponse>(
+      `/api/v1/feedback/${feedbackId}/comments`,
+      {
+        method: "GET",
+        headers: this.headers(reviewerToken),
+      },
+    );
+  }
+
+  async createComment(
+    feedbackId: string,
+    data: CreateCommentData,
+    reviewerToken: string,
+  ): Promise<FeedbackCommentItem> {
+    return this.request<FeedbackCommentItem>(
+      `/api/v1/feedback/${feedbackId}/comments`,
+      {
+        method: "POST",
+        headers: {
+          ...this.headers(reviewerToken),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      },
+    );
   }
 }
 

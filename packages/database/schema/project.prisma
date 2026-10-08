@@ -52,6 +52,7 @@ model Reviewer {
   isActive Boolean @default(true)
 
   feedback Feedback[]
+  comments FeedbackComment[]
 
   @@index([projectId])
   @@map("reviewer")
@@ -103,6 +104,7 @@ model Feedback {
   linearIssueLink FeedbackLinearIssueLink?
   jiraIssueLink   FeedbackJiraIssueLink?
   slackMessage    FeedbackSlackMessage?
+  comments        FeedbackComment[]
 
   @@index([projectId])
   @@index([reviewerId])
@@ -128,4 +130,29 @@ model FeedbackColumn {
 
   @@index([projectId, position])
   @@map("feedback_column")
+}
+
+// A message on a Feedback thread (ADR-0018). Written by the Feedback's Reviewer
+// through the Widget, or by a Member through the dashboard. Exactly one of
+// reviewerId / memberId is set, matching authorType.
+model FeedbackComment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  feedbackId String
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+
+  authorType String
+
+  reviewerId String?
+  reviewer   Reviewer? @relation(fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  memberId String?
+  member   Member? @relation(fields: [memberId], references: [id], onDelete: SetNull)
+
+  body String
+
+  @@index([feedbackId, createdAt])
+  @@map("feedback_comment")
 }

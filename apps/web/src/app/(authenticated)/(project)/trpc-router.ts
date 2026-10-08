@@ -100,6 +100,10 @@ import { updateFeedbacksStatus } from "./inbox/_services/update-feedbacks-status
 import { UpdateFeedbacksStatusSchema } from "./inbox/_services/update-feedbacks-status.schema";
 import { updateFeedbacksColumn } from "./inbox/_services/update-feedbacks-column";
 import { UpdateFeedbacksColumnSchema } from "./inbox/_services/update-feedbacks-column.schema";
+import { createFeedbackComment } from "./inbox/_services/create-feedback-comment";
+import { CreateFeedbackCommentSchema } from "./inbox/_services/create-feedback-comment.schema";
+import { listFeedbackComments } from "./inbox/_services/list-feedback-comments";
+import { ListFeedbackCommentsSchema } from "./inbox/_services/list-feedback-comments.schema";
 
 // Every denial of the migrated operations reads a loaded row (the Project, or
 // the Feedback and its Project), so all of them live in their service;
@@ -270,6 +274,23 @@ export const projectsRouter = router({
         updateFeedbacksColumn({
           feedbackIds: input.feedbackIds,
           columnId: input.columnId,
+          userId: ctx.session.user.id,
+        }),
+      ),
+    listComments: protectedProcedure
+      .input(ListFeedbackCommentsSchema)
+      .query(({ input, ctx }) =>
+        listFeedbackComments({
+          feedbackId: input.feedbackId,
+          userId: ctx.session.user.id,
+        }),
+      ),
+    createComment: protectedProcedure
+      .input(CreateFeedbackCommentSchema)
+      .mutation(({ input, ctx }) =>
+        createFeedbackComment({
+          feedbackId: input.feedbackId,
+          body: input.body,
           userId: ctx.session.user.id,
         }),
       ),

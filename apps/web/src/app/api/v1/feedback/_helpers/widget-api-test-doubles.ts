@@ -84,6 +84,10 @@ export const widgetApiPrisma = {
     update: vi.fn(),
     delete: vi.fn(),
   },
+  feedbackComment: {
+    findMany: vi.fn(),
+    create: vi.fn(),
+  },
   $queryRaw: vi.fn(),
   $transaction: vi.fn(),
 };
@@ -107,6 +111,7 @@ export function resetWidgetApiDoubles() {
   widgetApiPrisma.feedback.count.mockResolvedValue(0);
   widgetApiPrisma.feedback.findFirst.mockResolvedValue(feedbackRow());
   widgetApiPrisma.feedback.findMany.mockResolvedValue([]);
+  widgetApiPrisma.feedbackComment.findMany.mockResolvedValue([]);
   allowRateLimit();
 
   getSignedAssetUrlDouble.mockResolvedValue(SIGNED_ASSET_URL);

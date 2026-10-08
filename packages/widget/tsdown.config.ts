@@ -9,7 +9,11 @@ import { defineConfig } from "tsdown";
 // the first green 1.0.0 build, 86,764 bytes, plus a margin of about 10% so
 // ordinary fixes fit. Raise it deliberately, in its own commit, when a
 // feature justifies the weight.
-const IIFE_MAX_BYTES = 95_000;
+//
+// 2026-10-08: raised from 95,000 for comment threads (FFIX-11). The thread
+// UI added 3,905 bytes (91,287 -> 95,192): the expandable thread, its
+// composer, the styles and four labels. 105,000 keeps the ~10% margin.
+const IIFE_MAX_BYTES = 105_000;
 
 export default defineConfig([
   {

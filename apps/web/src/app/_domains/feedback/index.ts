@@ -7,4 +7,5 @@ export type {
   FeedbackColumnCategory,
   FeedbackStatus,
 } from "./_types/feedback-status";
+export type { FeedbackCommentAuthorType } from "./_types/feedback-comment";
 export { formatDiagnosticTrailLines } from "./_helpers/format-feedback-markdown";
