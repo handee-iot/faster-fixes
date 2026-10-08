@@ -1,5 +1,11 @@
-import type { FeedbackItem, Labels, WidgetPosition } from "@fasterfixes/core";
+import type {
+  FeedbackCommentItem,
+  FeedbackItem,
+  Labels,
+  WidgetPosition,
+} from "@fasterfixes/core";
 
+import { createIcon } from "./icons.js";
 import { statusColor } from "./pins.js";
 
 // Matches the `ff-list-exit-*` animations on `.list.closing`.
@@ -14,6 +20,13 @@ type FeedbackListOptions = {
 
 type FeedbackListActions = {
   onSelect: (item: FeedbackItem) => void;
+  /** The Feedback's thread, loaded when its row is expanded. */
+  loadComments: (item: FeedbackItem) => Promise<readonly FeedbackCommentItem[]>;
+  /** Stores a reply and resolves with the created comment. */
+  createComment: (
+    item: FeedbackItem,
+    body: string,
+  ) => Promise<FeedbackCommentItem>;
 };
 
 export type FeedbackList = {
@@ -54,7 +67,7 @@ export function pagePath(pageUrl: string) {
 export function createFeedbackList(
   document: Document,
   { labels, position, branding }: FeedbackListOptions,
-  { onSelect }: FeedbackListActions,
+  { onSelect, loadComments, createComment }: FeedbackListActions,
 ): FeedbackList {
   const panel = document.createElement("div");
   panel.className = "list";
@@ -100,9 +113,14 @@ export function createFeedbackList(
   let showResolved = false;
   let open = false;
   let closeTimer: ReturnType<typeof setTimeout> | null = null;
+  // Expansion and loaded threads outlive a re-render: `update` rebuilds rows.
+  const expanded = new Set<string>();
+  const threads = new Map<string, readonly FeedbackCommentItem[]>();
 
   function createRow(item: FeedbackItem) {
     const row = document.createElement("li");
+    row.className = "list-row";
+
     const button = document.createElement("button");
     button.type = "button";
     button.className = "list-item";
@@ -126,7 +144,130 @@ export function createFeedbackList(
 
     button.append(dot, text);
     button.addEventListener("click", () => onSelect(item));
-    row.appendChild(button);
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "list-comments";
+    toggle.setAttribute("aria-label", labels.commentsButton);
+    toggle.setAttribute("aria-expanded", String(expanded.has(item.id)));
+    toggle.title = labels.commentsButton;
+    toggle.appendChild(createIcon(document, "message", 14));
+
+    const thread = document.createElement("div");
+    thread.className = "list-thread";
+    thread.id = `ff-thread-${item.id}`;
+    thread.hidden = !expanded.has(item.id);
+    toggle.setAttribute("aria-controls", thread.id);
+
+    let sending = false;
+
+    function createComposer() {
+      const form = document.createElement("form");
+      form.className = "thread-composer";
+      const input = document.createElement("textarea");
+      input.className = "textarea thread-input";
+      input.rows = 2;
+      input.placeholder = labels.replyPlaceholder;
+      input.setAttribute("aria-label", labels.replyPlaceholder);
+      const send = document.createElement("button");
+      send.type = "submit";
+      send.className = "action action-primary thread-send";
+      send.textContent = labels.sendButton;
+      form.append(input, send);
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const body = input.value.trim();
+        if (sending || body === "") return;
+        sending = true;
+        send.disabled = true;
+        void createComment(item, body).then(
+          (created) => {
+            sending = false;
+            const current = threads.get(item.id) ?? [];
+            threads.set(item.id, [...current, created]);
+            if (expanded.has(item.id)) renderThread();
+          },
+          () => {
+            sending = false;
+            send.disabled = false;
+            form.querySelector(".thread-error")?.remove();
+            const error = document.createElement("p");
+            error.className = "thread-error";
+            error.textContent = labels.errorMessage;
+            form.appendChild(error);
+          },
+        );
+      });
+
+      return form;
+    }
+
+    function renderThread() {
+      thread.replaceChildren();
+      const comments = threads.get(item.id);
+      // Still loading: the pending load renders once it resolves.
+      if (!comments) return;
+
+      if (comments.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "thread-empty";
+        empty.textContent = labels.noComments;
+        thread.appendChild(empty);
+      } else {
+        const list = document.createElement("ul");
+        list.className = "thread-comments";
+        for (const entry of comments) {
+          const commentRow = document.createElement("li");
+          commentRow.className = "thread-comment";
+          const author = document.createElement("span");
+          author.className = "thread-author";
+          author.textContent = entry.author?.name ?? "";
+          const body = document.createElement("span");
+          body.className = "thread-body";
+          body.textContent = entry.body;
+          commentRow.append(author, body);
+          list.appendChild(commentRow);
+        }
+        thread.appendChild(list);
+      }
+
+      thread.appendChild(createComposer());
+    }
+
+    function loadThread() {
+      void loadComments(item).then(
+        (comments) => {
+          threads.set(item.id, comments);
+          if (expanded.has(item.id)) renderThread();
+        },
+        () => {
+          if (!expanded.has(item.id)) return;
+          const error = document.createElement("p");
+          error.className = "thread-error";
+          error.textContent = labels.errorMessage;
+          thread.replaceChildren(error);
+        },
+      );
+    }
+
+    toggle.addEventListener("click", () => {
+      const next = !expanded.has(item.id);
+      if (next) expanded.add(item.id);
+      else expanded.delete(item.id);
+      toggle.setAttribute("aria-expanded", String(next));
+      thread.hidden = !next;
+      if (!next) return;
+      // A failed load is not cached, so expanding again retries it.
+      if (threads.has(item.id)) renderThread();
+      else loadThread();
+    });
+
+    row.append(button, toggle, thread);
+    if (expanded.has(item.id)) {
+      if (threads.has(item.id)) renderThread();
+      else loadThread();
+    }
     return row;
   }
 

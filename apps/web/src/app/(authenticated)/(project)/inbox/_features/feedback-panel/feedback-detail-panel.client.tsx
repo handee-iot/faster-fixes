@@ -13,6 +13,7 @@ import type { ListFeedbackColumnsOutput } from "@/app/(authenticated)/(project)/
 import type { ListFeedbackOutput } from "../../_services/list-feedback";
 import { getBoardStatusAppearance } from "../kanban/board-status-appearance";
 import { ElementContextCard } from "./element-context-card.client";
+import { FeedbackComments } from "./feedback-comments.client";
 import { FeedbackPropertiesRail } from "./feedback-properties-rail.client";
 import { ScreenshotDialog } from "./screenshot-dialog.client";
 
@@ -74,6 +75,8 @@ export function FeedbackDetailPanel({
             )}
 
             {element.hasContext && <ElementContextCard element={element} />}
+
+            <FeedbackComments feedbackId={feedback.id} />
           </div>
 
           <FeedbackPropertiesRail

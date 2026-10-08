@@ -482,14 +482,20 @@ export const WIDGET_CSS = `
     list-style: none;
   }
 
+  .list-row {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #3f3f46;
+  }
+
   .list-item {
     all: initial;
     display: flex;
+    flex: 1 1 auto;
     align-items: center;
     gap: 8px;
-    width: 100%;
+    min-width: 0;
     padding: 10px 14px;
-    border-bottom: 1px solid #3f3f46;
     box-sizing: border-box;
     color: var(--ff-foreground);
     font: 13px/1.4 var(--ff-font-family);
@@ -523,6 +529,87 @@ export const WIDGET_CSS = `
   .list-item-page {
     color: #71717a;
     font-size: 11px;
+  }
+
+  .list-comments {
+    all: initial;
+    display: flex;
+    flex: none;
+    align-items: center;
+    padding: 10px 12px 10px 0;
+    color: #71717a;
+    cursor: pointer;
+    transition: color 0.1s ease;
+  }
+
+  .list-comments:hover,
+  .list-comments[aria-expanded="true"] {
+    color: var(--ff-foreground);
+  }
+
+  .list-comments:focus-visible {
+    outline: 2px solid var(--ff-accent);
+    outline-offset: -2px;
+  }
+
+  .list-thread {
+    flex-basis: 100%;
+    padding: 0 14px 10px;
+    box-sizing: border-box;
+  }
+
+  .thread-comments {
+    margin: 0 0 8px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .thread-comment {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+  }
+
+  .thread-author {
+    color: #71717a;
+    font-size: 11px;
+  }
+
+  .thread-body {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  .thread-empty {
+    margin: 0 0 8px;
+    color: #71717a;
+    font-size: 12px;
+  }
+
+  .thread-error {
+    margin: 0 0 8px;
+    color: #dc2626;
+    font-size: 12px;
+  }
+
+  .thread-composer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Builds on the shared textarea styles: the composer sits in the list. */
+  .thread-input {
+    min-height: 52px;
+    padding: 6px 8px;
+    font: 13px/1.4 var(--ff-font-family);
+  }
+
+  /* Builds on the shared action-primary styles, sized down for the panel. */
+  .thread-send {
+    align-self: flex-end;
+    padding: 4px 12px;
+    font-size: 12px;
   }
 
   .list-empty {

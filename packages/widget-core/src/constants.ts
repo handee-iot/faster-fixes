@@ -46,6 +46,11 @@ export type Labels = {
   hideResolved: string;
   feedbackListTitle: string;
   emptyList: string;
+  // Accessible name of a Feedback row's comments toggle.
+  commentsButton: string;
+  noComments: string;
+  replyPlaceholder: string;
+  sendButton: string;
   startFeedback: string;
   exitFeedbackMode: string;
   showFeedbackList: string;
@@ -74,6 +79,10 @@ export const DEFAULT_LABELS: Labels = {
   hideResolved: "Hide resolved",
   feedbackListTitle: "Feedback",
   emptyList: "No feedback on this page",
+  commentsButton: "Comments",
+  noComments: "No comments yet",
+  replyPlaceholder: "Write a reply...",
+  sendButton: "Send",
   startFeedback: "Start feedback",
   exitFeedbackMode: "Exit feedback mode",
   showFeedbackList: "Show feedback list",

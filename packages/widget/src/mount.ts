@@ -310,6 +310,13 @@ export function mountWidget({
         scrollToTarget(item);
         activate(item);
       },
+      async loadComments(item) {
+        const { comments } = await client.listComments(item.id, reviewerToken);
+        return comments;
+      },
+      createComment(item, body) {
+        return client.createComment(item.id, { body }, reviewerToken);
+      },
     },
   );
 
