@@ -30,4 +30,16 @@ describe("mail sender addresses", () => {
       expect(NO_REPLY_EMAIL).toBe("noreply@muzza-feedback.vercel.app");
     },
   );
+
+  it("prefers a full EMAIL_FROM address over the derived domain", async () => {
+    vi.stubEnv("DOMAIN_NAME", "muzza-feedback.vercel.app");
+    vi.stubEnv("MAIL_FROM_DOMAIN", "mail.example.com");
+    vi.stubEnv("EMAIL_FROM", "onboarding@resend.dev");
+    vi.resetModules();
+
+    const { SENDER_EMAIL, NO_REPLY_EMAIL } = await import("./constants");
+
+    expect(SENDER_EMAIL).toBe("onboarding@resend.dev");
+    expect(NO_REPLY_EMAIL).toBe("onboarding@resend.dev");
+  });
 });
