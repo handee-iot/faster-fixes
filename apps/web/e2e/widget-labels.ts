@@ -25,9 +25,16 @@ export const LABEL_OVERRIDES: TextLabels = {
   feedbackListTitle: "Retours",
   emptyList: "Aucun retour sur cette page",
   commentsButton: "Commentaires",
+  thisPageTab: "Cette page",
+  allTab: "Toutes",
+  backButton: "Retour",
+  showOnPage: "Afficher sur la page",
+  viewScreenshot: "Voir la capture",
+  commentsTitle: "Commentaires",
   noComments: "Aucun commentaire",
   replyPlaceholder: "Écrire une réponse",
   sendButton: "Envoyer",
+  reportedBy: (when, by) => `Signalé ${when} par ${by}`,
   startFeedback: "Commencer un retour",
   exitFeedbackMode: "Quitter le mode retour",
   showFeedbackList: "Afficher la liste",
@@ -38,10 +45,12 @@ export const LABEL_OVERRIDES: TextLabels = {
 };
 export const PIN_LABEL_PREFIX = "Retour : ";
 
-const { pinAriaLabel, ...defaultTextLabels } = DEFAULT_LABELS;
+const { pinAriaLabel, reportedBy, ...defaultTextLabels } = DEFAULT_LABELS;
 const DEFAULT_STRINGS = [
   ...Object.values(defaultTextLabels),
   pinAriaLabel("").trim(),
+  // The function labels are checked by their distinctive English word.
+  reportedBy("", "").split(" ")[0],
 ];
 
 // Everything a Reviewer can read or hear: the text of every node, hidden panes
@@ -130,6 +139,15 @@ export async function expectLabelsEverywhere(page: Page) {
     page.getByRole("button", { name: LABEL_OVERRIDES.hideResolved }),
   ).toBeVisible();
   await expectNoDefaultLabel(page);
+
+  // The first task's detail carries its own labels.
+  await page.locator("button.list-item").first().click();
+  await expect(
+    page.getByRole("button", { name: LABEL_OVERRIDES.backButton }),
+  ).toBeVisible();
+  await expectNoDefaultLabel(page);
+  await page.getByRole("button", { name: LABEL_OVERRIDES.backButton }).click();
+
   await page
     .getByRole("button", { name: LABEL_OVERRIDES.hideFeedbackList })
     .click();

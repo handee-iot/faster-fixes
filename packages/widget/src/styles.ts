@@ -415,7 +415,7 @@ export const WIDGET_CSS = `
     display: flex;
     flex-direction: column;
     width: 320px;
-    max-height: 320px;
+    max-height: min(560px, calc(100vh - 120px));
     overflow: hidden;
     border-radius: var(--ff-radius);
     background-color: var(--ff-background);
@@ -531,31 +531,169 @@ export const WIDGET_CSS = `
     font-size: 11px;
   }
 
-  .list-comments {
+  .list-screen,
+  .list-detail {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* The hidden attribute needs a display override on flex containers. */
+  .list-screen[hidden],
+  .list-detail[hidden] {
+    display: none;
+  }
+
+  .list-tabs {
+    display: flex;
+    flex: none;
+    gap: 6px;
+    padding: 8px 14px;
+  }
+
+  .list-tab {
     all: initial;
+    flex: 1;
+    padding: 5px 8px;
+    border: 1px solid #3f3f46;
+    border-radius: calc(var(--ff-radius) - 2px);
+    color: #a1a1aa;
+    font: 500 12px/1.3 var(--ff-font-family);
+    text-align: center;
+    cursor: pointer;
+    transition:
+      background-color 0.1s ease,
+      color 0.1s ease;
+  }
+
+  .list-tab[aria-pressed="true"] {
+    background-color: var(--ff-accent);
+    border-color: var(--ff-accent);
+    color: #fff;
+  }
+
+  .list-tab:focus-visible {
+    outline: 2px solid var(--ff-accent);
+    outline-offset: 2px;
+  }
+
+  .list-item-comments {
     display: flex;
     flex: none;
     align-items: center;
-    padding: 10px 12px 10px 0;
     color: #71717a;
-    cursor: pointer;
-    transition: color 0.1s ease;
   }
 
-  .list-comments:hover,
-  .list-comments[aria-expanded="true"] {
+  .detail-header {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #3f3f46;
+  }
+
+  .detail-back {
+    all: initial;
     color: var(--ff-foreground);
+    font: 500 12px/1.3 var(--ff-font-family);
+    cursor: pointer;
   }
 
-  .list-comments:focus-visible {
+  .detail-back::before {
+    content: "‹ ";
+  }
+
+  .detail-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background-color: #27272a;
+    font-size: 11px;
+    text-transform: capitalize;
+  }
+
+  .detail-back:focus-visible,
+  .detail-locate:focus-visible,
+  .detail-shot:focus-visible {
     outline: 2px solid var(--ff-accent);
-    outline-offset: -2px;
+    outline-offset: 2px;
   }
 
-  .list-thread {
-    flex-basis: 100%;
-    padding: 0 14px 10px;
-    box-sizing: border-box;
+  .detail-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 12px 14px;
+    overflow-y: auto;
+  }
+
+  .detail-comment {
+    margin: 0 0 10px;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  .detail-shot {
+    all: initial;
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    overflow: hidden;
+    border: 1px solid #3f3f46;
+    border-radius: calc(var(--ff-radius) - 2px);
+    cursor: zoom-in;
+  }
+
+  .detail-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .detail-meta {
+    margin: 0 0 10px;
+    color: #71717a;
+    font-size: 11px;
+  }
+
+  .detail-location {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border-radius: calc(var(--ff-radius) - 2px);
+    background-color: #27272a;
+  }
+
+  .detail-location-path {
+    overflow: hidden;
+    color: #a1a1aa;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .detail-locate {
+    all: initial;
+    flex: none;
+    color: var(--ff-accent);
+    font: 500 11px/1.3 var(--ff-font-family);
+    cursor: pointer;
+  }
+
+  .detail-comments-title {
+    margin: 0 0 8px;
+    color: #71717a;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
   .thread-comments {
@@ -707,6 +845,7 @@ export const WIDGET_CSS = `
     .button,
     .controls,
     .list-item,
+    .list-tab,
     .overlay,
     .pin-excerpt,
     .popover.fading,

@@ -86,6 +86,7 @@ const createdFeedbackRow = {
 const listedFeedbackRow = {
   ...createdFeedbackRow,
   screenshot: { key: "shot.png", provider: "r2", bucket: STORAGE_BUCKET },
+  _count: { comments: 2 },
 };
 
 function submitRequest(body: BodyInit, overrides = {}) {
@@ -436,6 +437,7 @@ describe("GET /api/v1/feedback", () => {
           selector: "#submit",
           screenshotUrl: SIGNED_ASSET_URL,
           metadata: null,
+          commentCount: 2,
           reviewer: { id: REVIEWER_ID, name: REVIEWER_NAME },
           createdAt: CREATED_AT.toISOString(),
         },

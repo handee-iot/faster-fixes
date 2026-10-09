@@ -28,6 +28,7 @@ export async function listFeedbacks({
     include: {
       reviewer: { select: { id: true, name: true } },
       screenshot: { select: { key: true, provider: true, bucket: true } },
+      _count: { select: { comments: true } },
     },
   });
 
@@ -44,6 +45,7 @@ export async function listFeedbacks({
         ? await getSignedAssetUrl(f.screenshot)
         : null,
       metadata: f.metadata,
+      commentCount: f._count.comments,
       reviewer: f.reviewer,
       createdAt: f.createdAt,
     })),
