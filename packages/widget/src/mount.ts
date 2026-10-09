@@ -328,6 +328,27 @@ export function mountWidget({
   function setListOpen(open: boolean) {
     list.setOpen(open);
     toolbar.setListShown(open);
+    // Docked while open: the panel fills the viewport height beside the
+    // toolbar, which keeps its corner with a margin. Closed, the stack
+    // returns to its anchored corner.
+    stack.style.removeProperty("top");
+    stack.style.removeProperty("right");
+    stack.style.removeProperty("bottom");
+    stack.style.removeProperty("left");
+    stack.style.removeProperty("transform");
+    applyStackLayout(stack, options.position);
+    if (open) {
+      stack.dataset.listOpen = "true";
+      stack.style.top = "0";
+      stack.style.bottom = "0";
+      stack.style.setProperty(
+        options.position.includes("right") ? "right" : "left",
+        "0",
+      );
+      stack.style.removeProperty("transform");
+    } else {
+      delete stack.dataset.listOpen;
+    }
   }
 
   const toolbar = createToolbar(document, options, {

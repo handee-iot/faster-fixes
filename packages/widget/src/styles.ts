@@ -41,6 +41,10 @@ export const WIDGET_CSS = `
     pointer-events: auto;
   }
 
+  .stack[data-list-open="true"] .toolbar {
+    margin: 20px;
+  }
+
   .toolbar {
     position: relative;
     display: flex;
@@ -414,10 +418,10 @@ export const WIDGET_CSS = `
   .list {
     display: flex;
     flex-direction: column;
-    width: 320px;
-    max-height: min(560px, calc(100vh - 120px));
+    width: 480px;
+    max-width: calc(100vw - 88px);
+    height: 100%;
     overflow: hidden;
-    border-radius: var(--ff-radius);
     background-color: var(--ff-background);
     color: var(--ff-foreground);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
