@@ -512,6 +512,14 @@ export const WIDGET_CSS = `
     outline-offset: -2px;
   }
 
+  .list-item::after {
+    content: "›";
+    flex: none;
+    color: #52525b;
+    font-size: 15px;
+    line-height: 1;
+  }
+
   .list-item-text {
     display: flex;
     flex: 1;
