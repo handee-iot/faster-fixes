@@ -73,7 +73,7 @@ export function subscriptionRow(overrides: Record<string, unknown> = {}) {
 }
 
 export const widgetApiPrisma = {
-  project: { findFirst: vi.fn() },
+  project: { findFirst: vi.fn(), update: vi.fn() },
   reviewer: { findFirst: vi.fn() },
   subscription: { findFirst: vi.fn() },
   feedback: {
@@ -106,6 +106,7 @@ export function resetWidgetApiDoubles() {
   vi.clearAllMocks();
 
   widgetApiPrisma.project.findFirst.mockResolvedValue(projectRow());
+  widgetApiPrisma.project.update.mockResolvedValue({ feedbackSequence: 1 });
   widgetApiPrisma.reviewer.findFirst.mockResolvedValue(reviewerRow());
   widgetApiPrisma.subscription.findFirst.mockResolvedValue(null);
   widgetApiPrisma.feedback.count.mockResolvedValue(0);

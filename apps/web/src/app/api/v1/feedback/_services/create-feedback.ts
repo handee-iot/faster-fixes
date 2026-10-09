@@ -2,6 +2,7 @@ import { inngest } from "@/server/inngest";
 import { buildEvent, feedbackCreatedEvent } from "@/server/inngest/events";
 import { getSignedAssetUrl } from "@/server/storage/get-signed-asset-url";
 import { prisma } from "@workspace/db";
+import { allocateFeedbackNumbers } from "@/app/_domains/feedback/_services/allocate-feedback-numbers";
 import type { CreateFeedbackInput } from "./create-feedback.schema";
 
 type CreateFeedbackServiceInput = {
@@ -24,10 +25,13 @@ export async function createFeedback({
   screenshotId,
   data,
 }: CreateFeedbackServiceInput) {
+  const number = await allocateFeedbackNumbers(projectId, 1);
+
   const feedback = await prisma.feedback.create({
     data: {
       projectId,
       reviewerId,
+      number,
       comment: data.comment,
       pageUrl: data.pageUrl,
       clickX: data.clickX,
@@ -61,6 +65,7 @@ export async function createFeedback({
   return {
     id: feedback.id,
     status: feedback.status,
+    number: feedback.number,
     comment: feedback.comment,
     pageUrl: feedback.pageUrl,
     clickX: feedback.clickX,

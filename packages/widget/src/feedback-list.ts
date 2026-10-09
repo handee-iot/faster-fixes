@@ -188,6 +188,13 @@ export function createFeedbackList(
     button.setAttribute("part", "list-item");
     button.dataset.ffFeedbackId = item.id;
 
+    if (item.number !== undefined) {
+      const number = document.createElement("span");
+      number.className = "list-item-number";
+      number.textContent = String(item.number);
+      button.appendChild(number);
+    }
+
     const dot = document.createElement("span");
     dot.className = "status-dot";
     dot.style.backgroundColor = statusColor(item.status);
@@ -336,7 +343,16 @@ export function createFeedbackList(
     const statusText = document.createElement("span");
     statusText.textContent = statusLabel(item.status);
     status.append(statusDot, statusText);
-    detailHeader.append(back, status);
+    const headerRight = document.createElement("span");
+    headerRight.className = "detail-header-right";
+    if (item.number !== undefined) {
+      const number = document.createElement("span");
+      number.className = "detail-number";
+      number.textContent = `#${item.number}`;
+      headerRight.appendChild(number);
+    }
+    headerRight.appendChild(status);
+    detailHeader.append(back, headerRight);
 
     const body = document.createElement("div");
     body.className = "detail-body";

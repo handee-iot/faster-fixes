@@ -72,6 +72,7 @@ const CREATED_AT = new Date("2026-01-02T03:04:05.000Z");
 const createdFeedbackRow = {
   id: "feedback_1",
   status: "new",
+  number: 1,
   comment: validFeedbackPayload.comment,
   pageUrl: validFeedbackPayload.pageUrl,
   clickX: 12,
@@ -264,6 +265,7 @@ describe("POST /api/v1/feedback", () => {
     await expect(response.json()).resolves.toEqual({
       id: "feedback_1",
       status: "new",
+      number: 1,
       comment: validFeedbackPayload.comment,
       pageUrl: validFeedbackPayload.pageUrl,
       clickX: 12,
@@ -279,6 +281,7 @@ describe("POST /api/v1/feedback", () => {
         data: expect.objectContaining({
           projectId: PROJECT_ID,
           reviewerId: REVIEWER_ID,
+          number: 1,
           comment: validFeedbackPayload.comment,
           pageUrl: validFeedbackPayload.pageUrl,
           screenshotId: undefined,
@@ -430,6 +433,7 @@ describe("GET /api/v1/feedback", () => {
         {
           id: "feedback_1",
           status: "new",
+          number: 1,
           comment: validFeedbackPayload.comment,
           pageUrl: validFeedbackPayload.pageUrl,
           clickX: 12,

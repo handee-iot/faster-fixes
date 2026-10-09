@@ -36,6 +36,7 @@ export async function listFeedbacks({
     feedbackList.map(async (f) => ({
       id: f.id,
       status: f.status,
+      number: f.number,
       comment: f.comment,
       pageUrl: f.pageUrl,
       clickX: f.clickX,

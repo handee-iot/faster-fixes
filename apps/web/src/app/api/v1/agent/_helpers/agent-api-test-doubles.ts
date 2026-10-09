@@ -46,6 +46,7 @@ export function agentTokenRow(scopes: string[] = ALL_AGENT_SCOPES) {
 export const agentApiPrisma = {
   agentToken: { findFirst: vi.fn(), update: vi.fn() },
   subscription: { findFirst: vi.fn() },
+  project: { update: vi.fn() },
   feedback: {
     findFirst: vi.fn(),
     findMany: vi.fn(),
@@ -75,6 +76,7 @@ export function resetAgentApiDoubles() {
   // Fire-and-forget `lastUsedAt` write: the handler only calls `.catch` on it.
   agentApiPrisma.agentToken.update.mockResolvedValue(undefined);
   agentApiPrisma.subscription.findFirst.mockResolvedValue(null);
+  agentApiPrisma.project.update.mockResolvedValue({ feedbackSequence: 1 });
   agentApiPrisma.$transaction.mockImplementation(
     async (operations: Promise<unknown>[]) => Promise.all(operations),
   );

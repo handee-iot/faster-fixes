@@ -54,3 +54,4 @@ What changes because of this? What new constraints does it create?
 - [ADR-0017](./0017-board-columns-are-a-layer-over-status.md): Board columns are a per-Project layer over Status; a column's category is the Status, and moving a card sets both.
 - [ADR-0018](./0018-feedback-comments-carry-a-typed-author.md): Feedback comments carry a typed author (Reviewer or Member) in one table; visibility follows the existing reviewer rule.
 - [ADR-0019](./0019-reviewer-emails-are-optional.md): Reviewer emails are optional; resolve and reply notifications are transactional, token-free, and skip silently without an address.
+- [ADR-0020](./0020-feedback-numbers-are-per-project.md): Feedback numbers are per-Project and monotonic, allocated from a Project counter; gaps are allowed and numbers are never reused.

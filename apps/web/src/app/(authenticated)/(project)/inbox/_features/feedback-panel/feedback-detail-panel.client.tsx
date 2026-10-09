@@ -61,9 +61,14 @@ export function FeedbackDetailPanel({
 
         <div className="grid min-h-full md:grid-cols-[1fr_15rem]">
           <div className="flex min-w-0 flex-col gap-5 p-5 pr-12 md:pr-5">
-            <p className="text-lg leading-snug font-semibold whitespace-pre-wrap">
-              {feedback.comment}
-            </p>
+            <div className="flex flex-col gap-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                #{feedback.number}
+              </p>
+              <p className="text-lg leading-snug font-semibold whitespace-pre-wrap">
+                {feedback.comment}
+              </p>
+            </div>
 
             {feedback.screenshotUrl ? (
               <ScreenshotDialog src={feedback.screenshotUrl} />

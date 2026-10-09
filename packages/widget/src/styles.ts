@@ -597,6 +597,31 @@ export const WIDGET_CSS = `
     color: #71717a;
   }
 
+  .list-item-number {
+    flex: none;
+    min-width: 20px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: #27272a;
+    color: #a1a1aa;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .detail-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .detail-number {
+    color: #a1a1aa;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
   .detail-header {
     display: flex;
     flex: none;

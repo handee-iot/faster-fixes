@@ -14,6 +14,7 @@ const FREE_PLAN_FEEDBACK_LIMIT = 50;
 const createdRow = {
   id: "feedback_2",
   status: "new",
+  number: 1,
   comment: "Typo in the footer",
   pageUrl: "https://client.test/",
   createdAt: new Date("2026-01-02T03:04:05.000Z"),
@@ -36,6 +37,9 @@ function fakeDb(overrides: { feedbackCount?: number[] } = {}) {
 
   return {
     subscription: { findFirst: vi.fn().mockResolvedValue(null) },
+    project: {
+      update: vi.fn().mockResolvedValue({ feedbackSequence: 1 }),
+    },
     feedback: {
       count,
       create: vi.fn().mockResolvedValue(createdRow),
@@ -133,6 +137,7 @@ describe("createFeedbacks", () => {
         data: expect.objectContaining({
           projectId: "project_1",
           reviewerId: REVIEWER_ID,
+          number: 1,
           status: "new",
           metadata: { source: "bugherd" },
         }),

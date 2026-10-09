@@ -21,6 +21,8 @@ export type FeedbackReviewer = {
 export type FeedbackItem = {
   id: string;
   status: FeedbackStatus;
+  /** The per-Project number (ADR-0020); omitted by sources that don't number. */
+  number?: number;
   comment: string;
   pageUrl: string;
   clickX: number | null;

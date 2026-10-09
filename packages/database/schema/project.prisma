@@ -9,6 +9,9 @@ model Project {
   apiKeyHash     String
   apiKeyLastFour String
 
+  // The last Feedback number handed out; numbering is per Project (ADR-0020).
+  feedbackSequence Int @default(0)
+
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -72,6 +75,8 @@ model Feedback {
 
   status  String @default("new")
   comment String
+  // Per-Project, monotonic, assigned on creation (ADR-0020).
+  number  Int
 
   // Board lane (ADR-0017). Null means "first column of the status category";
   // when set, column.category always equals status.
@@ -108,6 +113,7 @@ model Feedback {
   slackMessage    FeedbackSlackMessage?
   comments        FeedbackComment[]
 
+  @@unique([projectId, number])
   @@index([projectId])
   @@index([reviewerId])
   @@index([assigneeId])

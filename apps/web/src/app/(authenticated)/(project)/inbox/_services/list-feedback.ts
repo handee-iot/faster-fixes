@@ -69,6 +69,7 @@ export async function listFeedback(
       createdAt: f.createdAt,
       updatedAt: f.updatedAt,
       status: f.status,
+      number: f.number,
       columnId: f.columnId,
       comment: f.comment,
       pageUrl: f.pageUrl,

@@ -3,6 +3,7 @@ import {
   resolveOrganizationPlan,
 } from "@/server/auth/subscription";
 import { NotFoundError } from "@/server/errors/domain-errors";
+import { allocateFeedbackNumbers } from "@/app/_domains/feedback/_services/allocate-feedback-numbers";
 import { prisma } from "@workspace/db";
 import type { Prisma } from "@workspace/db/types";
 import { resolveProjectId } from "../../_helpers/resolve-project-id";
@@ -75,8 +76,14 @@ export async function createFeedbacks(
     db,
   );
 
+  const firstNumber = await allocateFeedbackNumbers(
+    projectId,
+    feedbacks.length,
+    db,
+  );
+
   const created = await db.$transaction(
-    feedbacks.map((f) => {
+    feedbacks.map((f, index) => {
       const baseMetadata = f.metadata ?? {};
       const metadata: Prisma.InputJsonObject = source
         ? { ...baseMetadata, source }
@@ -87,6 +94,7 @@ export async function createFeedbacks(
         data: {
           projectId,
           reviewerId: reviewer.id,
+          number: firstNumber + index,
           comment: f.comment,
           pageUrl: f.pageUrl,
           status: f.status ?? "new",
@@ -104,6 +112,7 @@ export async function createFeedbacks(
         select: {
           id: true,
           status: true,
+          number: true,
           comment: true,
           pageUrl: true,
           createdAt: true,
