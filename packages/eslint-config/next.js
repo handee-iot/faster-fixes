@@ -114,6 +114,7 @@ const serviceVerbOptions = {
     "impersonate",
     "leave",
     "link",
+    "move",
     "notify",
     "refresh",
     "regenerate",

@@ -5,6 +5,7 @@ import {
   customSessionClient,
   inferAdditionalFields,
   lastLoginMethodClient,
+  magicLinkClient,
   organizationClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
@@ -32,6 +33,7 @@ export const {
     adminClient(),
     organizationClient(),
     lastLoginMethodClient(),
+    magicLinkClient(),
     stripeClient({
       subscription: true, // Enables subscription management
     }),

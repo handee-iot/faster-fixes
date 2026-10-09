@@ -4,11 +4,12 @@ import { prisma } from "@workspace/db";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
-import { admin, lastLoginMethod } from "better-auth/plugins";
+import { admin, lastLoginMethod, magicLink } from "better-auth/plugins";
 import { after } from "next/server";
 import { databaseHooks } from "./config/database-hooks";
 import { emailAndPassword } from "./config/email-and-password";
 import { emailVerification } from "./config/email-verification";
+import { sendReviewerMagicLink } from "./config/reviewer-magic-link";
 import { customSessionPlugin } from "./plugins/custom-session";
 import { organizationPlugin } from "./plugins/organization";
 import { getStripePlugin } from "./plugins/stripe";
@@ -31,6 +32,7 @@ export const auth = betterAuth({
     storage: "database",
     customRules: {
       "/api/auth/sign-in/email": { window: 60, max: 5 },
+      "/api/auth/sign-in/magic-link": { window: 60, max: 5 },
       "/api/auth/sign-up/email": { window: 60, max: 3 },
       "/api/auth/change-password": { window: 60, max: 3 },
     },
@@ -69,6 +71,13 @@ export const auth = betterAuth({
     customSessionPlugin,
     admin(),
     organizationPlugin,
+    // Reviewers sign in here (ADR-0021): only an active Reviewer's email
+    // receives a link, and everyone else gets silence.
+    magicLink({
+      sendMagicLink: async ({ email, url }) => {
+        await sendReviewerMagicLink({ email, url });
+      },
+    }),
     ...(cloudBillingPlugin ? [cloudBillingPlugin] : []),
     lastLoginMethod(),
     nextCookies(), // must be last plugin of the array

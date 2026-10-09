@@ -1,5 +1,4 @@
-import { NotFoundError } from "@/server/errors/domain-errors";
-import { prisma } from "@workspace/db";
+import { createReviewerComment } from "@/app/_domains/feedback/_services/create-reviewer-comment";
 
 type CreateFeedbackCommentInput = {
   projectId: string;
@@ -9,40 +8,11 @@ type CreateFeedbackCommentInput = {
 };
 
 /**
- * Stores a Reviewer's reply on one Feedback. Scoped by projectId so a forged
- * feedback id from another Project cannot be replied to; the caller has already
- * checked the Reviewer token.
+ * The widget API's reviewer reply (ADR-0018); the portal shares the domain
+ * service behind it.
  */
-export async function createFeedbackComment({
-  projectId,
-  feedbackId,
-  reviewerId,
-  body,
-}: CreateFeedbackCommentInput) {
-  const feedback = await prisma.feedback.findFirst({
-    where: { id: feedbackId, projectId },
-    select: { id: true },
-  });
-
-  if (!feedback) {
-    throw new NotFoundError("Feedback not found.");
-  }
-
-  // Widget replies are always a Reviewer author (ADR-0018).
-  const comment = await prisma.feedbackComment.create({
-    data: { feedbackId, authorType: "reviewer", reviewerId, body },
-    include: { reviewer: { select: { id: true, name: true } } },
-  });
-
-  return {
-    id: comment.id,
-    createdAt: comment.createdAt,
-    authorType: "reviewer" as const,
-    body: comment.body,
-    author: comment.reviewer
-      ? { id: comment.reviewer.id, name: comment.reviewer.name }
-      : null,
-  };
+export async function createFeedbackComment(input: CreateFeedbackCommentInput) {
+  return createReviewerComment(input);
 }
 
 export type CreateFeedbackCommentOutput = Awaited<

@@ -1,4 +1,5 @@
 import { authenticatedRouter } from "@/app/(authenticated)/trpc-router";
+import { portalRouter } from "@/app/(portal)/trpc-router";
 import { publicRouter } from "@/app/(public)/trpc-router";
 import { authRouter } from "@/app/_domains/auth/trpc-router";
 import { organizationRouter } from "@/app/_domains/organization/trpc-router";
@@ -10,6 +11,7 @@ import { router } from "../trpc";
 export const appRouter = router({
   auth: authRouter,
   authenticated: authenticatedRouter,
+  portal: portalRouter,
   onboarding: onboardingRouter,
   admin: adminRouter,
   public: publicRouter,
