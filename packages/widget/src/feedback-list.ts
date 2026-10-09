@@ -55,7 +55,19 @@ export function listedFeedback(
 
 /** The items submitted on one page, for the list's "This page" tab. */
 export function pageItems(items: readonly FeedbackItem[], pageUrl: string) {
-  return items.filter((item) => item.pageUrl === pageUrl);
+  const target = pageKey(pageUrl);
+  return items.filter((item) => pageKey(item.pageUrl) === target);
+}
+
+// Origin and path only: query and fragment vary (tokens, analytics, SPA
+// state) while the Reviewer still means "this page".
+function pageKey(pageUrl: string) {
+  try {
+    const { origin, pathname } = new URL(pageUrl);
+    return `${origin}${pathname}`;
+  } catch {
+    return pageUrl;
+  }
 }
 
 /** "in_progress" reads as "in progress" in the detail's status pill. */

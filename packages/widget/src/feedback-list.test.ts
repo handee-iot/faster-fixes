@@ -57,12 +57,12 @@ describe("pageItems", () => {
     ).toEqual(["a", "c"]);
   });
 
-  it("matches the full URL, query included", () => {
+  it("ignores the query so the page matches across params", () => {
     const items = [
       { id: "a", pageUrl: "https://example.com/pricing?plan=pro" },
     ] as FeedbackItem[];
 
-    expect(pageItems(items, "https://example.com/pricing")).toEqual([]);
+    expect(pageItems(items, "https://example.com/pricing")).toEqual(items);
   });
 });
 
