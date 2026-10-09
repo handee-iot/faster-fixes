@@ -25,6 +25,7 @@ export const LABEL_OVERRIDES: TextLabels = {
   feedbackListTitle: "Retours",
   emptyList: "Aucun retour sur cette page",
   commentsButton: "Commentaires",
+  newFeedback: "Nouveau retour",
   thisPageTab: "Cette page",
   allTab: "Toutes",
   backButton: "Retour",
@@ -98,6 +99,8 @@ export async function expectLabelsEverywhere(page: Page) {
     page.getByRole("button", { name: LABEL_OVERRIDES.exitFeedbackMode }),
   ).toBeVisible();
   await expectNoDefaultLabel(page);
+  // The + control starts element selection; the icon alone never does.
+  await page.getByRole("button", { name: LABEL_OVERRIDES.newFeedback }).click();
 
   await page.locator("h1").click();
   const textarea = page.getByPlaceholder(LABEL_OVERRIDES.textareaPlaceholder);
@@ -114,8 +117,7 @@ export async function expectLabelsEverywhere(page: Page) {
   await expect(pin).toBeVisible();
   await expectNoDefaultLabel(page);
 
-  // A submit ends feedback mode once the popover has faded out.
-  await start.click();
+  // The bar stays open after a submit; its markers control toggles pins.
   await page.getByRole("button", { name: LABEL_OVERRIDES.hideMarkers }).click();
   await expect(
     page.getByRole("button", { name: LABEL_OVERRIDES.showMarkers }),

@@ -99,6 +99,7 @@ export function mountWidget({
   }
 
   let mode: WidgetMode = "idle";
+  let barOpen = false;
   let selection: {
     element: Element;
     click: PinPoint;
@@ -109,8 +110,8 @@ export function mountWidget({
     mode = next;
     // Annotating and commenting take over the page; a pin popover would sit in the way.
     if (next !== "idle") closePinPopover();
-    toolbar.setActive(next !== "idle");
-    if (next === "idle") setListOpen(false);
+    toolbar.setAnnotating(next !== "idle");
+    if (next === "annotating") setListOpen(false);
     if (next === "annotating") annotation.start();
     else annotation.stop();
     if (next !== "selected") {
@@ -351,9 +352,24 @@ export function mountWidget({
     }
   }
 
+  function openBar() {
+    if (destroyed || barOpen) return;
+    barOpen = true;
+    toolbar.setOpen(true);
+  }
+
+  function closeBar() {
+    if (!barOpen) return;
+    barOpen = false;
+    toolbar.setOpen(false);
+    setListOpen(false);
+    if (mode !== "idle") setMode("idle");
+  }
+
   const toolbar = createToolbar(document, options, {
-    onStart: () => setMode("annotating"),
-    onExit: () => setMode("idle"),
+    onOpen: () => openBar(),
+    onToggleCreate: () => setMode(mode === "idle" ? "annotating" : "idle"),
+    onExit: () => closeBar(),
     onTogglePins: togglePins,
     onToggleList: () => setListOpen(!list.isOpen),
   });
@@ -395,6 +411,9 @@ export function mountWidget({
       if (destroyed || !state.current.isVisible) return;
       setMode("idle");
       closePinPopover();
+      barOpen = false;
+      toolbar.setOpen(false);
+      setListOpen(false);
       list.close();
       host.remove();
       state.set({ isVisible: false });
@@ -405,6 +424,7 @@ export function mountWidget({
     startAnnotation() {
       if (destroyed) return;
       show();
+      openBar();
       setMode("annotating");
     },
     get feedbackItems() {

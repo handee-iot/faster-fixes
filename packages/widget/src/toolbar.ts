@@ -5,7 +5,11 @@ import type { IconName } from "./icons.js";
 import type { ResolvedDisplayOptions } from "./options.js";
 
 type ToolbarActions = {
-  onStart: () => void;
+  /** The collapsed button: opens the bar. */
+  onOpen: () => void;
+  /** The + control: starts or cancels element selection. */
+  onToggleCreate: () => void;
+  /** The close control: leaves feedback mode and collapses the bar. */
   onExit: () => void;
   onTogglePins: () => void;
   onToggleList: () => void;
@@ -13,8 +17,10 @@ type ToolbarActions = {
 
 export type Toolbar = {
   element: HTMLElement;
-  /** Collapsed shows the start button, active shows the controls. */
-  setActive: (active: boolean) => void;
+  /** Collapsed shows the button, open shows the bar's controls. */
+  setOpen: (open: boolean) => void;
+  /** Reflects whether element selection is active in the + control. */
+  setAnnotating: (annotating: boolean) => void;
   /** Reflects whether pins are shown in the markers control. */
   setPinsShown: (shown: boolean) => void;
   /** Reflects whether the Feedback list is open in the list control. */
@@ -58,13 +64,20 @@ function createControl(
 }
 
 /**
- * The floating button while idle; once feedback mode starts it becomes a
- * toolbar with its controls, the exit control nearest the screen edge.
+ * The floating button while collapsed; opened, it becomes the bar with its
+ * controls, the close control nearest the screen edge. The + control starts
+ * element selection, so opening the bar never does anything to the page.
  */
 export function createToolbar(
   document: Document,
   { labels, position }: ResolvedDisplayOptions,
-  { onStart, onExit, onTogglePins, onToggleList }: ToolbarActions,
+  {
+    onOpen,
+    onToggleCreate,
+    onExit,
+    onTogglePins,
+    onToggleList,
+  }: ToolbarActions,
 ): Toolbar {
   const side = tooltipSide(position);
   // One pill that grows from the button into the controls, so the shadow and
@@ -79,10 +92,17 @@ export function createToolbar(
   trigger.setAttribute("aria-label", labels.startFeedback);
   trigger.appendChild(createIcon(document, "message", 18));
   trigger.appendChild(createTooltip(document, labels.startFeedback, side));
-  trigger.addEventListener("click", onStart);
+  trigger.addEventListener("click", onOpen);
 
   const controls = document.createElement("div");
   controls.className = "controls";
+  const create = createControl(
+    document,
+    labels.newFeedback,
+    "plus",
+    side,
+    onToggleCreate,
+  );
   const exit = createControl(
     document,
     labels.exitFeedbackMode,
@@ -106,19 +126,19 @@ export function createToolbar(
   );
   controls.append(
     ...(position.includes("top")
-      ? [exit.control, list.control, markers.control]
-      : [list.control, markers.control, exit.control]),
+      ? [exit.control, create.control, list.control, markers.control]
+      : [create.control, list.control, markers.control, exit.control]),
   );
 
   toolbar.append(trigger, controls);
 
   // Both layers stay rendered so they can cross-fade; `inert` takes the
   // faded one out of the tab order and the accessibility tree.
-  function applyState(active: boolean) {
-    toolbar.dataset.state = active ? "expanded" : "collapsed";
+  function applyState(open: boolean) {
+    toolbar.dataset.state = open ? "expanded" : "collapsed";
     for (const [layer, visible] of [
-      [trigger, !active],
-      [controls, active],
+      [trigger, !open],
+      [controls, open],
     ] as const) {
       layer.dataset.visible = String(visible);
       layer.inert = !visible;
@@ -129,15 +149,19 @@ export function createToolbar(
 
   return {
     element: toolbar,
-    setActive(active) {
+    setOpen(open) {
       const root = toolbar.getRootNode();
       const focusWasInside =
         root instanceof ShadowRoot && toolbar.contains(root.activeElement);
-      applyState(active);
+      applyState(open);
       // Keeps keyboard users on the toolbar when the button they pressed hides.
       if (focusWasInside) {
-        (active ? exit.control : trigger).focus();
+        (open ? create.control : trigger).focus();
       }
+    },
+    setAnnotating(annotating) {
+      create.control.setAttribute("aria-pressed", String(annotating));
+      create.control.classList.toggle("control-pressed", annotating);
     },
     setPinsShown(shown) {
       markers.setContent(

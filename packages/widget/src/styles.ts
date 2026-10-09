@@ -61,7 +61,7 @@ export const WIDGET_CSS = `
   }
 
   .toolbar[data-state="expanded"] {
-    height: 112px;
+    height: 148px;
     border-radius: 24px;
   }
 

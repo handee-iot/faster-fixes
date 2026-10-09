@@ -48,6 +48,8 @@ export type Labels = {
   emptyList: string;
   // Unused by the Widget, kept so existing `labels` objects still type-check.
   commentsButton: string;
+  // Accessible name of the bar's create control.
+  newFeedback: string;
   thisPageTab: string;
   allTab: string;
   backButton: string;
@@ -88,6 +90,7 @@ export const DEFAULT_LABELS: Labels = {
   feedbackListTitle: "Feedback",
   emptyList: "No feedback on this page",
   commentsButton: "Comments",
+  newFeedback: "New feedback",
   thisPageTab: "This page",
   allTab: "All",
   backButton: "Back",
