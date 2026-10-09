@@ -6,6 +6,17 @@ export const databaseHooks: NonNullable<BetterAuthOptions["databaseHooks"]> = {
   user: {
     create: {
       after: async (user) => {
+        // A Reviewer signing in (ADR-0021) is a client, not a workspace user:
+        // no default Organization, no marketing preferences.
+        const reviewer = await prisma.reviewer.findFirst({
+          where: {
+            email: { equals: user.email, mode: "insensitive" },
+            isActive: true,
+          },
+          select: { id: true },
+        });
+        if (reviewer) return;
+
         // Create marketing preferences record
         await prisma.marketingPreferences.create({
           data: {
