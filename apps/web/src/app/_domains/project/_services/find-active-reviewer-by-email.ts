@@ -15,7 +15,7 @@ export async function findActiveReviewerByEmail(
       id: true,
       name: true,
       projectId: true,
-      project: { select: { name: true } },
+      project: { select: { name: true, domain: true } },
     },
   });
 }

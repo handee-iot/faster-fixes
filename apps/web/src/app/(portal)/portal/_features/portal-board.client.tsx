@@ -14,7 +14,7 @@ import { Textarea } from "@workspace/ui/components/textarea";
 import { cn } from "@workspace/ui/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { LogOut, MessageSquare } from "lucide-react";
+import { ExternalLink, LogOut, MapPin, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -23,15 +23,30 @@ type BoardColumn = ListPortalBoardOutput["columns"][number];
 
 type PortalBoardProps = {
   projectName: string;
+  siteUrl: string;
   reviewerName: string;
 };
+
+// The page a card names: the URL's path and query, or the raw value.
+function pagePath(pageUrl: string) {
+  try {
+    const { pathname, search } = new URL(pageUrl);
+    return `${pathname}${search}`;
+  } catch {
+    return pageUrl;
+  }
+}
 
 /**
  * The reviewer's board (ADR-0021): the Project's columns and cards, a detail
  * drawer with the conversation, and column moves. Nothing else: no assignee,
  * no integrations, no settings.
  */
-export function PortalBoard({ projectName, reviewerName }: PortalBoardProps) {
+export function PortalBoard({
+  projectName,
+  siteUrl,
+  reviewerName,
+}: PortalBoardProps) {
   const trpc = useTRPC();
   const { data } = useQuery(trpc.portal.board.list.queryOptions());
   const [openId, setOpenId] = useState<string | null>(null);
@@ -55,7 +70,17 @@ export function PortalBoard({ projectName, reviewerName }: PortalBoardProps) {
       <header className="flex items-center justify-between border-b bg-background px-6 py-3">
         <div>
           <p className="text-xs text-muted-foreground">Feedback board</p>
-          <h1 className="text-sm font-semibold">{projectName}</h1>
+          <h1 className="text-sm font-semibold">
+            <a
+              href={siteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 hover:underline"
+            >
+              {projectName}
+              <ExternalLink className="size-3 text-muted-foreground" />
+            </a>
+          </h1>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground">{reviewerName}</span>
@@ -239,6 +264,16 @@ function PortalDetail({ item, columns }: PortalDetailProps) {
           {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}{" "}
           by {item.reviewer.name}
         </p>
+
+        <a
+          href={item.pageUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:underline"
+        >
+          <MapPin className="size-3.5 shrink-0" />
+          <span className="truncate">{pagePath(item.pageUrl)}</span>
+        </a>
 
         <div className="flex flex-col gap-3">
           <h3 className="text-xs font-medium text-muted-foreground uppercase">

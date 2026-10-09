@@ -30,6 +30,7 @@ export default async function PortalPage() {
   return (
     <PortalBoard
       projectName={reviewer.project.name}
+      siteUrl={`https://${reviewer.project.domain}`}
       reviewerName={reviewer.name}
     />
   );
