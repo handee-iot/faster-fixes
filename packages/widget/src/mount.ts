@@ -329,32 +329,31 @@ export function mountWidget({
   function setListOpen(open: boolean) {
     list.setOpen(open);
     toolbar.setListShown(open);
-    // Docked while open: the panel fills the viewport height beside the
-    // toolbar, which keeps its corner with a margin. Closed, the stack
-    // returns to its anchored corner.
+  }
+
+  // The stack docks to the screen edge while the bar is open: the bar fills
+  // the viewport height and the drawer slides out from it.
+  function dockStack(docked: boolean) {
     stack.style.removeProperty("top");
     stack.style.removeProperty("right");
     stack.style.removeProperty("bottom");
     stack.style.removeProperty("left");
     stack.style.removeProperty("transform");
     applyStackLayout(stack, options.position);
-    if (open) {
-      stack.dataset.listOpen = "true";
-      stack.style.top = "0";
-      stack.style.bottom = "0";
-      stack.style.setProperty(
-        options.position.includes("right") ? "right" : "left",
-        "0",
-      );
-      stack.style.removeProperty("transform");
-    } else {
-      delete stack.dataset.listOpen;
-    }
+    if (!docked) return;
+    stack.style.top = "0";
+    stack.style.bottom = "0";
+    stack.style.setProperty(
+      options.position.includes("right") ? "right" : "left",
+      "0",
+    );
+    stack.style.removeProperty("transform");
   }
 
   function openBar() {
     if (destroyed || barOpen) return;
     barOpen = true;
+    dockStack(true);
     toolbar.setOpen(true);
   }
 
@@ -363,6 +362,7 @@ export function mountWidget({
     barOpen = false;
     toolbar.setOpen(false);
     setListOpen(false);
+    dockStack(false);
     if (mode !== "idle") setMode("idle");
   }
 
@@ -414,6 +414,7 @@ export function mountWidget({
       barOpen = false;
       toolbar.setOpen(false);
       setListOpen(false);
+      dockStack(false);
       list.close();
       host.remove();
       state.set({ isVisible: false });

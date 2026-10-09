@@ -124,11 +124,8 @@ export function createToolbar(
     side,
     onToggleList,
   );
-  controls.append(
-    ...(position.includes("top")
-      ? [exit.control, create.control, list.control, markers.control]
-      : [create.control, list.control, markers.control, exit.control]),
-  );
+  // Fixed order: the close control is pinned to the bar's bottom by CSS.
+  controls.append(create.control, list.control, markers.control, exit.control);
 
   toolbar.append(trigger, controls);
 

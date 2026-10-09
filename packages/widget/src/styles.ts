@@ -35,14 +35,9 @@ export const WIDGET_CSS = `
     position: fixed;
     z-index: var(--ff-z-index);
     display: flex;
-    gap: 8px;
     font-family: var(--ff-font-family);
     color: var(--ff-foreground);
     pointer-events: auto;
-  }
-
-  .stack[data-list-open="true"] .toolbar {
-    margin: 20px;
   }
 
   .toolbar {
@@ -55,14 +50,14 @@ export const WIDGET_CSS = `
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     animation: ff-button-pop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
     transition:
-      height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
       border-radius 0.22s ease,
       transform 0.16s ease;
   }
 
+  /* Open, the toolbar is a full-height bar docked to the screen edge. */
   .toolbar[data-state="expanded"] {
-    height: 148px;
-    border-radius: 24px;
+    height: 100%;
+    border-radius: 0;
   }
 
   .toolbar[data-state="collapsed"]:hover {
@@ -107,7 +102,7 @@ export const WIDGET_CSS = `
 
   .controls {
     position: absolute;
-    inset: 4px;
+    inset: 8px 4px;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -115,6 +110,11 @@ export const WIDGET_CSS = `
       opacity 150ms ease,
       transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
       filter 220ms ease;
+  }
+
+  /* The close control sits at the bar's bottom, like BugHerd's collapse. */
+  .controls .control:last-child {
+    margin-top: auto;
   }
 
   .controls[data-visible="false"] {
