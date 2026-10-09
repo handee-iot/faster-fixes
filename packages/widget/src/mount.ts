@@ -297,7 +297,12 @@ export function mountWidget({
 
   const list = createFeedbackList(
     document,
-    { labels: options.labels, position: options.position, branding },
+    {
+      labels: options.labels,
+      position: options.position,
+      branding,
+      currentPageUrl: () => window.location.href,
+    },
     {
       onSelect(item) {
         if (item.pageUrl !== window.location.href) {

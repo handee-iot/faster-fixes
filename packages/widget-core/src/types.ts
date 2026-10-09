@@ -27,6 +27,8 @@ export type FeedbackItem = {
   clickY: number | null;
   selector: string | null;
   screenshotUrl: string | null;
+  /** How many comments the thread holds; omitted when the source cannot count. */
+  commentCount?: number;
   reviewer: FeedbackReviewer;
   createdAt: string;
   metadata?: Record<string, unknown> | null;

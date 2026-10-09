@@ -46,11 +46,19 @@ export type Labels = {
   hideResolved: string;
   feedbackListTitle: string;
   emptyList: string;
-  // Accessible name of a Feedback row's comments toggle.
+  // Unused by the Widget, kept so existing `labels` objects still type-check.
   commentsButton: string;
+  thisPageTab: string;
+  allTab: string;
+  backButton: string;
+  showOnPage: string;
+  viewScreenshot: string;
+  commentsTitle: string;
   noComments: string;
   replyPlaceholder: string;
   sendButton: string;
+  // Receives the formatted time and the author name.
+  reportedBy: (when: string, by: string) => string;
   startFeedback: string;
   exitFeedbackMode: string;
   showFeedbackList: string;
@@ -80,9 +88,16 @@ export const DEFAULT_LABELS: Labels = {
   feedbackListTitle: "Feedback",
   emptyList: "No feedback on this page",
   commentsButton: "Comments",
+  thisPageTab: "This page",
+  allTab: "All",
+  backButton: "Back",
+  showOnPage: "Show on page",
+  viewScreenshot: "View screenshot",
+  commentsTitle: "Comments",
   noComments: "No comments yet",
   replyPlaceholder: "Write a reply...",
   sendButton: "Send",
+  reportedBy: (when, by) => `Reported ${when} by ${by}`,
   startFeedback: "Start feedback",
   exitFeedbackMode: "Exit feedback mode",
   showFeedbackList: "Show feedback list",

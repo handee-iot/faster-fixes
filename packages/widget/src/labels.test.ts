@@ -17,7 +17,7 @@ describe("resolveLabels", () => {
   });
 
   it("resolves every text key to a string", () => {
-    const { pinAriaLabel, ...textLabels } = resolveLabels({
+    const { pinAriaLabel, reportedBy, ...textLabels } = resolveLabels({
       emptyList: "Aucun retour",
     });
 
@@ -25,6 +25,7 @@ describe("resolveLabels", () => {
       expect(typeof value).toBe("string");
     }
     expect(pinAriaLabel("Broken link")).toBe("Feedback: Broken link");
+    expect(reportedBy("today", "Marie")).toBe("Reported today by Marie");
   });
 
   it("uses an overridden pin aria-label pattern", () => {
@@ -40,11 +41,13 @@ describe("resolveLabels", () => {
       submitButton: undefined,
       cancelButton: 42,
       pinAriaLabel: "Feedback",
+      reportedBy: "Reported",
     } as unknown as Partial<Labels>);
 
     expect(labels.submitButton).toBe(DEFAULT_LABELS.submitButton);
     expect(labels.cancelButton).toBe(DEFAULT_LABELS.cancelButton);
     expect(labels.pinAriaLabel).toBe(DEFAULT_LABELS.pinAriaLabel);
+    expect(labels.reportedBy).toBe(DEFAULT_LABELS.reportedBy);
   });
 
   it("ignores keys outside the labels contract", () => {

@@ -1,7 +1,12 @@
 import type { FeedbackItem, FeedbackStatus } from "@fasterfixes/core";
 import { describe, expect, it } from "vitest";
 
-import { listedFeedback, pagePath } from "./feedback-list.js";
+import {
+  listedFeedback,
+  pageItems,
+  pagePath,
+  statusLabel,
+} from "./feedback-list.js";
 
 function item(id: string, status: FeedbackStatus) {
   return { id, status } as FeedbackItem;
@@ -36,5 +41,34 @@ describe("pagePath", () => {
 
   it("returns an unparsable value unchanged", () => {
     expect(pagePath("not a url")).toBe("not a url");
+  });
+});
+
+describe("pageItems", () => {
+  it("keeps only the items submitted on the page", () => {
+    const items = [
+      { id: "a", pageUrl: "https://example.com/pricing" },
+      { id: "b", pageUrl: "https://example.com/" },
+      { id: "c", pageUrl: "https://example.com/pricing" },
+    ] as FeedbackItem[];
+
+    expect(
+      pageItems(items, "https://example.com/pricing").map(({ id }) => id),
+    ).toEqual(["a", "c"]);
+  });
+
+  it("matches the full URL, query included", () => {
+    const items = [
+      { id: "a", pageUrl: "https://example.com/pricing?plan=pro" },
+    ] as FeedbackItem[];
+
+    expect(pageItems(items, "https://example.com/pricing")).toEqual([]);
+  });
+});
+
+describe("statusLabel", () => {
+  it("reads an underscored status as words", () => {
+    expect(statusLabel("in_progress")).toBe("in progress");
+    expect(statusLabel("new")).toBe("new");
   });
 });
