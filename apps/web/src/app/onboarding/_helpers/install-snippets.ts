@@ -48,5 +48,10 @@ export default function RootLayout({
 export function buildScriptEmbedSnippet(projectId: string) {
   const apiOrigin = snippetApiOrigin();
   const apiOriginAttr = apiOrigin ? ` data-api-origin="${apiOrigin}"` : "";
-  return `<script src="${SCRIPT_EMBED_URL}" data-project-id="${projectId}"${apiOriginAttr} defer></script>`;
+  // A self-hosted instance serves its own built widget (`/widget.iife.js`), so
+  // an install always matches the deployment; the cloud keeps the CDN channel.
+  const scriptUrl = apiOrigin
+    ? `${apiOrigin}/widget.iife.js`
+    : SCRIPT_EMBED_URL;
+  return `<script src="${scriptUrl}" data-project-id="${projectId}"${apiOriginAttr} defer></script>`;
 }

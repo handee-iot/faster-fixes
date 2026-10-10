@@ -46,10 +46,10 @@ describe("buildScriptEmbedSnippet", () => {
     expect(buildScriptEmbedSnippet(PROJECT_ID)).not.toContain("\n");
   });
 
-  it("pins data-api-origin on a self-hosted instance, normalizing a trailing slash", () => {
+  it("serves the instance's own widget on a self-hosted install", () => {
     vi.stubEnv("NEXT_PUBLIC_FF_API_ORIGIN", `${SELF_HOSTED_ORIGIN}/`);
     expect(buildScriptEmbedSnippet(PROJECT_ID)).toBe(
-      `<script src="https://cdn.jsdelivr.net/npm/@fasterfixes/widget@1/dist/widget.iife.js" data-project-id="${PROJECT_ID}" data-api-origin="${SELF_HOSTED_ORIGIN}" defer></script>`,
+      `<script src="${SELF_HOSTED_ORIGIN}/widget.iife.js" data-project-id="${PROJECT_ID}" data-api-origin="${SELF_HOSTED_ORIGIN}" defer></script>`,
     );
   });
 });
