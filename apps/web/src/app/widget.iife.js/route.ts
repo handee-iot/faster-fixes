@@ -9,6 +9,10 @@ const IIFE_FILE = join(
   "node_modules/@fasterfixes/widget/dist/widget.iife.js",
 );
 
+// Read per request: a static optimization would pin Next's own long cache and
+// leave installed sites on an old widget for hours after a deploy.
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const script = await readFile(IIFE_FILE, "utf8");
