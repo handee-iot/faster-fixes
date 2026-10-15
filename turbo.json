@@ -11,7 +11,8 @@
     "MAIL_FROM_DOMAIN",
     "EMAIL_FROM",
     "BRAND_NAME",
-    "BRAND_URL"
+    "BRAND_URL",
+    "BRAND_LOGO_URL"
   ],
   "tasks": {
     "build": {

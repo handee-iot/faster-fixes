@@ -47,11 +47,13 @@ ported selectively; candidates for upstream PRs):
    cache mount for faster rebuilds. Their Next standalone runner and separate
    migrator container were not ported: Railway's pre-deploy command already
    runs `prisma migrate deploy` in the app image.
-8. Email branding — `BRAND_NAME` and `BRAND_URL` brand every email (sender
-   display name, header lockup with an accent rule, footer), the email palette
-   follows Handee's ink/red, and the welcome email drops upstream's founder
-   persona. Candidate for an upstream PR: self-hosters should brand their own
-   instance the same way.
+8. Email branding — `BRAND_NAME`, `BRAND_URL` and `BRAND_LOGO_URL` brand every
+   email (sender display name, header lockup with an accent rule, footer), the
+   email palette follows Handee's ink/red, and the welcome email drops
+   upstream's founder persona. The logo asset lives at
+   `apps/web/public/images/handee-logo.png` (black on transparent, from
+   `~/Documents/Brand/handee-iot-trans-black.png`). Candidate for an upstream
+   PR: self-hosters should brand their own instance the same way.
 
 Deploy artifacts:
 

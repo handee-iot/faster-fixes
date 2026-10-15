@@ -5,6 +5,7 @@ import {
   Head,
   Hr,
   Html,
+  Img,
   Link,
   Section,
   Tailwind,
@@ -29,9 +30,19 @@ export function EmailShell({ children }: EmailShellProps) {
         <Body className="bg-secondary py-[40px] font-sans">
           <Container className="mx-auto max-w-[600px] bg-card px-[40px] py-[40px]">
             <Section>
-              <Text className="m-0 text-[20px] font-bold tracking-[-0.02em] text-foreground">
-                {BRAND.name}
-              </Text>
+              {BRAND.logoUrl ? (
+                <Img
+                  src={BRAND.logoUrl}
+                  alt={BRAND.name}
+                  width={240}
+                  height={29}
+                  className="m-0"
+                />
+              ) : (
+                <Text className="m-0 text-[20px] font-bold tracking-[-0.02em] text-foreground">
+                  {BRAND.name}
+                </Text>
+              )}
               <Hr className="mx-0 mt-[10px] mb-[28px] w-[44px] border-t-[3px] border-accent" />
             </Section>
 
