@@ -1,7 +1,4 @@
-import {
-  BadRequestError,
-  ForbiddenError,
-} from "@/server/errors/domain-errors";
+import { BadRequestError, ForbiddenError } from "@/server/errors/domain-errors";
 import { prisma } from "@workspace/db";
 import type { DeleteFeedbackColumnInput } from "./delete-feedback-column.schema";
 import { getFeedbackColumn } from "./get-feedback-column";

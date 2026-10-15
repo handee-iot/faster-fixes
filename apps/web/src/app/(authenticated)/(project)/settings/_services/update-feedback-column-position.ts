@@ -1,7 +1,4 @@
-import {
-  BadRequestError,
-  ForbiddenError,
-} from "@/server/errors/domain-errors";
+import { BadRequestError, ForbiddenError } from "@/server/errors/domain-errors";
 import { prisma } from "@workspace/db";
 import { getFeedbackColumn } from "./get-feedback-column";
 import type { UpdateFeedbackColumnPositionInput } from "./update-feedback-column-position.schema";
@@ -40,7 +37,9 @@ export async function updateFeedbackColumnPosition(
   // Columns only reorder within their category so the board's left-to-right
   // flow always matches the status lifecycle (ADR-0017).
   if (!neighbor || neighbor.category !== column.category) {
-    throw new BadRequestError("A column can only move within its status group.");
+    throw new BadRequestError(
+      "A column can only move within its status group.",
+    );
   }
 
   await db.$transaction([
