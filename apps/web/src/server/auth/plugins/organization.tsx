@@ -1,6 +1,6 @@
 import { ORGANIZATION_ROLES } from "@/app/_domains/organization";
 import { mailer } from "@/lib/mailer/client";
-import { SENDER_EMAIL } from "@/lib/mailer/constants";
+import { SENDER_FROM } from "@/lib/mailer/constants";
 import { OrganizationInvitation } from "@/lib/mailer/templates/organization-invitation";
 import { getAppUrl } from "@/utils/url/get-app-url";
 import { render } from "@react-email/components";
@@ -25,7 +25,7 @@ export const organizationPlugin = organization({
     try {
       const { email, organization: org, inviter } = data;
       const normalizedEmail = email.toLowerCase().trim();
-      const from = SENDER_EMAIL;
+      const from = SENDER_FROM;
       const inviterName = inviter.user.name || inviter.user.email;
       const role = ROLE_LABELS[data.role] ?? data.role;
       const invitationLink = `${getAppUrl()}/organization/invitations`;

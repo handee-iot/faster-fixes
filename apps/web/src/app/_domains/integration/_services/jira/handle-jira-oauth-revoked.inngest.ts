@@ -1,5 +1,5 @@
 import { mailer } from "@/lib/mailer/client";
-import { SENDER_EMAIL } from "@/lib/mailer/constants";
+import { SENDER_FROM } from "@/lib/mailer/constants";
 import {
   JiraReconnectRequired,
   type JiraReconnectRequiredProps,
@@ -85,7 +85,7 @@ export const handleJiraOAuthRevoked = inngest.createFunction(
     await Promise.all(
       recipients.map((to) =>
         mailer.emails.send({
-          from: SENDER_EMAIL,
+          from: SENDER_FROM,
           to,
           subject: "Action required: reconnect Jira",
           body,

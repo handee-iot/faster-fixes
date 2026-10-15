@@ -1,5 +1,5 @@
 import { mailer } from "@/lib/mailer/client";
-import { SENDER_EMAIL } from "@/lib/mailer/constants";
+import { SENDER_FROM } from "@/lib/mailer/constants";
 import { VerifyEmail } from "@/lib/mailer/templates/verify-email";
 import { inngest } from "@/server/inngest";
 import { buildEvent, userEmailVerifiedEvent } from "@/server/inngest/events";
@@ -30,7 +30,7 @@ export const emailVerification: NonNullable<
     }
 
     const normalizedEmail = user.email.toLowerCase().trim();
-    const from = SENDER_EMAIL;
+    const from = SENDER_FROM;
     const body = await render(<VerifyEmail verificationLink={url} />);
 
     await mailer.emails.send({

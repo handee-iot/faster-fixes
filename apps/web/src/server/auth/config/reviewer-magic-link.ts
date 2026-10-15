@@ -1,7 +1,7 @@
 import "server-only";
 
 import { mailer } from "@/lib/mailer/client";
-import { SENDER_EMAIL } from "@/lib/mailer/constants";
+import { SENDER_FROM } from "@/lib/mailer/constants";
 import { ReviewerMagicLinkEmail } from "@/lib/mailer/templates/reviewer-magic-link";
 import { render } from "@react-email/components";
 import { prisma } from "@workspace/db";
@@ -32,7 +32,7 @@ export async function sendReviewerMagicLink(
   );
 
   await mailer.emails.send({
-    from: SENDER_EMAIL,
+    from: SENDER_FROM,
     to: email.toLowerCase().trim(),
     subject: `Sign in to ${reviewer.project.name}`,
     body,

@@ -1,6 +1,6 @@
 import { pageLabel } from "@/app/_domains/feedback/_helpers/page-label";
 import { mailer } from "@/lib/mailer/client";
-import { SENDER_EMAIL } from "@/lib/mailer/constants";
+import { SENDER_FROM } from "@/lib/mailer/constants";
 import { FeedbackResolvedEmail } from "@/lib/mailer/templates/feedback-resolved";
 import { render } from "@react-email/components";
 import { prisma } from "@workspace/db";
@@ -40,7 +40,7 @@ export async function sendResolvedEmailToReviewer(
   );
 
   await mailer.emails.send({
-    from: SENDER_EMAIL,
+    from: SENDER_FROM,
     to: email,
     subject: "Your feedback has been resolved",
     body,

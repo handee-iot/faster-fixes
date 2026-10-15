@@ -9,7 +9,9 @@
     "VERCEL_URL",
     "VERCEL_PROJECT_PRODUCTION_URL",
     "MAIL_FROM_DOMAIN",
-    "EMAIL_FROM"
+    "EMAIL_FROM",
+    "BRAND_NAME",
+    "BRAND_URL"
   ],
   "tasks": {
     "build": {

@@ -1,6 +1,6 @@
 import { pageLabel } from "@/app/_domains/feedback/_helpers/page-label";
 import { mailer } from "@/lib/mailer/client";
-import { SENDER_EMAIL } from "@/lib/mailer/constants";
+import { SENDER_FROM } from "@/lib/mailer/constants";
 import { FeedbackReplyEmail } from "@/lib/mailer/templates/feedback-reply";
 import { render } from "@react-email/components";
 import { prisma } from "@workspace/db";
@@ -48,7 +48,7 @@ export async function sendReplyEmailToReviewer(
   );
 
   await mailer.emails.send({
-    from: SENDER_EMAIL,
+    from: SENDER_FROM,
     to: email,
     subject: "New reply to your feedback",
     body,

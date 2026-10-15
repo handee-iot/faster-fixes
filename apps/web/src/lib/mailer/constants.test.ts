@@ -42,4 +42,14 @@ describe("mail sender addresses", () => {
     expect(SENDER_EMAIL).toBe("onboarding@resend.dev");
     expect(NO_REPLY_EMAIL).toBe("onboarding@resend.dev");
   });
+
+  it("prefixes the sender with the brand name", async () => {
+    vi.stubEnv("DOMAIN_NAME", "handee.co.za");
+    vi.stubEnv("BRAND_NAME", "Handee");
+    vi.resetModules();
+
+    const { SENDER_FROM } = await import("./constants");
+
+    expect(SENDER_FROM).toBe("Handee <contact@handee.co.za>");
+  });
 });

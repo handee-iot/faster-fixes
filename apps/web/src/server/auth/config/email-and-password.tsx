@@ -1,5 +1,5 @@
 import { mailer } from "@/lib/mailer/client";
-import { SENDER_EMAIL } from "@/lib/mailer/constants";
+import { SENDER_FROM } from "@/lib/mailer/constants";
 import { ResetPassword } from "@/lib/mailer/templates/reset-password";
 import { PreconditionFailedError } from "@/server/errors/domain-errors";
 import { render } from "@react-email/components";
@@ -15,7 +15,7 @@ export const emailAndPassword: NonNullable<
   sendResetPassword: async ({ user, url }) => {
     try {
       const normalizedEmail = user.email.toLowerCase().trim();
-      const from = SENDER_EMAIL;
+      const from = SENDER_FROM;
       const body = await render(<ResetPassword resetPasswordLink={url} />);
 
       await mailer.emails.send({

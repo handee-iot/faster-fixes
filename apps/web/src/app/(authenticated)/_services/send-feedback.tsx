@@ -1,5 +1,5 @@
 import { mailer } from "@/lib/mailer/client";
-import { NO_REPLY_EMAIL } from "@/lib/mailer/constants";
+import { NO_REPLY_FROM } from "@/lib/mailer/constants";
 import { UserFeedback } from "@/lib/mailer/templates/user-feedback";
 import { PreconditionFailedError } from "@/server/errors/domain-errors";
 import { render } from "@react-email/components";
@@ -47,7 +47,7 @@ export async function sendFeedback(
   await Promise.all(
     adminEmails.map((to) =>
       mailer.emails.send({
-        from: NO_REPLY_EMAIL,
+        from: NO_REPLY_FROM,
         to,
         subject,
         body,

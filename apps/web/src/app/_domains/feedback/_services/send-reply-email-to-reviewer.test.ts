@@ -1,5 +1,5 @@
 import type { Mailer } from "@/lib/mailer/client";
-import { SENDER_EMAIL } from "@/lib/mailer/constants";
+import { SENDER_FROM } from "@/lib/mailer/constants";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const send = vi.fn<Mailer["emails"]["send"]>();
@@ -87,7 +87,7 @@ describe("sendReplyEmailToReviewer", () => {
     expect(send).toHaveBeenCalledTimes(1);
     const options = send.mock.calls[0]![0];
     expect(options).toMatchObject({
-      from: SENDER_EMAIL,
+      from: SENDER_FROM,
       to: "marie@example.com",
       subject: "New reply to your feedback",
     });
