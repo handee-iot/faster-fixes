@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  REACT_INSTALL_COMMAND,
+  buildReactLayoutSnippet,
+  buildScriptEmbedSnippet,
+} from "@/app/_domains/project/_helpers/install-snippets";
 import { Button } from "@workspace/ui/components/button";
 import { CopyButton } from "@workspace/ui/components/copy-button";
 import {
@@ -9,12 +14,6 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { ArrowRight } from "lucide-react";
-
-import {
-  REACT_INSTALL_COMMAND,
-  buildReactLayoutSnippet,
-  buildScriptEmbedSnippet,
-} from "../../_helpers/install-snippets";
 
 type InstallSnippetStepProps = {
   projectId: string;

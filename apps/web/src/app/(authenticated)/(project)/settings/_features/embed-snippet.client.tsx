@@ -1,5 +1,6 @@
 "use client";
 
+import { buildScriptEmbedSnippet } from "@/app/_domains/project/_helpers/install-snippets";
 import { useTRPC } from "@/lib/trpc/trpc-client";
 import { getErrorMessage } from "@/utils/error/get-error-message";
 import { matchQueryStatus } from "@/utils/tanstack-query/match-query-status";
@@ -12,21 +13,11 @@ import {
 import { CopyButton } from "@workspace/ui/components/copy-button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 
-type ApiKeyMigrationNoticeProps = {
+type EmbedSnippetProps = {
   projectId: string;
 };
 
-const INSTALL_COMMAND = "npm install @fasterfixes/react@latest";
-
-function buildSnippet(publicId: string) {
-  return `<FeedbackProvider projectId="${publicId}">
-  {children}
-</FeedbackProvider>`;
-}
-
-export function ApiKeyMigrationNotice({
-  projectId,
-}: ApiKeyMigrationNoticeProps) {
+export function EmbedSnippet({ projectId }: EmbedSnippetProps) {
   const trpc = useTRPC();
   const projectQuery = useQuery(
     trpc.authenticated.projects.get.queryOptions({ projectId }),
@@ -37,14 +28,13 @@ export function ApiKeyMigrationNotice({
       <div className="flex flex-col gap-4">
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-20 w-full" />
       </div>
     ),
     // The snippet is the point of the card, and a placeholder Project ID would
     // be copied as if it were real, so the failure replaces the whole card.
     Errored: (error) => (
       <Alert variant="destructive">
-        <AlertTitle>Failed to load the migration snippet</AlertTitle>
+        <AlertTitle>Failed to load the embed snippet</AlertTitle>
         <AlertDescription>{getErrorMessage(error)}</AlertDescription>
       </Alert>
     ),
@@ -56,34 +46,17 @@ export function ApiKeyMigrationNotice({
       </p>
     ),
     Success: ({ data: project }) => {
-      const snippet = buildSnippet(project.publicId);
+      const snippet = buildScriptEmbedSnippet(project.publicId);
 
       return (
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <p className="text-sm text-muted-foreground">
-              The widget now authenticates with your Project ID, shown in
-              Project information above. Existing installs that use an API key
-              continue to work.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              To migrate, update @fasterfixes/react to version 0.0.9 or later
-              and pass your Project ID via the projectId prop.
-            </p>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Paste this snippet into your site, before the closing body tag. It
+            loads the feedback widget and connects it to this project.
+          </p>
 
           <div className="relative rounded-md border bg-muted p-3">
-            <code className="font-mono text-sm">{INSTALL_COMMAND}</code>
-            <CopyButton
-              content={INSTALL_COMMAND}
-              variant="ghost"
-              size="icon-xs"
-              className="absolute top-2 right-2"
-            />
-          </div>
-
-          <div className="relative rounded-md border bg-muted p-3">
-            <pre className="overflow-x-auto font-mono text-sm leading-relaxed">
+            <pre className="pr-10 font-mono text-sm leading-relaxed break-words whitespace-pre-wrap">
               <code>{snippet}</code>
             </pre>
             <CopyButton

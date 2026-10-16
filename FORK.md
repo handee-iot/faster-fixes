@@ -54,6 +54,12 @@ ported selectively; candidates for upstream PRs):
    `apps/web/public/images/handee-logo.png` (black on transparent, from
    `~/Documents/Brand/handee-iot-trans-black.png`). Candidate for an upstream
    PR: self-hosters should brand their own instance the same way.
+9. Widget embed snippet in project settings — the API-key migration notice is
+   replaced by an Embed section showing the plain `<script>` tag (pointing at
+   the instance's own `/widget.iife.js`) with a copy button. The snippet
+   builder (`install-snippets.ts`) moved from the onboarding feature to
+   `_domains/project/_helpers/` so both surfaces share it. Candidate for an
+   upstream PR: a self-hosted instance should surface its own embed snippet.
 
 Deploy artifacts:
 
@@ -61,7 +67,7 @@ Deploy artifacts:
   generate, `next build`; runtime runs `next start` as a non-root user behind
   `docker/entrypoint.sh`).
 - `railway.json` — Dockerfile builder, pre-deploy `prisma migrate deploy`,
-  start command, healthcheck at `/login`.
+  start command, healthcheck at `/api/health`.
 - `.dockerignore`.
 
 Notes for upstream PRs (see upstream issue #246): patch 1, the adopted

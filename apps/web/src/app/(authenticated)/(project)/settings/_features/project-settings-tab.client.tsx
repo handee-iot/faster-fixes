@@ -4,9 +4,9 @@ import { DashboardSection } from "@/app/(authenticated)/_features/dashboard/dash
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { AlertTriangleIcon } from "lucide-react";
 
-import { ApiKeyMigrationNotice } from "./api-key-migration-notice.client";
 import { BoardColumnsSection } from "./board-columns/board-columns-section.client";
 import { DeleteProjectButton } from "./delete/delete-project-button.client";
+import { EmbedSnippet } from "./embed-snippet.client";
 import { GitHubSection } from "./github/github-section.client";
 import { JiraSection } from "./jira/jira-section.client";
 import { LinearSection } from "./linear/linear-section.client";
@@ -39,12 +39,12 @@ export function ProjectSettingsTab({ projectId }: ProjectSettingsTabProps) {
       </DashboardSection>
 
       <DashboardSection
-        title="API key"
-        description="API keys are deprecated. The widget now authenticates with your Project ID."
-        cardTitle="API key (deprecated)"
+        title="Embed"
+        description="Add the widget to any site with one script tag, no package install needed."
+        cardTitle="Embed code"
         cardClassName="lg:max-w-lg"
       >
-        <ApiKeyMigrationNotice projectId={projectId} />
+        <EmbedSnippet projectId={projectId} />
       </DashboardSection>
 
       <DashboardSection
