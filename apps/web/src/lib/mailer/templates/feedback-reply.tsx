@@ -22,7 +22,7 @@ export function FeedbackReplyEmail({
           New reply
         </Text>
 
-        <Text className="mt-0 mb-[24px] text-[16px] leading-[24px] text-foreground">
+        <Text className="mt-0 mb-[24px] text-[16px] leading-[24px] break-words text-foreground">
           {reviewerName ? `Hi ${reviewerName}, ` : "Hi, "}
           the team replied to the feedback you left on {pageLabel}:
         </Text>

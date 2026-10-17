@@ -21,7 +21,7 @@ export function FeedbackResolvedEmail({
           Feedback resolved
         </Text>
 
-        <Text className="mt-0 mb-[24px] text-[16px] leading-[24px] text-foreground">
+        <Text className="mt-0 mb-[24px] text-[16px] leading-[24px] break-words text-foreground">
           {reviewerName ? `Hi ${reviewerName}, ` : "Hi, "}
           the feedback you left on {pageLabel} has been resolved.
         </Text>
