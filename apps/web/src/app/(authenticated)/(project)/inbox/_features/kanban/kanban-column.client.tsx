@@ -28,7 +28,9 @@ export function KanbanColumnBody({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex flex-1 flex-col gap-2 rounded-lg border border-dashed p-2 transition-colors",
+        // min-w-0 lets the column shrink to its slot; without it the cards'
+        // long page paths set the column's min-content width and overflow.
+        "flex min-w-0 flex-1 flex-col gap-2 rounded-lg border border-dashed p-2 transition-colors",
         isOver
           ? "border-primary/50 bg-primary/5"
           : "border-transparent bg-muted/50",

@@ -96,7 +96,9 @@ function DiagnosticsTabs({ trail }: DiagnosticsTabsProps) {
   const networkCount = trail.network.length;
 
   return (
-    <Tabs defaultValue="console">
+    // min-w-0 keeps this grid item from sizing to its content: a long request
+    // URL would otherwise widen the row past the dialog.
+    <Tabs defaultValue="console" className="min-w-0">
       <TabsList>
         <TabsTrigger value="console">Console ({consoleCount})</TabsTrigger>
         <TabsTrigger value="network">Network ({networkCount})</TabsTrigger>

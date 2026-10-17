@@ -30,6 +30,16 @@ import { Archive } from "lucide-react";
 
 type ArchivedItem = ListArchivedFeedbackOutput["items"][number];
 
+// The host plus path is enough to recognise a page; the query adds noise.
+function pageUrlLabel(pageUrl: string) {
+  try {
+    const url = new URL(pageUrl);
+    return url.hostname + url.pathname.replace(/\/$/, "");
+  } catch {
+    return pageUrl;
+  }
+}
+
 type ArchiveTabProps = {
   projectId: string;
 };
@@ -92,20 +102,15 @@ export function ArchiveTab({ projectId }: ArchiveTabProps) {
         accessorKey: "pageUrl",
         header: "Page URL",
         cell: ({ row }) => {
-          try {
-            const url = new URL(row.original.pageUrl);
-            return (
-              <span className="text-xs text-muted-foreground">
-                {url.hostname + url.pathname.replace(/\/$/, "")}
-              </span>
-            );
-          } catch {
-            return (
-              <span className="text-xs text-muted-foreground">
-                {row.original.pageUrl}
-              </span>
-            );
-          }
+          const label = pageUrlLabel(row.original.pageUrl);
+          return (
+            <span
+              className="block max-w-[300px] truncate text-xs text-muted-foreground"
+              title={label}
+            >
+              {label}
+            </span>
+          );
         },
       },
       {

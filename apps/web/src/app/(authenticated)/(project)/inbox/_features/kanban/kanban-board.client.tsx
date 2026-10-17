@@ -69,6 +69,9 @@ export function KanbanBoard({
   const { bulkUpdateStatus, updateColumn } = useFeedbackMutations();
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [activeId, setActiveId] = React.useState<string | null>(null);
+  // The overlay renders outside the column, so it has no width of its own;
+  // freezing the source card's width keeps the ghost from sizing to content.
+  const [activeWidth, setActiveWidth] = React.useState<number | null>(null);
 
   const boardColumns = React.useMemo(
     () =>
@@ -116,10 +119,12 @@ export function KanbanBoard({
 
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id as string);
+    setActiveWidth(event.active.rect.current.initial?.width ?? null);
   }
 
   function handleDragEnd(event: DragEndEvent) {
     setActiveId(null);
+    setActiveWidth(null);
     const { active, over } = event;
     if (!over) return;
 
@@ -134,6 +139,7 @@ export function KanbanBoard({
 
   function handleDragCancel() {
     setActiveId(null);
+    setActiveWidth(null);
   }
 
   const activeFeedback = activeId
@@ -238,10 +244,12 @@ export function KanbanBoard({
             slot when the item has actually moved to another column. */}
         <DragOverlay dropAnimation={null}>
           {activeFeedback ? (
-            <KanbanCardOverlay
-              feedback={activeFeedback}
-              isSelected={selectedIds.has(activeFeedback.id)}
-            />
+            <div style={activeWidth ? { width: activeWidth } : undefined}>
+              <KanbanCardOverlay
+                feedback={activeFeedback}
+                isSelected={selectedIds.has(activeFeedback.id)}
+              />
+            </div>
           ) : null}
         </DragOverlay>
       </DndContext>
