@@ -17,9 +17,10 @@ email round trip, and many reviewers have no email at all (ADR-0019).
 The portal accepts a token hand-off and an embed mode:
 
 - `GET /portal/handoff?token=<reviewer token>` verifies the token against an
-  active Reviewer, sets it as an HttpOnly, SameSite=Lax cookie scoped to
-  `/portal` (12 hours), and redirects to `/portal/embed`, so the token does not
-  linger in the frame's history.
+  active Reviewer, sets it as an HttpOnly, SameSite=Lax cookie scoped to the
+  site (12 hours; site-wide because the board's data calls go to `/api/trpc`),
+  and redirects to `/portal/embed`, so the token does not linger in the
+  frame's history.
 - `/portal/embed` renders the board with no header and no sign-out, resolving
   the Reviewer from the signed-in User's email or from the cookie.
 - The portal's tRPC procedures resolve the Reviewer the same way and rate-limit

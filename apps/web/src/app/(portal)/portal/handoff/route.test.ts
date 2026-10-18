@@ -47,7 +47,9 @@ describe("GET /portal/handoff", () => {
     const cookie = response.headers.get("set-cookie") ?? "";
     expect(cookie).toContain("portal_reviewer=abc123");
     expect(cookie).toContain("HttpOnly");
-    expect(cookie).toContain("Path=/portal");
+    // Site-wide: the board's data calls go to /api/trpc.
+    expect(cookie).toContain("Path=/");
+    expect(cookie).not.toContain("Path=/portal");
   });
 
   it("redirects without a cookie when the token is unknown", async () => {

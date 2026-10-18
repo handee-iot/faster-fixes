@@ -23,7 +23,9 @@ export async function GET(req: NextRequest) {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      path: "/portal",
+      // Site-wide, not /portal: the board's data calls go to /api/trpc, and a
+      // /portal-scoped cookie would never reach them.
+      path: "/",
       // Long enough to survive a working day without another hand-off; the
       // CRM re-runs the hand-off on every page render anyway.
       maxAge: 60 * 60 * 12,

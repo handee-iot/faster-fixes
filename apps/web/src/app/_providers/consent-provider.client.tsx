@@ -6,6 +6,7 @@ import {
   CookieBanner,
 } from "@c15t/nextjs";
 import { ClientSideOptionsProvider } from "@c15t/nextjs/client";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 type ConsentProviderProps = {
@@ -13,6 +14,10 @@ type ConsentProviderProps = {
 };
 
 export function ConsentProvider({ children }: ConsentProviderProps) {
+  // The embed shows the board alone (ADR-0022); a consent banner belongs to a
+  // page the visitor navigated to, not to a frame inside someone else's app.
+  const embedded = usePathname().startsWith("/portal/embed");
+
   return (
     <ConsentManagerProvider
       options={{
@@ -61,7 +66,7 @@ export function ConsentProvider({ children }: ConsentProviderProps) {
       }}
     >
       <ClientSideOptionsProvider>
-        <CookieBanner />
+        {embedded ? null : <CookieBanner />}
         <ConsentManagerDialog />
 
         {children}
