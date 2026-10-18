@@ -60,6 +60,11 @@ ported selectively; candidates for upstream PRs):
    builder (`install-snippets.ts`) moved from the onboarding feature to
    `_domains/project/_helpers/` so both surfaces share it. Candidate for an
    upstream PR: a self-hosted instance should surface its own embed snippet.
+10. Portal embed hand-off — `GET /portal/handoff?token=…` sets the Reviewer's
+    token as an HttpOnly cookie and redirects to `/portal/embed`, which renders
+    the board with no portal chrome; `frame-ancestors` on `/portal/*` lets the
+    Handee CRM frame it (ADR-0022). Candidate for an upstream PR: any
+    self-hoster embedding the board in their own back office.
 
 Deploy artifacts:
 

@@ -1,23 +1,36 @@
 import { createReviewerComment } from "@/app/_domains/feedback/_services/create-reviewer-comment";
 import { listReviewerComments } from "@/app/_domains/feedback/_services/list-reviewer-comments";
-import { findActiveReviewerByEmail } from "@/app/_domains/project/_services/find-active-reviewer-by-email";
-import { protectedProcedure, router } from "@/server/trpc/trpc";
+import { checkRateLimit } from "@/server/rate-limit/check-rate-limit";
+import { publicProcedure, router } from "@/server/trpc/trpc";
 import { TRPCError } from "@trpc/server";
+import { cookies } from "next/headers";
 import { z } from "zod";
+import { PORTAL_REVIEWER_COOKIE } from "./_helpers/portal-reviewer-cookie";
 import { CreatePortalCommentSchema } from "./_services/create-portal-comment.schema";
+import { findPortalReviewer } from "./_services/find-portal-reviewer";
 import { listPortalBoard } from "./_services/list-portal-board";
 import { moveFeedbackColumn } from "./_services/move-feedback-column";
 import { MoveFeedbackColumnSchema } from "./_services/move-feedback-column.schema";
 
 /**
- * The session's User must be an active Reviewer (ADR-0021); every procedure
+ * The request must resolve to an active Reviewer (ADR-0021): the signed-in
+ * User's email, or the embed hand-off's cookie (ADR-0022). Every procedure
  * then scopes its reads and writes to that Reviewer's Project.
  */
-const reviewerProcedure = protectedProcedure.use(async (opts) => {
-  const reviewer = await findActiveReviewerByEmail(opts.ctx.session.user.email);
+const reviewerProcedure = publicProcedure.use(async (opts) => {
+  const token = (await cookies()).get(PORTAL_REVIEWER_COOKIE)?.value;
+  const reviewer = await findPortalReviewer({
+    email: opts.ctx.session?.user.email,
+    token,
+  });
 
   if (!reviewer) {
     throw new TRPCError({ code: "FORBIDDEN" });
+  }
+
+  const { allowed } = await checkRateLimit(reviewer.id, "trpc");
+  if (!allowed) {
+    throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
   }
 
   return opts.next({ ctx: { reviewer } });

@@ -37,6 +37,18 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // The board can be framed by the CRM embed (ADR-0022). Browsers that
+        // know frame-ancestors ignore the X-Frame-Options below.
+        source: "/portal/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value:
+              "frame-ancestors 'self' https://crm.handee.co.za http://localhost:3000",
+          },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           {

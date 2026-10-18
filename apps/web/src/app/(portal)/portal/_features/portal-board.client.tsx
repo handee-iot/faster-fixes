@@ -25,6 +25,8 @@ type PortalBoardProps = {
   projectName: string;
   siteUrl: string;
   reviewerName: string;
+  /** The embed drops the portal's own chrome; the CRM supplies the frame. */
+  embedded?: boolean;
 };
 
 // The page a card names: the URL's path and query, or the raw value.
@@ -46,6 +48,7 @@ export function PortalBoard({
   projectName,
   siteUrl,
   reviewerName,
+  embedded,
 }: PortalBoardProps) {
   const trpc = useTRPC();
   const { data } = useQuery(trpc.portal.board.list.queryOptions());
@@ -67,35 +70,39 @@ export function PortalBoard({
 
   return (
     <div className="flex min-h-svh flex-col bg-muted/30">
-      <header className="flex items-center justify-between border-b bg-background px-6 py-3">
-        <div>
-          <p className="text-xs text-muted-foreground">Feedback board</p>
-          <h1 className="text-sm font-semibold">
-            <a
-              href={siteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 hover:underline"
+      {embedded ? null : (
+        <header className="flex items-center justify-between border-b bg-background px-6 py-3">
+          <div>
+            <p className="text-xs text-muted-foreground">Feedback board</p>
+            <h1 className="text-sm font-semibold">
+              <a
+                href={siteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 hover:underline"
+              >
+                {projectName}
+                <ExternalLink className="size-3 text-muted-foreground" />
+              </a>
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">
+              {reviewerName}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                void signOut().then(() => window.location.reload());
+              }}
             >
-              {projectName}
-              <ExternalLink className="size-3 text-muted-foreground" />
-            </a>
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-muted-foreground">{reviewerName}</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              void signOut().then(() => window.location.reload());
-            }}
-          >
-            <LogOut className="size-3.5" />
-            Sign out
-          </Button>
-        </div>
-      </header>
+              <LogOut className="size-3.5" />
+              Sign out
+            </Button>
+          </div>
+        </header>
+      )}
 
       <div className="flex flex-1 items-start gap-4 overflow-x-auto p-6">
         {columns.map((column) => {
