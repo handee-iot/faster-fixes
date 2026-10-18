@@ -1,4 +1,5 @@
 import { findActiveReviewerByToken } from "@/app/_domains/project/_services/find-active-reviewer-by-token";
+import { getAppUrl } from "@/utils/url/get-app-url";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { PORTAL_REVIEWER_COOKIE } from "../../_helpers/portal-reviewer-cookie";
@@ -12,9 +13,9 @@ export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token")?.trim() ?? "";
   const reviewer = token ? await findActiveReviewerByToken(token) : null;
 
-  const response = NextResponse.redirect(
-    new URL("/portal/embed", req.nextUrl.origin),
-  );
+  // The public app URL, not the request's: behind the proxy the request
+  // reports the container's own origin.
+  const response = NextResponse.redirect(new URL("/portal/embed", getAppUrl()));
   response.headers.set("Cache-Control", "no-store");
 
   if (reviewer) {

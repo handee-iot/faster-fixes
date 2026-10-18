@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
 const findActiveReviewerByToken = vi.fn();
@@ -26,6 +26,12 @@ function request(query = "") {
 describe("GET /portal/handoff", () => {
   beforeEach(() => {
     findActiveReviewerByToken.mockReset();
+    // The redirect target comes from the app's own URL, not the request.
+    vi.stubEnv("BASE_URL", "https://faster-fixes.handee.co.za");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("sets the reviewer cookie and redirects to the embed", async () => {
