@@ -7,6 +7,8 @@ import { deleteReviewer } from "./reviewers/_services/delete-reviewer";
 import { DeleteReviewerSchema } from "./reviewers/_services/delete-reviewer.schema";
 import { listReviewers } from "./reviewers/_services/list-reviewers";
 import { ListReviewersSchema } from "./reviewers/_services/list-reviewers.schema";
+import { resendReviewerInvite } from "@/app/_domains/project/_services/resend-reviewer-invite";
+import { ResendReviewerInviteSchema } from "./reviewers/_services/resend-reviewer-invite.schema";
 import { restoreReviewer } from "./reviewers/_services/restore-reviewer";
 import { RestoreReviewerSchema } from "./reviewers/_services/restore-reviewer.schema";
 import { revokeReviewer } from "./reviewers/_services/revoke-reviewer";
@@ -173,6 +175,14 @@ export const projectsRouter = router({
       .input(RevokeReviewerSchema)
       .mutation(({ input, ctx }) =>
         revokeReviewer({
+          reviewerId: input.reviewerId,
+          userId: ctx.session.user.id,
+        }),
+      ),
+    resendInvite: protectedProcedure
+      .input(ResendReviewerInviteSchema)
+      .mutation(({ input, ctx }) =>
+        resendReviewerInvite({
           reviewerId: input.reviewerId,
           userId: ctx.session.user.id,
         }),

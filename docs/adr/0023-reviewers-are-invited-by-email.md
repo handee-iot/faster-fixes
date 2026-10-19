@@ -23,9 +23,9 @@ Creating a Reviewer with an email sends them an invite email:
   a mailer outage never fails the creation, and delivery retries on its own.
 - A Reviewer with no recorded email is skipped silently, as with the resolve
   and reply emails (ADR-0019).
-- There is no resend: the raw token is not recoverable. Rotating the Reviewer's
-  token would break every widget link already handed out, so a resend would
-  need its own decision.
+- There is no resend in this decision: the raw token is not recoverable here.
+  ADR-0024 adds an encrypted copy for exactly that, so resending re-sends the
+  same links.
 
 ## Alternatives considered
 

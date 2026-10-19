@@ -75,6 +75,11 @@ RESEND_API_KEY="re_..."
 BRAND_NAME="Your company"
 BRAND_URL="https://your-domain.com"
 BRAND_LOGO_URL="https://your-domain.com/images/logo.png"
+
+# Optional: 32-byte hex (`openssl rand -hex 32`). Lets a Reviewer's invite be
+# resent without changing the links they already have (ADR-0024); without it,
+# resending issues a new link instead.
+# REVIEWER_TOKEN_ENCRYPTION_KEY="..."
 # PLUNK_SECRET_KEY="sk_..."
 
 # Widget API (points clients' widgets at your instance)

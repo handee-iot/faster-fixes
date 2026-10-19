@@ -16,6 +16,7 @@ import { toast } from "sonner";
 
 import type { ListReviewersOutput } from "../_services/list-reviewers";
 import { DeleteReviewerButton } from "./delete/delete-reviewer-button.client";
+import { ResendReviewerInviteButton } from "./resend/resend-reviewer-invite-button.client";
 import { RestoreReviewerButton } from "./restore/restore-reviewer-button.client";
 import { RevokeReviewerButton } from "./revoke/revoke-reviewer-button.client";
 
@@ -90,11 +91,20 @@ export function ReviewersTable({ projectId, reviewers }: ReviewersTableProps) {
             <TableCell>
               <div className="flex items-center gap-1">
                 {reviewer.isActive ? (
-                  <RevokeReviewerButton
-                    projectId={projectId}
-                    reviewerId={reviewer.id}
-                    reviewerName={reviewer.name}
-                  />
+                  <>
+                    {reviewer.email ? (
+                      <ResendReviewerInviteButton
+                        projectId={projectId}
+                        reviewerId={reviewer.id}
+                        reviewerName={reviewer.name}
+                      />
+                    ) : null}
+                    <RevokeReviewerButton
+                      projectId={projectId}
+                      reviewerId={reviewer.id}
+                      reviewerName={reviewer.name}
+                    />
+                  </>
                 ) : (
                   <>
                     <RestoreReviewerButton

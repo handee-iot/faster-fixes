@@ -67,8 +67,11 @@ ported selectively; candidates for upstream PRs):
     self-hoster embedding the board in their own back office.
 11. Reviewer invites — creating a Reviewer with an email sends them the board
     hand-off link and the widget link for their site, as a `reviewer/created`
-    Inngest event (ADR-0023). Candidate for an upstream PR alongside the
-    portal.
+    Inngest event (ADR-0023), and a **Resend invite** button re-sends them. The
+    raw token is stored encrypted (`REVIEWER_TOKEN_ENCRYPTION_KEY`, ADR-0024)
+    so a resend never changes the links a client already has; a Reviewer from
+    before that column gets a fresh token, and the UI says so. Candidates for
+    upstream PRs alongside the portal.
 
 Deploy artifacts:
 

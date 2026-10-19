@@ -51,6 +51,18 @@ export const reviewerCreatedEvent = eventType("reviewer/created", {
   }),
 });
 
+export const reviewerInviteResendRequestedEvent = eventType(
+  "reviewer/invite-resend-requested",
+  {
+    schema: z.object({
+      reviewerId: z.string(),
+      // The decrypted token, or a fresh one when the Reviewer predates the
+      // reversible copy (ADR-0024).
+      token: z.string(),
+    }),
+  },
+);
+
 export const githubWebhookIssuesEvent = eventType("github/webhook.issues", {
   schema: z.object({
     action: z.string(),

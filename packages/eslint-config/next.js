@@ -122,6 +122,7 @@ const serviceVerbOptions = {
     "reject",
     "request",
     "require",
+    "resend",
     "reset",
     "restore",
     "revoke",

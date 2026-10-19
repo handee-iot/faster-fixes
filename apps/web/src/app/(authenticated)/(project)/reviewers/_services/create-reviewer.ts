@@ -1,5 +1,9 @@
 import { buildEvent, reviewerCreatedEvent } from "@/server/inngest/events";
 import { inngest } from "@/server/inngest";
+import {
+  encryptReviewerToken,
+  reviewerTokenEncryptionReady,
+} from "@/app/_domains/project/_services/reviewer-token-crypto";
 import { ForbiddenError, NotFoundError } from "@/server/errors/domain-errors";
 import { prisma } from "@workspace/db";
 import crypto from "crypto";
@@ -41,6 +45,11 @@ export async function createReviewer(
       name,
       email: reviewerEmail,
       token: tokenHash,
+      // The reversible copy exists only to resend the invite (ADR-0024); an
+      // instance without the key still creates reviewers.
+      tokenEncrypted: reviewerTokenEncryptionReady()
+        ? encryptReviewerToken(token)
+        : null,
     },
   });
 

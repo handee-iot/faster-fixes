@@ -54,6 +54,10 @@ model Reviewer {
   // Optional: the resolve email goes out only when the team recorded one.
   email    String?
   token    String  @unique
+  /// Reversible copy of the token (AES-GCM, ADR-0024) so the invite can be
+  /// resent; `token` stays the SHA-256 hash lookups use. Null when no
+  /// encryption key is configured, or for reviewers created before it existed.
+  tokenEncrypted String?
   isActive Boolean @default(true)
 
   feedback Feedback[]
