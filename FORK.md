@@ -81,6 +81,13 @@ Deploy artifacts:
 - `railway.json` — Dockerfile builder, pre-deploy `prisma migrate deploy`,
   start command, healthcheck at `/api/health`.
 - `.dockerignore`.
+- **Inngest needs a manual Sync** after a deploy that adds or changes a
+  function: the Inngest app does not re-sync on its own (there is no
+  Vercel-style integration). Until you hit Sync in the dashboard (Apps →
+  `faster-fixes`), events arrive but nothing triggers, so the background emails
+  silently never send. Bit us on 19 Oct 2026: the app listed 17 of 20
+  functions, so the reviewer invite, resolve and reply emails had never
+  delivered.
 
 Notes for upstream PRs (see upstream issue #246): patch 1, the adopted
 brian-muzza fixes, and the self-hosting docs correction (`migrate:prod` runs
