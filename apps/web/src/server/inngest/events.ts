@@ -42,6 +42,15 @@ export const userEmailVerifiedEvent = eventType("user/email-verified", {
   schema: z.object({ userId: z.string() }),
 });
 
+export const reviewerCreatedEvent = eventType("reviewer/created", {
+  schema: z.object({
+    reviewerId: z.string(),
+    // The raw token, which only exists at creation (the stored one is a hash);
+    // the invite links carry it.
+    token: z.string(),
+  }),
+});
+
 export const githubWebhookIssuesEvent = eventType("github/webhook.issues", {
   schema: z.object({
     action: z.string(),

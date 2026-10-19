@@ -65,6 +65,10 @@ ported selectively; candidates for upstream PRs):
     the board with no portal chrome; `frame-ancestors` on `/portal/*` lets the
     Handee CRM frame it (ADR-0022). Candidate for an upstream PR: any
     self-hoster embedding the board in their own back office.
+11. Reviewer invites — creating a Reviewer with an email sends them the board
+    hand-off link and the widget link for their site, as a `reviewer/created`
+    Inngest event (ADR-0023). Candidate for an upstream PR alongside the
+    portal.
 
 Deploy artifacts:
 

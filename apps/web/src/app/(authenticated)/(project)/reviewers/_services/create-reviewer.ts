@@ -1,3 +1,5 @@
+import { buildEvent, reviewerCreatedEvent } from "@/server/inngest/events";
+import { inngest } from "@/server/inngest";
 import { ForbiddenError, NotFoundError } from "@/server/errors/domain-errors";
 import { prisma } from "@workspace/db";
 import crypto from "crypto";
@@ -41,6 +43,16 @@ export async function createReviewer(
       token: tokenHash,
     },
   });
+
+  // The invite carries the raw token, which exists only here; a mailer outage
+  // must not fail the creation, so it goes out as an event.
+  if (reviewerEmail) {
+    inngest
+      .send(
+        buildEvent(reviewerCreatedEvent, { reviewerId: reviewer.id, token }),
+      )
+      .catch(() => {});
+  }
 
   // Return raw token once — only the hash is persisted
   return {

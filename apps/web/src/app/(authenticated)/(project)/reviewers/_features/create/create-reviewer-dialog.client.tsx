@@ -124,7 +124,8 @@ export function CreateReviewerDialog({
                     />
                   </FormControl>
                   <FormDescription>
-                    Used to email them when their feedback is resolved.
+                    We send them their board link, and an update when their
+                    feedback is resolved.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
