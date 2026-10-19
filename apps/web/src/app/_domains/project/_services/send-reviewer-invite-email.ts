@@ -47,5 +47,9 @@ export async function sendReviewerInviteEmail(
     body,
   });
 
+  console.info(
+    `[reviewer-invite] sent reviewer=${reviewerId} project=${reviewer.project.name}`,
+  );
+
   return { sent: true as const };
 }

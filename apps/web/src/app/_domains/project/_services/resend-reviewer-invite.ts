@@ -78,7 +78,11 @@ export async function resendReviewerInvite(
         token,
       }),
     )
-    .catch(() => {});
+    .catch((error) => {
+      // Silent to the caller, but visible in the logs, which is where an
+      // undelivered invite is diagnosed.
+      console.warn("[reviewer-invite] resend event failed", error);
+    });
 
   return { sent: true as const, rotated };
 }

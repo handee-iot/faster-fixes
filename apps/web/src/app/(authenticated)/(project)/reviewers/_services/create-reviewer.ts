@@ -60,7 +60,11 @@ export async function createReviewer(
       .send(
         buildEvent(reviewerCreatedEvent, { reviewerId: reviewer.id, token }),
       )
-      .catch(() => {});
+      .catch((error) => {
+        // Silent to the caller, but visible in the logs, which is where an
+        // undelivered invite is diagnosed.
+        console.warn("[reviewer-invite] create event failed", error);
+      });
   }
 
   // Return raw token once — only the hash is persisted
