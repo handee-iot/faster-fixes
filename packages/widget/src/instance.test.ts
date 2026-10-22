@@ -137,6 +137,18 @@ describe("createDeferredWidget", () => {
     expect(deferred.widget.showPins).toBe(false);
   });
 
+  it("adopts the mounted Widget's pins state when nothing was asked", () => {
+    const deferred = createDeferredWidget();
+    const mounted = createFakeWidget();
+    // The mounted Widget carries the Reviewer's remembered hide.
+    mounted.togglePins();
+
+    deferred.attach(mounted);
+
+    expect(mounted.togglePins).toHaveBeenCalledOnce();
+    expect(deferred.widget.showPins).toBe(false);
+  });
+
   it("forwards togglePins after attach", () => {
     const deferred = createDeferredWidget();
     deferred.attach(createFakeWidget());

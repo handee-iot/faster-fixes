@@ -57,7 +57,10 @@ export function createDeferredWidget(): DeferredWidget {
   let mounted: Widget | null = null;
   let wantsVisible = true;
   let wantsAnnotation = false;
-  let wantsPins = true;
+  // Null until something asks: the mounted Widget's own state (the Reviewer's
+  // remembered choice, issues-hidden.ts) is adopted on attach, so a persisted
+  // hide is not undone by the default.
+  let wantsPins: boolean | null = null;
   let destroyed = false;
   let unsubscribeMounted: (() => void) | null = null;
   const listeners = createListeners();
@@ -96,12 +99,12 @@ export function createDeferredWidget(): DeferredWidget {
       if (destroyed) return;
       if (mounted) mounted.togglePins();
       else {
-        wantsPins = !wantsPins;
+        wantsPins = !(wantsPins ?? true);
         listeners.notify();
       }
     },
     get showPins() {
-      return mounted?.showPins ?? wantsPins;
+      return mounted?.showPins ?? wantsPins ?? true;
     },
     subscribe: listeners.subscribe,
     destroy() {
@@ -126,7 +129,10 @@ export function createDeferredWidget(): DeferredWidget {
       mounted = next;
       if (!wantsVisible) next.hide();
       if (wantsAnnotation) next.startAnnotation();
-      if (next.showPins !== wantsPins) next.togglePins();
+      // Only an explicit ask is reconciled; otherwise the mounted Widget's own
+      // state wins, and it becomes the baseline for later toggles.
+      if (wantsPins !== null && next.showPins !== wantsPins) next.togglePins();
+      wantsPins = next.showPins;
       unsubscribeMounted = next.subscribe(listeners.notify);
       if (!isSameState(before, snapshot())) listeners.notify();
     },
