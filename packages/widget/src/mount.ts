@@ -377,6 +377,10 @@ export function mountWidget({
     onToggleList: () => setListOpen(!list.isOpen),
   });
   toolbar.setListShown(false);
+  // The remembered hide choice applies before anything renders: the pins start
+  // hidden and the eye control says how to bring them back.
+  toolbar.setPinsShown(state.current.showPins);
+  pinLayer.setShown(state.current.showPins);
 
   const stack = document.createElement("div");
   stack.className = "stack";
