@@ -9,6 +9,7 @@ import type {
 import { createAnnotationMode } from "./annotation.js";
 import { createCommentPopover } from "./comment-popover.js";
 import { createFeedbackList } from "./feedback-list.js";
+import { readIssuesHidden, writeIssuesHidden } from "./issues-hidden.js";
 import { buildFeedbackPayload } from "./feedback-payload.js";
 import { guardHost } from "./host-guard.js";
 import type { Widget } from "./instance.js";
@@ -148,7 +149,9 @@ export function mountWidget({
   const state = createWidgetState({
     isVisible: true,
     feedbackItems: [],
-    showPins: true,
+    // The Reviewer's hide choice sticks across pages (issues-hidden.ts), so
+    // the pins do not reappear under their feet on every visit.
+    showPins: !readIssuesHidden(),
   });
 
   function setFeedbackItems(next: readonly FeedbackItem[]) {
@@ -370,7 +373,7 @@ export function mountWidget({
     onOpen: () => openBar(),
     onToggleCreate: () => setMode(mode === "idle" ? "annotating" : "idle"),
     onExit: () => closeBar(),
-    onTogglePins: togglePins,
+    onToggleIssues: toggleIssues,
     onToggleList: () => setListOpen(!list.isOpen),
   });
   toolbar.setListShown(false);
@@ -397,6 +400,14 @@ export function mountWidget({
     pinLayer.setShown(showPins);
     toolbar.setPinsShown(showPins);
     state.set({ showPins });
+    writeIssuesHidden(!showPins);
+  }
+
+  /** The rail's eye control: one press hides the pins and closes the list. */
+  function toggleIssues() {
+    const hide = state.current.showPins;
+    togglePins();
+    if (hide) setListOpen(false);
   }
 
   function show() {

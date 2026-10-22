@@ -72,6 +72,12 @@ ported selectively; candidates for upstream PRs):
     so a resend never changes the links a client already has; a Reviewer from
     before that column gets a fresh token, and the UI says so. Candidates for
     upstream PRs alongside the portal.
+12. The widget's eye control clears the view — one press hides the pins and
+    closes the issues list, and the choice sticks in `localStorage`
+    (`ff_issues_hidden`), so a Reviewer who does not want to see their issues
+    keeps them hidden across pages and visits. The `hideMarkers`/`showMarkers`
+    label defaults read "Hide my issues"/"Show my issues" for the same reason
+    (the keys are unchanged, so overrides keep working).
 
 Deploy artifacts:
 

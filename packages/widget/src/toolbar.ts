@@ -11,7 +11,8 @@ type ToolbarActions = {
   onToggleCreate: () => void;
   /** The close control: leaves feedback mode and collapses the bar. */
   onExit: () => void;
-  onTogglePins: () => void;
+  /** The eye control: hides the pins and the list, or brings the pins back. */
+  onToggleIssues: () => void;
   onToggleList: () => void;
 };
 
@@ -75,7 +76,7 @@ export function createToolbar(
     onOpen,
     onToggleCreate,
     onExit,
-    onTogglePins,
+    onToggleIssues,
     onToggleList,
   }: ToolbarActions,
 ): Toolbar {
@@ -115,7 +116,7 @@ export function createToolbar(
     labels.hideMarkers,
     "eye",
     side,
-    onTogglePins,
+    onToggleIssues,
   );
   const list = createControl(
     document,

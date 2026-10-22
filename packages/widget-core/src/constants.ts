@@ -105,13 +105,15 @@ export const DEFAULT_LABELS: Labels = {
   exitFeedbackMode: "Exit feedback mode",
   showFeedbackList: "Show feedback list",
   hideFeedbackList: "Hide feedback list",
-  showMarkers: "Show markers",
-  hideMarkers: "Hide markers",
+  showMarkers: "Show my issues",
+  hideMarkers: "Hide my issues",
   brandingLink: "Powered by FasterFixes",
   pinAriaLabel: (commentExcerpt) => `Feedback: ${commentExcerpt}`,
 };
 
 export const STORAGE_KEY_TOKEN = "ff_reviewer_token";
+/** The Reviewer hid their issues (pins and list); see the widget's issues-hidden.ts. */
+export const STORAGE_KEY_ISSUES_HIDDEN = "ff_issues_hidden";
 export const URL_PARAM_TOKEN = "ff_token";
 
 // Diagnostic Trail (console + network capture) bounds and redaction denylist.
