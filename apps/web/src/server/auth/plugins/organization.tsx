@@ -1,13 +1,5 @@
-import { ORGANIZATION_ROLES } from "@/app/_domains/organization";
-import { mailer } from "@/lib/mailer/client";
-import { SENDER_FROM } from "@/lib/mailer/constants";
-import { OrganizationInvitation } from "@/lib/mailer/templates/organization-invitation";
-import { getAppUrl } from "@/utils/url/get-app-url";
-import { render } from "@react-email/components";
+import { sendOrganizationInvitationEmail } from "@/server/auth/send-organization-invitation";
 import { organization } from "better-auth/plugins";
-
-// Widened so an invitation role outside the known set reads as `undefined`.
-const ROLE_LABELS: Partial<Record<string, string>> = ORGANIZATION_ROLES;
 
 export const organizationPlugin = organization({
   schema: {
@@ -23,29 +15,15 @@ export const organizationPlugin = organization({
   },
   sendInvitationEmail: async (data) => {
     try {
-      const { email, organization: org, inviter } = data;
-      const normalizedEmail = email.toLowerCase().trim();
-      const from = SENDER_FROM;
-      const inviterName = inviter.user.name || inviter.user.email;
-      const role = ROLE_LABELS[data.role] ?? data.role;
-      const invitationLink = `${getAppUrl()}/organization/invitations`;
-
-      const body = await render(
-        <OrganizationInvitation
-          organizationName={org.name}
-          inviterName={inviterName}
-          invitationLink={invitationLink}
-          role={role}
-        />,
-      );
-
-      await mailer.emails.send({
-        from,
-        to: normalizedEmail,
-        subject: `Invitation to join ${org.name}`,
-        body,
+      await sendOrganizationInvitationEmail({
+        id: data.id,
+        email: data.email,
+        organizationName: data.organization.name,
+        inviterName: data.inviter.user.name || data.inviter.user.email,
+        role: data.role,
       });
     } catch (error) {
+      // The invitation is already stored; a mailer outage must not undo it.
       console.error("Error sending organization invitation email:", error);
     }
   },

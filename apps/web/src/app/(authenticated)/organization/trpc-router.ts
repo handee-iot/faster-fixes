@@ -13,6 +13,8 @@ import { leaveOrganization } from "./_services/leave-organization";
 import { LeaveOrganizationSchema } from "./_services/leave-organization.schema";
 import { listInvitations } from "./_services/list-invitations";
 import { ListInvitationsSchema } from "./_services/list-invitations.schema";
+import { resendInvitation } from "./_services/resend-invitation";
+import { ResendInvitationSchema } from "./_services/resend-invitation.schema";
 import { updateMemberRole } from "./_services/update-member-role";
 import { UpdateMemberRoleSchema } from "./_services/update-member-role.schema";
 import { updateOrganization } from "./_services/update-organization";
@@ -81,6 +83,14 @@ export const organizationRouter = router({
       .query(({ input, ctx }) =>
         listInvitations({
           organizationId: input.organizationId,
+          userId: ctx.session.user.id,
+        }),
+      ),
+    resend: protectedProcedure
+      .input(ResendInvitationSchema)
+      .mutation(({ input, ctx }) =>
+        resendInvitation({
+          invitationId: input.invitationId,
           userId: ctx.session.user.id,
         }),
       ),

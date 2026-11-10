@@ -24,11 +24,16 @@ import { Input } from "@workspace/ui/components/input";
 import { PasswordInput } from "@workspace/ui/components/password-input";
 import { PasswordStrengthIndicator } from "@workspace/ui/components/password-strength-indicator";
 import { AlertCircleIcon, CheckCircleIcon } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 
 export function SignupForm() {
   const trpc = useTRPC();
+  const searchParams = useSearchParams();
+  // Set when the signup started from an invitation: the verification link then
+  // returns there, so the invitation can be accepted straight away.
+  const callbackURL = searchParams.get("nextUrl") ?? undefined;
   const [success, setSuccess] = useState(false);
 
   const form = useForm<RegisterUserInput>({
@@ -54,7 +59,7 @@ export function SignupForm() {
   );
 
   const onSubmit = async (data: RegisterUserInput) => {
-    signupMutation.mutate(data);
+    signupMutation.mutate({ ...data, callbackURL });
   };
 
   return (

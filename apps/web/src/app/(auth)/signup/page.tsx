@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { SignupForm } from "./_features/signup-form/signup-form.client";
 
 export const metadata: Metadata = {
@@ -26,7 +27,9 @@ export default async function SignupPage() {
             <h1 className="text-2xl font-bold">Create your account</h1>
           </div>
 
-          <SignupForm />
+          <Suspense>
+            <SignupForm />
+          </Suspense>
 
           <div className="text-center text-sm">
             <span className="text-muted-foreground">

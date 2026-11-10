@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { MoreHorizontal, X } from "lucide-react";
+import { MoreHorizontal, Send, X } from "lucide-react";
 import { toast } from "sonner";
 
 type InvitationActionsDropdownProps = {
@@ -22,12 +22,27 @@ export function InvitationActionsDropdown({
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
+  const invalidateList = () =>
+    queryClient.invalidateQueries(
+      trpc.authenticated.organization.invitation.list.queryFilter(),
+    );
+
+  const resendInvitation = useMutation(
+    trpc.authenticated.organization.invitation.resend.mutationOptions({
+      onSuccess: async () => {
+        await invalidateList();
+        toast.success("Invitation sent again");
+      },
+      onError: (error) => {
+        toast.error(error.message || "Error resending invitation.");
+      },
+    }),
+  );
+
   const cancelInvitation = useMutation(
     trpc.authenticated.organization.invitation.delete.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries(
-          trpc.authenticated.organization.invitation.list.queryFilter(),
-        );
+        await invalidateList();
         toast.success("Invitation canceled");
       },
       onError: (error) => {
@@ -42,12 +57,18 @@ export function InvitationActionsDropdown({
         <Button
           variant="ghost"
           size="icon"
-          disabled={cancelInvitation.isPending}
+          disabled={resendInvitation.isPending || cancelInvitation.isPending}
         >
           <MoreHorizontal className="size-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          onSelect={() => resendInvitation.mutate({ invitationId })}
+        >
+          <Send className="size-4" />
+          Resend invitation
+        </DropdownMenuItem>
         <DropdownMenuItem
           onSelect={() => cancelInvitation.mutate({ invitationId })}
           variant="destructive"

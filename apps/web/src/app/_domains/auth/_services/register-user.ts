@@ -4,9 +4,11 @@ import { ConflictError, DomainError } from "@/server/errors/domain-errors";
 export async function registerUser({
   email,
   password,
+  callbackURL,
 }: {
   email: string;
   password: string;
+  callbackURL?: string;
 }) {
   try {
     const localPart = email.split("@")[0];
@@ -18,6 +20,7 @@ export async function registerUser({
         name,
         email,
         password,
+        ...(callbackURL ? { callbackURL } : {}),
       },
     });
 

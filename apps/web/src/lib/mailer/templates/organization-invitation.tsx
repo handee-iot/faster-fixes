@@ -15,7 +15,7 @@ const baseUrl = getAppUrl();
 export function OrganizationInvitation({
   organizationName = "My organization",
   inviterName = "A user",
-  invitationLink = `${baseUrl}/organization/invitations`,
+  invitationLink = `${baseUrl}/accept-invitation`,
   role = "member",
 }: OrganizationInvitationProps) {
   return (
@@ -36,7 +36,9 @@ export function OrganizationInvitation({
         </Text>
 
         <Text className="mt-0 mb-[32px] text-[16px] leading-[24px] text-foreground">
-          Click the button below to accept the invitation.
+          Click the button below to accept the invitation. If you do not have an
+          account yet, create one with this email address first, then accept the
+          invitation.
         </Text>
 
         <Section className="mb-[32px] text-center">
@@ -44,7 +46,7 @@ export function OrganizationInvitation({
             href={invitationLink}
             className="box-border bg-primary px-[32px] py-[12px] text-[16px] font-medium text-primary-foreground no-underline"
           >
-            View invitation
+            Accept invitation
           </Button>
         </Section>
 
