@@ -9,6 +9,9 @@ import { deleteFeedback } from "./delete-feedback";
 vi.mock("@/server/storage/delete-asset", () => ({
   deleteAsset: vi.fn().mockResolvedValue(undefined),
 }));
+vi.mock("@/server/storage/delete-assets", () => ({
+  deleteAssets: vi.fn().mockResolvedValue(undefined),
+}));
 
 type FakeDb = NonNullable<Parameters<typeof deleteFeedback>[1]>;
 
@@ -28,6 +31,9 @@ function fakeDb(
       delete: vi.fn().mockResolvedValue({ id: "feedback_1" }),
     },
     member: { findFirst: vi.fn().mockResolvedValue(membership) },
+    feedbackCommentAttachment: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
   } as unknown as FakeDb;
 }
 

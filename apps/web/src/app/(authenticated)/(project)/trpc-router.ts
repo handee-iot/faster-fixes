@@ -302,6 +302,7 @@ export const projectsRouter = router({
         createFeedbackComment({
           feedbackId: input.feedbackId,
           body: input.body,
+          attachmentIds: input.attachmentIds,
           userId: ctx.session.user.id,
         }),
       ),

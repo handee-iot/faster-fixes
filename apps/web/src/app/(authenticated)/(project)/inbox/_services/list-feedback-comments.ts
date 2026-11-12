@@ -1,5 +1,6 @@
 import type { FeedbackCommentAuthorType } from "@/app/_domains/feedback";
 import { ForbiddenError, NotFoundError } from "@/server/errors/domain-errors";
+import { getSignedAssetUrl } from "@/server/storage/get-signed-asset-url";
 import { prisma } from "@workspace/db";
 import type { ListFeedbackCommentsInput } from "./list-feedback-comments.schema";
 
@@ -37,16 +38,28 @@ export async function listFeedbackComments(
           user: { select: { id: true, name: true, image: true } },
         },
       },
+      attachments: { orderBy: { position: "asc" }, include: { asset: true } },
     },
   });
 
-  return comments.map((comment) => ({
-    id: comment.id,
-    createdAt: comment.createdAt,
-    authorType: comment.authorType as FeedbackCommentAuthorType,
-    body: comment.body,
-    author: toAuthor(comment),
-  }));
+  return Promise.all(
+    comments.map(async (comment) => ({
+      id: comment.id,
+      createdAt: comment.createdAt,
+      authorType: comment.authorType as FeedbackCommentAuthorType,
+      body: comment.body,
+      author: toAuthor(comment),
+      attachments: await Promise.all(
+        comment.attachments.map(async ({ asset }) => ({
+          id: asset.id,
+          filename: asset.filename,
+          mimeType: asset.mimeType,
+          size: asset.size,
+          url: await getSignedAssetUrl(asset),
+        })),
+      ),
+    })),
+  );
 }
 
 type CommentWithAuthors = {

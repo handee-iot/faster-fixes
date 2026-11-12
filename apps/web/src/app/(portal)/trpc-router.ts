@@ -5,9 +5,9 @@ import { publicProcedure, router } from "@/server/trpc/trpc";
 import { TRPCError } from "@trpc/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
-import { PORTAL_REVIEWER_COOKIE } from "./_helpers/portal-reviewer-cookie";
+import { PORTAL_REVIEWER_COOKIE } from "@/app/_domains/project/_helpers/portal-reviewer-cookie";
 import { CreatePortalCommentSchema } from "./_services/create-portal-comment.schema";
-import { findPortalReviewer } from "./_services/find-portal-reviewer";
+import { findPortalReviewer } from "@/app/_domains/project/_services/find-portal-reviewer";
 import { listPortalBoard } from "./_services/list-portal-board";
 import { moveFeedbackColumn } from "./_services/move-feedback-column";
 import { MoveFeedbackColumnSchema } from "./_services/move-feedback-column.schema";
@@ -59,6 +59,7 @@ export const portalRouter = router({
           feedbackId: input.feedbackId,
           reviewerId: ctx.reviewer.id,
           body: input.body,
+          attachmentIds: input.attachmentIds,
         }),
       ),
     moveColumn: reviewerProcedure

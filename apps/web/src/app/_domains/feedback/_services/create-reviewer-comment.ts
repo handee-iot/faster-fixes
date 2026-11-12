@@ -1,3 +1,4 @@
+import { linkCommentAttachments } from "@/app/_domains/feedback/_services/link-comment-attachments";
 import { NotFoundError } from "@/server/errors/domain-errors";
 import { prisma } from "@workspace/db";
 
@@ -6,6 +7,7 @@ type CreateReviewerCommentInput = {
   feedbackId: string;
   reviewerId: string;
   body: string;
+  attachmentIds?: readonly string[];
 };
 
 /**
@@ -15,7 +17,13 @@ type CreateReviewerCommentInput = {
  * has already checked the Reviewer.
  */
 export async function createReviewerComment(
-  { projectId, feedbackId, reviewerId, body }: CreateReviewerCommentInput,
+  {
+    projectId,
+    feedbackId,
+    reviewerId,
+    body,
+    attachmentIds,
+  }: CreateReviewerCommentInput,
   db: typeof prisma = prisma,
 ) {
   const feedback = await db.feedback.findFirst({
@@ -32,6 +40,11 @@ export async function createReviewerComment(
     include: { reviewer: { select: { id: true, name: true } } },
   });
 
+  const attachments = await linkCommentAttachments(
+    { commentId: comment.id, feedbackId, assetIds: attachmentIds },
+    db,
+  );
+
   return {
     id: comment.id,
     createdAt: comment.createdAt,
@@ -40,6 +53,7 @@ export async function createReviewerComment(
     author: comment.reviewer
       ? { id: comment.reviewer.id, name: comment.reviewer.name }
       : null,
+    attachments,
   };
 }
 

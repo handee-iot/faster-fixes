@@ -3,6 +3,10 @@ import { describe, expect, it, vi } from "vitest";
 
 import { listFeedbackComments } from "./list-feedback-comments";
 
+vi.mock("@/server/storage/get-signed-asset-url", () => ({
+  getSignedAssetUrl: async () => "https://example.test/file",
+}));
+
 type FakeDb = NonNullable<Parameters<typeof listFeedbackComments>[1]>;
 
 const input = { feedbackId: "feedback_1", userId: "user_1" };
@@ -15,6 +19,7 @@ function fakeDb({
       id: "comment_1",
       createdAt: new Date("2026-01-01T00:00:00.000Z"),
       authorType: "reviewer",
+      attachments: [],
       body: "It breaks on Safari.",
       reviewer: { id: "reviewer_1", name: "Claire" },
       member: null,
@@ -23,6 +28,7 @@ function fakeDb({
       id: "comment_2",
       createdAt: new Date("2026-01-02T00:00:00.000Z"),
       authorType: "member",
+      attachments: [],
       body: "Reproduced, fixing now.",
       reviewer: null,
       member: {
@@ -68,6 +74,7 @@ describe("listFeedbackComments", () => {
         id: "comment_1",
         createdAt: new Date("2026-01-01T00:00:00.000Z"),
         authorType: "reviewer",
+        attachments: [],
         body: "It breaks on Safari.",
         author: { id: "reviewer_1", name: "Claire", image: null },
       },
@@ -75,6 +82,7 @@ describe("listFeedbackComments", () => {
         id: "comment_2",
         createdAt: new Date("2026-01-02T00:00:00.000Z"),
         authorType: "member",
+        attachments: [],
         body: "Reproduced, fixing now.",
         author: {
           id: "member_1",
@@ -94,6 +102,10 @@ describe("listFeedbackComments", () => {
             id: true,
             user: { select: { id: true, name: true, image: true } },
           },
+        },
+        attachments: {
+          orderBy: { position: "asc" },
+          include: { asset: true },
         },
       },
     });

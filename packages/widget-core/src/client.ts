@@ -3,6 +3,7 @@ import type {
   CreateFeedbackData,
   CreateFeedbackResponse,
   FeedbackClient,
+  FeedbackCommentAttachment,
   FeedbackCommentItem,
   FeedbackCommentListResponse,
   FeedbackListResponse,
@@ -150,6 +151,25 @@ export class FasterFixesClient implements FeedbackClient {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+      },
+    );
+  }
+
+  /** Uploads one file for a comment and resolves with the asset to attach. */
+  async uploadCommentAttachment(
+    feedbackId: string,
+    file: File,
+    reviewerToken: string,
+  ): Promise<FeedbackCommentAttachment> {
+    const formData = new FormData();
+    formData.append("file", file);
+    // No Content-Type header: the browser sets the multipart boundary itself.
+    return this.request<FeedbackCommentAttachment>(
+      `/api/v1/feedback/${feedbackId}/attachments`,
+      {
+        method: "POST",
+        headers: this.headers(reviewerToken),
+        body: formData,
       },
     );
   }

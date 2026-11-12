@@ -12,10 +12,22 @@ import {
 } from "@workspace/ui/components/sheet";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { cn } from "@workspace/ui/lib/utils";
+import {
+  COMMENT_ATTACHMENT_MAX_BYTES,
+  COMMENT_ATTACHMENT_MAX_FILES,
+  COMMENT_ATTACHMENT_TYPES,
+} from "@fasterfixes/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { ExternalLink, LogOut, MapPin, MessageSquare } from "lucide-react";
-import { useState } from "react";
+import {
+  ExternalLink,
+  LogOut,
+  MapPin,
+  MessageSquare,
+  Paperclip,
+  X,
+} from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 type BoardItem = ListPortalBoardOutput["feedback"][number];
@@ -180,6 +192,9 @@ function PortalDetail({ item, columns }: PortalDetailProps) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const [body, setBody] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const commentsQuery = trpc.portal.feedback.comments.queryOptions({
     feedbackId: item.id,
@@ -205,6 +220,7 @@ function PortalDetail({ item, columns }: PortalDetailProps) {
     trpc.portal.feedback.createComment.mutationOptions({
       onSuccess: async () => {
         setBody("");
+        setFiles([]);
         await queryClient.invalidateQueries({
           queryKey: commentsQuery.queryKey,
         });
@@ -291,9 +307,27 @@ function PortalDetail({ item, columns }: PortalDetailProps) {
               <span className="text-[11px] text-muted-foreground">
                 {comment.author?.name ?? "Unknown"}
               </span>
-              <span className="text-sm whitespace-pre-wrap">
-                {comment.body}
-              </span>
+              {comment.body !== "" && (
+                <span className="text-sm whitespace-pre-wrap">
+                  {comment.body}
+                </span>
+              )}
+              {comment.attachments.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {comment.attachments.map((attachment) => (
+                    <a
+                      key={attachment.id}
+                      href={attachment.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex max-w-full items-center gap-1 rounded border bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground hover:underline"
+                    >
+                      <Paperclip className="size-3 shrink-0" />
+                      <span className="truncate">{attachment.filename}</span>
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
           {(comments ?? []).length === 0 && (
@@ -305,8 +339,39 @@ function PortalDetail({ item, columns }: PortalDetailProps) {
             onSubmit={(event) => {
               event.preventDefault();
               const trimmed = body.trim();
-              if (trimmed === "" || createComment.isPending) return;
-              createComment.mutate({ feedbackId: item.id, body: trimmed });
+              if (
+                (trimmed === "" && files.length === 0) ||
+                createComment.isPending ||
+                uploading
+              ) {
+                return;
+              }
+              void (async () => {
+                try {
+                  setUploading(true);
+                  const attachmentIds: string[] = [];
+                  for (const file of files) {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    const response = await fetch(
+                      `/api/v1/feedback/${item.id}/attachments`,
+                      { method: "POST", body: formData },
+                    );
+                    if (!response.ok) throw new Error("Upload failed");
+                    const uploaded = (await response.json()) as { id: string };
+                    attachmentIds.push(uploaded.id);
+                  }
+                  createComment.mutate({
+                    feedbackId: item.id,
+                    body: trimmed,
+                    attachmentIds,
+                  });
+                } catch {
+                  toast.error("Could not upload one of the files.");
+                } finally {
+                  setUploading(false);
+                }
+              })();
             }}
           >
             <Textarea
@@ -317,11 +382,75 @@ function PortalDetail({ item, columns }: PortalDetailProps) {
               maxLength={4000}
               className="text-sm"
             />
-            <div className="flex justify-end">
+
+            {files.length > 0 && (
+              <ul className="flex flex-col gap-1">
+                {files.map((file, index) => (
+                  <li
+                    key={`${file.name}-${index}`}
+                    className="flex items-center justify-between gap-2 rounded bg-muted px-2 py-1 text-xs"
+                  >
+                    <span className="truncate">{file.name}</span>
+                    <button
+                      type="button"
+                      aria-label={`Remove ${file.name}`}
+                      onClick={() =>
+                        setFiles((current) =>
+                          current.filter((_, item) => item !== index),
+                        )
+                      }
+                      className="shrink-0 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div className="flex items-center justify-between">
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                hidden
+                accept={COMMENT_ATTACHMENT_TYPES.join(",")}
+                onChange={(event) => {
+                  const selected = [...(event.target.files ?? [])];
+                  event.target.value = "";
+                  setFiles((current) => {
+                    const next = [...current];
+                    for (const file of selected) {
+                      if (next.length >= COMMENT_ATTACHMENT_MAX_FILES) break;
+                      if (file.size > COMMENT_ATTACHMENT_MAX_BYTES) continue;
+                      next.push(file);
+                    }
+                    return next;
+                  });
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={
+                  uploading ||
+                  createComment.isPending ||
+                  files.length >= COMMENT_ATTACHMENT_MAX_FILES
+                }
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Paperclip className="size-3.5" />
+                Attach
+              </Button>
               <Button
                 type="submit"
                 size="sm"
-                disabled={body.trim() === "" || createComment.isPending}
+                disabled={
+                  (body.trim() === "" && files.length === 0) ||
+                  createComment.isPending ||
+                  uploading
+                }
               >
                 Send
               </Button>

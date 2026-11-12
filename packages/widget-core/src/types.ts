@@ -93,12 +93,23 @@ export type FeedbackCommentAuthor = {
   name: string;
 };
 
+export type FeedbackCommentAttachment = {
+  id: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+  /** A short-lived signed URL from the instance. */
+  url: string;
+};
+
 export type FeedbackCommentItem = {
   id: string;
   createdAt: string;
   authorType: "reviewer" | "member";
   body: string;
   author: FeedbackCommentAuthor | null;
+  /** Files attached to the comment, in order (ADR-0026). */
+  attachments: FeedbackCommentAttachment[];
 };
 
 export type FeedbackCommentListResponse = {
@@ -107,6 +118,8 @@ export type FeedbackCommentListResponse = {
 
 export type CreateCommentData = {
   body: string;
+  /** Assets uploaded through the attachments endpoint, in order. */
+  attachmentIds?: string[];
 };
 
 export type ApiErrorResponse = {
@@ -151,4 +164,10 @@ export type FeedbackClient = {
     data: CreateCommentData,
     reviewerToken: string,
   ): Promise<FeedbackCommentItem>;
+  /** Uploads one file for a comment; the returned id is what the comment attaches. */
+  uploadCommentAttachment(
+    feedbackId: string,
+    file: File,
+    reviewerToken: string,
+  ): Promise<FeedbackCommentAttachment>;
 };

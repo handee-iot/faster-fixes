@@ -1,3 +1,4 @@
+import { linkCommentAttachments } from "@/app/_domains/feedback/_services/link-comment-attachments";
 import { ForbiddenError, NotFoundError } from "@/server/errors/domain-errors";
 import { inngest } from "@/server/inngest";
 import {
@@ -8,7 +9,12 @@ import { prisma } from "@workspace/db";
 import type { CreateFeedbackCommentInput } from "./create-feedback-comment.schema";
 
 export async function createFeedbackComment(
-  { feedbackId, body, userId }: CreateFeedbackCommentInput & { userId: string },
+  {
+    feedbackId,
+    body,
+    attachmentIds,
+    userId,
+  }: CreateFeedbackCommentInput & { userId: string },
   db: typeof prisma = prisma,
 ) {
   const feedback = await db.feedback.findUnique({
@@ -36,6 +42,11 @@ export async function createFeedbackComment(
     data: { feedbackId, authorType: "member", memberId: membership.id, body },
   });
 
+  const attachments = await linkCommentAttachments(
+    { commentId: comment.id, feedbackId, assetIds: attachmentIds },
+    db,
+  );
+
   // Fire-and-forget: the Reviewer learns about the reply by email (ADR-0019).
   inngest
     .send(
@@ -56,5 +67,6 @@ export async function createFeedbackComment(
       name: membership.user.name,
       image: membership.user.image,
     },
+    attachments,
   };
 }

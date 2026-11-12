@@ -10,6 +10,10 @@ vi.mock("@workspace/db", () => ({
 
 import { prisma } from "@workspace/db";
 
+vi.mock("@/server/storage/get-signed-asset-url", () => ({
+  getSignedAssetUrl: async () => "https://example.test/file",
+}));
+
 const input = { projectId: "project_1", feedbackId: "feedback_1" };
 
 describe("listFeedbackComments (widget)", () => {
@@ -24,6 +28,10 @@ describe("listFeedbackComments (widget)", () => {
         member: {
           select: { id: true, user: { select: { id: true, name: true } } },
         },
+        attachments: {
+          orderBy: { position: "asc" },
+          include: { asset: true },
+        },
       },
     });
   });
@@ -34,6 +42,7 @@ describe("listFeedbackComments (widget)", () => {
         id: "comment_1",
         createdAt: new Date("2026-01-02T00:00:00.000Z"),
         authorType: "member",
+        attachments: [],
         body: "Fixed in the next deploy.",
         reviewer: null,
         member: { id: "member_1", user: { id: "user_1", name: "Dawie" } },
@@ -45,6 +54,7 @@ describe("listFeedbackComments (widget)", () => {
         id: "comment_1",
         createdAt: new Date("2026-01-02T00:00:00.000Z"),
         authorType: "member",
+        attachments: [],
         body: "Fixed in the next deploy.",
         author: { id: "member_1", name: "Dawie" },
       },

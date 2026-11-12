@@ -1,3 +1,4 @@
+import { getSignedAssetUrl } from "@/server/storage/get-signed-asset-url";
 import { prisma } from "@workspace/db";
 
 type ListReviewerCommentsInput = {
@@ -8,7 +9,7 @@ type ListReviewerCommentsInput = {
 /**
  * The comment thread on one Feedback, oldest first, from the widget or the
  * portal (ADR-0021). Scoped by projectId; the caller has already resolved the
- * Reviewer.
+ * Reviewer. Attachments come with a signed URL each (ADR-0026).
  */
 export async function listReviewerComments(
   { projectId, feedbackId }: ListReviewerCommentsInput,
@@ -22,16 +23,28 @@ export async function listReviewerComments(
       member: {
         select: { id: true, user: { select: { id: true, name: true } } },
       },
+      attachments: { orderBy: { position: "asc" }, include: { asset: true } },
     },
   });
 
-  return comments.map((comment) => ({
-    id: comment.id,
-    createdAt: comment.createdAt,
-    authorType: comment.authorType,
-    body: comment.body,
-    author: toAuthor(comment),
-  }));
+  return Promise.all(
+    comments.map(async (comment) => ({
+      id: comment.id,
+      createdAt: comment.createdAt,
+      authorType: comment.authorType,
+      body: comment.body,
+      author: toAuthor(comment),
+      attachments: await Promise.all(
+        comment.attachments.map(async ({ asset }) => ({
+          id: asset.id,
+          filename: asset.filename,
+          mimeType: asset.mimeType,
+          size: asset.size,
+          url: await getSignedAssetUrl(asset),
+        })),
+      ),
+    })),
+  );
 }
 
 type CommentWithAuthors = {

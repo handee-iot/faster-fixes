@@ -4,7 +4,7 @@ import { requireEnv } from "@/utils/environment/require-env";
 import { RejectUpload, route, type Router } from "@better-upload/server";
 import { toRouteHandler } from "@better-upload/server/adapters/next";
 import { z } from "zod";
-import { findUploadingMember } from "./_services/find-uploading-member";
+import { findUploadingMember } from "@/app/_domains/project/_services/find-uploading-member";
 
 const routes: Router["routes"] = {
   "organization-logo": route({

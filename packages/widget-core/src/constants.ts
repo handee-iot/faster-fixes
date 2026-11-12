@@ -59,6 +59,8 @@ export type Labels = {
   noComments: string;
   replyPlaceholder: string;
   sendButton: string;
+  /** The composer's paperclip: opens the file picker for a reply's attachments. */
+  attachFile: string;
   // Receives the formatted time and the author name.
   reportedBy: (when: string, by: string) => string;
   startFeedback: string;
@@ -100,6 +102,7 @@ export const DEFAULT_LABELS: Labels = {
   noComments: "No comments yet",
   replyPlaceholder: "Write a reply...",
   sendButton: "Send",
+  attachFile: "Attach a file",
   reportedBy: (when, by) => `Reported ${when} by ${by}`,
   startFeedback: "Start feedback",
   exitFeedbackMode: "Exit feedback mode",
@@ -114,6 +117,28 @@ export const DEFAULT_LABELS: Labels = {
 export const STORAGE_KEY_TOKEN = "ff_reviewer_token";
 /** The Reviewer hid their issues (pins and list); see the widget's issues-hidden.ts. */
 export const STORAGE_KEY_ISSUES_HIDDEN = "ff_issues_hidden";
+
+/**
+ * Comment attachments (ADR-0026): a handful of files per comment, small enough
+ * to travel through the app, in the types a client or a teammate actually
+ * sends. The API and every composer share these limits.
+ */
+export const COMMENT_ATTACHMENT_MAX_FILES = 3;
+export const COMMENT_ATTACHMENT_MAX_BYTES = 10 * 1024 * 1024;
+export const COMMENT_ATTACHMENT_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/gif",
+  "application/pdf",
+  "text/plain",
+  "text/csv",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/zip",
+] as const;
 export const URL_PARAM_TOKEN = "ff_token";
 
 // Diagnostic Trail (console + network capture) bounds and redaction denylist.

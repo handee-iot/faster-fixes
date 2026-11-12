@@ -28,5 +28,7 @@ model Asset {
 
   feedbackScreenshots Feedback[] @relation("FeedbackScreenshot")
 
+  commentAttachments FeedbackCommentAttachment[]
+
   @@map("assets")
 }

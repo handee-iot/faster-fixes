@@ -10,10 +10,15 @@ import {
 } from "@workspace/ui/components/avatar";
 import { Button } from "@workspace/ui/components/button";
 import { Textarea } from "@workspace/ui/components/textarea";
+import {
+  COMMENT_ATTACHMENT_MAX_BYTES,
+  COMMENT_ATTACHMENT_MAX_FILES,
+  COMMENT_ATTACHMENT_TYPES,
+} from "@fasterfixes/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { MessageSquare, Send } from "lucide-react";
-import { useState } from "react";
+import { MessageSquare, Paperclip, Send, X } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 type Comment = ListFeedbackCommentsOutput[number];
@@ -24,13 +29,16 @@ type FeedbackCommentsProps = {
 
 /**
  * The client conversation on a Feedback (ADR-0018): every comment in creation
- * order, plus a composer. Replies land in the widget for whoever holds the
- * Reviewer link.
+ * order, plus a composer that takes files as well as text (ADR-0026). Replies
+ * land in the widget for whoever holds the Reviewer link.
  */
 export function FeedbackComments({ feedbackId }: FeedbackCommentsProps) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const [body, setBody] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const commentsQuery =
     trpc.authenticated.projects.feedback.listComments.queryOptions({
@@ -42,6 +50,7 @@ export function FeedbackComments({ feedbackId }: FeedbackCommentsProps) {
     trpc.authenticated.projects.feedback.createComment.mutationOptions({
       onSuccess: async () => {
         setBody("");
+        setFiles([]);
         await queryClient.invalidateQueries({
           queryKey: commentsQuery.queryKey,
         });
@@ -53,11 +62,43 @@ export function FeedbackComments({ feedbackId }: FeedbackCommentsProps) {
   );
 
   const items = comments ?? [];
+  const busy = createComment.isPending || uploading;
 
-  function handleSend() {
+  function addFiles(selected: File[]) {
+    setFiles((current) => {
+      const next = [...current];
+      for (const file of selected) {
+        if (next.length >= COMMENT_ATTACHMENT_MAX_FILES) break;
+        if (file.size > COMMENT_ATTACHMENT_MAX_BYTES) continue;
+        next.push(file);
+      }
+      return next;
+    });
+  }
+
+  async function handleSend() {
     const trimmed = body.trim();
-    if (trimmed === "" || createComment.isPending) return;
-    createComment.mutate({ feedbackId, body: trimmed });
+    if ((trimmed === "" && files.length === 0) || busy) return;
+    try {
+      setUploading(true);
+      const attachmentIds: string[] = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await fetch(
+          `/api/v1/feedback/${feedbackId}/attachments`,
+          { method: "POST", body: formData },
+        );
+        if (!response.ok) throw new Error("Upload failed");
+        const uploaded = (await response.json()) as { id: string };
+        attachmentIds.push(uploaded.id);
+      }
+      createComment.mutate({ feedbackId, body: trimmed, attachmentIds });
+    } catch {
+      toast.error("Could not upload one of the files.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   return (
@@ -88,7 +129,7 @@ export function FeedbackComments({ feedbackId }: FeedbackCommentsProps) {
         className="flex flex-col gap-2"
         onSubmit={(event) => {
           event.preventDefault();
-          handleSend();
+          void handleSend();
         }}
       >
         <Textarea
@@ -99,11 +140,58 @@ export function FeedbackComments({ feedbackId }: FeedbackCommentsProps) {
           maxLength={4000}
           className="text-sm"
         />
-        <div className="flex justify-end">
+
+        {files.length > 0 && (
+          <ul className="flex flex-col gap-1">
+            {files.map((file, index) => (
+              <li
+                key={`${file.name}-${index}`}
+                className="flex items-center justify-between gap-2 rounded bg-muted px-2 py-1 text-xs"
+              >
+                <span className="truncate">{file.name}</span>
+                <button
+                  type="button"
+                  aria-label={`Remove ${file.name}`}
+                  onClick={() =>
+                    setFiles((current) =>
+                      current.filter((_, item) => item !== index),
+                    )
+                  }
+                  className="shrink-0 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="size-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="flex items-center justify-between">
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            hidden
+            accept={COMMENT_ATTACHMENT_TYPES.join(",")}
+            onChange={(event) => {
+              addFiles([...(event.target.files ?? [])]);
+              event.target.value = "";
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={busy || files.length >= COMMENT_ATTACHMENT_MAX_FILES}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Paperclip className="size-3.5" />
+            Attach
+          </Button>
           <Button
             type="submit"
             size="sm"
-            disabled={body.trim() === "" || createComment.isPending}
+            disabled={(body.trim() === "" && files.length === 0) || busy}
           >
             <Send className="size-3.5" />
             Send
@@ -147,9 +235,27 @@ function CommentRow({ comment }: CommentRowProps) {
             })}
           </span>
         </div>
-        <p className="mt-0.5 text-sm break-words whitespace-pre-wrap">
-          {comment.body}
-        </p>
+        {comment.body !== "" && (
+          <p className="mt-0.5 text-sm break-words whitespace-pre-wrap">
+            {comment.body}
+          </p>
+        )}
+        {comment.attachments.length > 0 && (
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            {comment.attachments.map((attachment) => (
+              <a
+                key={attachment.id}
+                href={attachment.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex max-w-full items-center gap-1 rounded border bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground hover:underline"
+              >
+                <Paperclip className="size-3 shrink-0" />
+                <span className="truncate">{attachment.filename}</span>
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </li>
   );

@@ -3,6 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createFeedbackComment } from "./create-feedback-comment";
 
+vi.mock("@/server/storage/get-signed-asset-url", () => ({
+  getSignedAssetUrl: async () => "https://example.test/file",
+}));
+
 const send = vi
   .fn<(payload: unknown) => Promise<void>>()
   .mockResolvedValue(undefined);
@@ -75,6 +79,7 @@ describe("createFeedbackComment", () => {
       authorType: "member",
       body: "Looking into it.",
       author: { id: "member_1", name: "Dawie", image: null },
+      attachments: [],
     });
 
     expect(db.feedbackComment.create).toHaveBeenCalledWith({

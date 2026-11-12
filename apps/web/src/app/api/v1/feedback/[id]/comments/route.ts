@@ -122,6 +122,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       feedbackId: id,
       reviewerId: reviewer.id,
       body: parsed.data.body,
+      attachmentIds: parsed.data.attachmentIds,
     });
 
     return NextResponse.json(comment, { status: 201 });

@@ -165,6 +165,28 @@ model FeedbackComment {
 
   body String
 
+  /// Files attached to this comment (a paperclip in any composer), in order.
+  attachments FeedbackCommentAttachment[]
+
   @@index([feedbackId, createdAt])
   @@map("feedback_comment")
+}
+
+/// One file on a comment (ADR-0026): the Asset holds the storage facts, this
+/// row orders it on the thread.
+model FeedbackCommentAttachment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  commentId String
+  comment   FeedbackComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  assetId String
+  asset   Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  position Int @default(0)
+
+  @@unique([commentId, assetId])
+  @@index([commentId, position])
+  @@map("feedback_comment_attachment")
 }

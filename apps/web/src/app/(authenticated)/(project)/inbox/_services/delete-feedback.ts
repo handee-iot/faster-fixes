@@ -4,6 +4,7 @@ import {
   NotFoundError,
 } from "@/server/errors/domain-errors";
 import { deleteAsset } from "@/server/storage/delete-asset";
+import { deleteAssets } from "@/server/storage/delete-assets";
 import { prisma } from "@workspace/db";
 import type { DeleteFeedbackInput } from "./delete-feedback.schema";
 
@@ -38,6 +39,16 @@ export async function deleteFeedback(
 
   if (feedback.screenshotId) {
     await deleteAsset(feedback.screenshotId);
+  }
+
+  // Comment attachments go with the Feedback: their rows cascade, their files
+  // do not (ADR-0026).
+  const commentAttachments = await db.feedbackCommentAttachment.findMany({
+    where: { comment: { feedbackId } },
+    select: { assetId: true },
+  });
+  if (commentAttachments.length > 0) {
+    await deleteAssets(commentAttachments.map(({ assetId }) => assetId));
   }
 
   await db.feedback.delete({ where: { id: feedbackId } });

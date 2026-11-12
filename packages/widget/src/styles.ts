@@ -787,6 +787,78 @@ export const WIDGET_CSS = `
     font-size: 12px;
   }
 
+  .thread-composer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .thread-attach {
+    align-self: flex-start;
+    padding: 4px 10px;
+    font-size: 12px;
+    border: 1px solid var(--ff-border);
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .thread-files {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .thread-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--ff-muted);
+    font-size: 12px;
+  }
+
+  .thread-file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .thread-file-remove {
+    flex-shrink: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .thread-comment-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .thread-comment-file {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--ff-muted);
+    color: inherit;
+    font-size: 12px;
+    text-decoration: underline;
+  }
+
   .list-empty {
     margin: 0;
     padding: 20px 14px;

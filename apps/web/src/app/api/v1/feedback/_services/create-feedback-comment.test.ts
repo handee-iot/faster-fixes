@@ -12,6 +12,10 @@ vi.mock("@workspace/db", () => ({
 
 import { prisma } from "@workspace/db";
 
+vi.mock("@/server/storage/get-signed-asset-url", () => ({
+  getSignedAssetUrl: async () => "https://example.test/file",
+}));
+
 const input = {
   projectId: "project_1",
   feedbackId: "feedback_1",
@@ -46,6 +50,7 @@ describe("createFeedbackComment (widget)", () => {
       authorType: "reviewer",
       body: "Any update on this?",
       author: { id: "reviewer_1", name: "Claire" },
+      attachments: [],
     });
 
     expect(prisma.feedback.findFirst).toHaveBeenCalledWith({

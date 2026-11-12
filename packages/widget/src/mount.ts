@@ -323,8 +323,15 @@ export function mountWidget({
         const { comments } = await client.listComments(item.id, reviewerToken);
         return comments;
       },
-      createComment(item, body) {
-        return client.createComment(item.id, { body }, reviewerToken);
+      createComment(item, body, attachmentIds) {
+        return client.createComment(
+          item.id,
+          { body, attachmentIds },
+          reviewerToken,
+        );
+      },
+      uploadAttachment(item, file) {
+        return client.uploadCommentAttachment(item.id, file, reviewerToken);
       },
     },
   );

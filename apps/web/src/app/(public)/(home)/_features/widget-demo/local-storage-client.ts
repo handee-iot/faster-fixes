@@ -187,6 +187,7 @@ export class LocalStorageFeedbackClient implements FeedbackClient {
       authorType: "reviewer",
       body: data.body,
       author: { id: "demo-visitor", name: "You" },
+      attachments: [],
     };
     const comments = this.readComments();
     safeWrite(COMMENTS_KEY, {
@@ -194,5 +195,9 @@ export class LocalStorageFeedbackClient implements FeedbackClient {
       [feedbackId]: [...(comments[feedbackId] ?? []), comment],
     });
     return comment;
+  }
+
+  async uploadCommentAttachment(): Promise<never> {
+    throw new Error("Attachments are not supported in the demo");
   }
 }

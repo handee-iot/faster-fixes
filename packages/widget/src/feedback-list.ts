@@ -1,8 +1,14 @@
 import type {
+  FeedbackCommentAttachment,
   FeedbackCommentItem,
   FeedbackItem,
   Labels,
   WidgetPosition,
+} from "@fasterfixes/core";
+import {
+  COMMENT_ATTACHMENT_MAX_BYTES,
+  COMMENT_ATTACHMENT_MAX_FILES,
+  COMMENT_ATTACHMENT_TYPES,
 } from "@fasterfixes/core";
 
 import { createIcon } from "./icons.js";
@@ -29,7 +35,13 @@ type FeedbackListActions = {
   createComment: (
     item: FeedbackItem,
     body: string,
+    attachmentIds?: string[],
   ) => Promise<FeedbackCommentItem>;
+  /** Uploads one file for a reply; the resolved id is what the comment attaches. */
+  uploadAttachment: (
+    item: FeedbackItem,
+    file: File,
+  ) => Promise<FeedbackCommentAttachment>;
 };
 
 export type FeedbackList = {
@@ -103,7 +115,12 @@ function formatWhen(createdAt: string) {
 export function createFeedbackList(
   document: Document,
   { labels, position, branding, currentPageUrl }: FeedbackListOptions,
-  { onSelect, loadComments, createComment }: FeedbackListActions,
+  {
+    onSelect,
+    loadComments,
+    createComment,
+    uploadAttachment,
+  }: FeedbackListActions,
 ): FeedbackList {
   const panel = document.createElement("div");
   panel.className = "list";
@@ -236,38 +253,112 @@ export function createFeedbackList(
     input.rows = 2;
     input.placeholder = labels.replyPlaceholder;
     input.setAttribute("aria-label", labels.replyPlaceholder);
+
+    // Attachments: a paperclip over a hidden picker, then the chosen files as
+    // removable chips (ADR-0026).
+    const chosen: File[] = [];
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.multiple = true;
+    fileInput.hidden = true;
+    fileInput.accept = COMMENT_ATTACHMENT_TYPES.join(",");
+    const attach = document.createElement("button");
+    attach.type = "button";
+    attach.className = "action thread-attach";
+    attach.textContent = labels.attachFile;
+    attach.addEventListener("click", () => fileInput.click());
+
+    const files = document.createElement("ul");
+    files.className = "thread-files";
+    function createFileChip(file: File, index: number) {
+      const chip = document.createElement("li");
+      chip.className = "thread-file";
+      const name = document.createElement("span");
+      name.className = "thread-file-name";
+      name.textContent = file.name;
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "thread-file-remove";
+      remove.setAttribute("aria-label", `Remove ${file.name}`);
+      remove.textContent = "×";
+      remove.addEventListener("click", () => {
+        chosen.splice(index, 1);
+        renderFiles();
+      });
+      chip.append(name, remove);
+      return chip;
+    }
+    function renderFiles() {
+      files.replaceChildren(...chosen.map(createFileChip));
+    }
+    fileInput.addEventListener("change", () => {
+      const selected = [...(fileInput.files ?? [])];
+      fileInput.value = "";
+      for (const file of selected) {
+        if (chosen.length >= COMMENT_ATTACHMENT_MAX_FILES) break;
+        if (file.size > COMMENT_ATTACHMENT_MAX_BYTES) continue;
+        chosen.push(file);
+      }
+      renderFiles();
+    });
+
+    const row = document.createElement("div");
+    row.className = "thread-composer-row";
     const send = document.createElement("button");
     send.type = "submit";
     send.className = "action action-primary thread-send";
     send.textContent = labels.sendButton;
-    form.append(input, send);
+    row.append(attach, send);
+    form.append(input, files, fileInput, row);
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       const body = input.value.trim();
-      if (sending || body === "") return;
+      const hasFiles = chosen.length > 0;
+      if (sending || (body === "" && !hasFiles)) return;
       sending = true;
       send.disabled = true;
-      void createComment(item, body).then(
-        (created) => {
+      attach.disabled = true;
+      void (async () => {
+        try {
+          const attachmentIds: string[] = [];
+          for (const file of chosen) {
+            attachmentIds.push((await uploadAttachment(item, file)).id);
+          }
+          const created = await createComment(item, body, attachmentIds);
           sending = false;
           const current = threads.get(item.id) ?? [];
           threads.set(item.id, [...current, created]);
           if (detailId === item.id) renderThread(item, container);
-        },
-        () => {
+        } catch {
           sending = false;
           send.disabled = false;
+          attach.disabled = false;
           form.querySelector(".thread-error")?.remove();
           const error = document.createElement("p");
           error.className = "thread-error";
           error.textContent = labels.errorMessage;
           form.appendChild(error);
-        },
-      );
+        }
+      })();
     });
 
     return form;
+  }
+
+  function renderCommentFiles(entry: FeedbackCommentItem) {
+    const files = document.createElement("span");
+    files.className = "thread-comment-files";
+    for (const attachment of entry.attachments) {
+      const link = document.createElement("a");
+      link.className = "thread-comment-file";
+      link.href = attachment.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = attachment.filename;
+      files.appendChild(link);
+    }
+    return files;
   }
 
   function renderThread(item: FeedbackItem, container: HTMLElement) {
@@ -294,6 +385,9 @@ export function createFeedbackList(
         body.className = "thread-body";
         body.textContent = entry.body;
         commentRow.append(author, body);
+        if (entry.attachments.length > 0) {
+          commentRow.appendChild(renderCommentFiles(entry));
+        }
         list.appendChild(commentRow);
       }
       container.appendChild(list);

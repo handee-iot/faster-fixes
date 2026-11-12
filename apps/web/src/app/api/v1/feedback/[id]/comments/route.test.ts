@@ -26,6 +26,9 @@ vi.mock("@workspace/db", async () => {
 });
 
 vi.mock("@/server/storage", () => ({ s3Client: {} }));
+vi.mock("@/server/storage/get-signed-asset-url", () => ({
+  getSignedAssetUrl: async () => "https://example.test/file",
+}));
 
 const { GET, POST } = await import("./route");
 
@@ -89,6 +92,7 @@ describe("GET /api/v1/feedback/[id]/comments", () => {
         id: "comment_1",
         createdAt: CREATED_AT,
         authorType: "reviewer",
+        attachments: [],
         body: "Any update on this?",
         reviewer: { id: REVIEWER_ID, name: REVIEWER_NAME },
         member: null,
@@ -97,6 +101,7 @@ describe("GET /api/v1/feedback/[id]/comments", () => {
         id: "comment_2",
         createdAt: CREATED_AT,
         authorType: "member",
+        attachments: [],
         body: "Fixed in the next deploy.",
         reviewer: null,
         member: { id: "member_1", user: { id: "user_1", name: "Dawie" } },
@@ -112,6 +117,7 @@ describe("GET /api/v1/feedback/[id]/comments", () => {
           id: "comment_1",
           createdAt: "2026-01-02T03:04:05.000Z",
           authorType: "reviewer",
+          attachments: [],
           body: "Any update on this?",
           author: { id: REVIEWER_ID, name: REVIEWER_NAME },
         },
@@ -119,6 +125,7 @@ describe("GET /api/v1/feedback/[id]/comments", () => {
           id: "comment_2",
           createdAt: "2026-01-02T03:04:05.000Z",
           authorType: "member",
+          attachments: [],
           body: "Fixed in the next deploy.",
           author: { id: "member_1", name: "Dawie" },
         },
@@ -182,6 +189,7 @@ describe("POST /api/v1/feedback/[id]/comments", () => {
       id: "comment_1",
       createdAt: "2026-01-02T03:04:05.000Z",
       authorType: "reviewer",
+      attachments: [],
       body: "Any update on this?",
       author: { id: REVIEWER_ID, name: REVIEWER_NAME },
     });

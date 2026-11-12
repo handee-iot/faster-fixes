@@ -2,7 +2,7 @@ import { findActiveReviewerByToken } from "@/app/_domains/project/_services/find
 import { getAppUrl } from "@/utils/url/get-app-url";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { PORTAL_REVIEWER_COOKIE } from "../../_helpers/portal-reviewer-cookie";
+import { PORTAL_REVIEWER_COOKIE } from "@/app/_domains/project/_helpers/portal-reviewer-cookie";
 
 /**
  * The embed hand-off (ADR-0022): the CRM opens this URL with the Reviewer's

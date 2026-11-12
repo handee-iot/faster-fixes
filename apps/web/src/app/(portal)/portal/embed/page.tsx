@@ -1,8 +1,8 @@
 import { auth } from "@/server/auth";
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
-import { PORTAL_REVIEWER_COOKIE } from "../../_helpers/portal-reviewer-cookie";
-import { findPortalReviewer } from "../../_services/find-portal-reviewer";
+import { PORTAL_REVIEWER_COOKIE } from "@/app/_domains/project/_helpers/portal-reviewer-cookie";
+import { findPortalReviewer } from "@/app/_domains/project/_services/find-portal-reviewer";
 import { PortalBoard } from "../_features/portal-board.client";
 
 export const metadata: Metadata = {

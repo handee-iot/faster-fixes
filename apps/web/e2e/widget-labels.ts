@@ -33,6 +33,7 @@ export const LABEL_OVERRIDES: TextLabels = {
   viewScreenshot: "Voir la capture",
   commentsTitle: "Commentaires",
   noComments: "Aucun commentaire",
+  attachFile: "Joindre un fichier",
   replyPlaceholder: "Écrire une réponse",
   sendButton: "Envoyer",
   reportedBy: (when, by) => `Signalé ${when} par ${by}`,

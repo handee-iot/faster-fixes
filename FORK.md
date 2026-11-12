@@ -78,6 +78,10 @@ ported selectively; candidates for upstream PRs):
     keeps them hidden across pages and visits. The `hideMarkers`/`showMarkers`
     label defaults read "Hide my issues"/"Show my issues" for the same reason
     (the keys are unchanged, so overrides keep working).
+13. Comment attachments (ADR-0026) — replies on the widget, portal and dashboard
+    take up to three files (10MB, an allowlist) uploaded through the instance;
+    `linkCommentAttachments` guards the asset prefix, reads hand back signed
+    URLs, and deleting a Feedback frees the files. Candidate for an upstream PR.
 
 Deploy artifacts:
 
