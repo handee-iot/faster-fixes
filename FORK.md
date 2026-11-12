@@ -102,6 +102,12 @@ Deploy artifacts:
   silently never send. Bit us on 19 Oct 2026: the app listed 17 of 20
   functions, so the reviewer invite, resolve and reply emails had never
   delivered.
+- **The widget bundle is not cached, by design.** `/widget.iife.js` answers
+  `Cache-Control: no-store` because Cloudflare's Browser Cache TTL rewrote a
+  short `max-age` to four hours on this zone, which left installed sites on the
+  previous widget after a deploy (the 12 Nov paperclip appeared only after a
+  hard refresh, commit `0d9ec6e7`). Keep the header `no-store`; the bundle is
+  ~34KB gzipped.
 
 Notes for upstream PRs (see upstream issue #246): patch 1, the adopted
 brian-muzza fixes, and the self-hosting docs correction (`migrate:prod` runs
