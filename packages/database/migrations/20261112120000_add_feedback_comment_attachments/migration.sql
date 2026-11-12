@@ -19,4 +19,4 @@ CREATE INDEX "feedback_comment_attachment_commentId_position_idx" ON "feedback_c
 ALTER TABLE "feedback_comment_attachment" ADD CONSTRAINT "feedback_comment_attachment_commentId_fkey" FOREIGN KEY ("commentId") REFERENCES "feedback_comment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "feedback_comment_attachment" ADD CONSTRAINT "feedback_comment_attachment_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "asset"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "feedback_comment_attachment" ADD CONSTRAINT "feedback_comment_attachment_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "assets"("id") ON DELETE CASCADE ON UPDATE CASCADE;
