@@ -266,6 +266,19 @@ export function mountWidget({
     }
   }
 
+  // Also best-effort once the Feedback exists: a failed upload must not turn
+  // the submit into an error the Reviewer would retry as a duplicate report.
+  async function attachFiles(feedbackId: string, files: readonly File[]) {
+    try {
+      for (const file of files) {
+        await client.uploadFeedbackAttachment(feedbackId, file, reviewerToken);
+      }
+      if (!destroyed) void loadFeedback();
+    } catch (err) {
+      console.warn("[faster-fixes] attachment upload failed:", err);
+    }
+  }
+
   const annotation = createAnnotationMode(document, overlay, {
     onSelect(element, click) {
       setMode("selected");
@@ -277,7 +290,7 @@ export function mountWidget({
   });
 
   const popover = createCommentPopover(document, shadow, options.labels, {
-    async onSubmit(comment) {
+    async onSubmit(comment, files) {
       if (!selection) return;
       const { screenshot } = selection;
       const created = await client.createFeedback(
@@ -290,6 +303,7 @@ export function mountWidget({
         reviewerToken,
       );
       void attachScreenshot(created.id, screenshot);
+      if (files.length > 0) void attachFiles(created.id, files);
       if (destroyed) return;
       setFeedbackItems([...state.current.feedbackItems, created]);
       void loadFeedback();

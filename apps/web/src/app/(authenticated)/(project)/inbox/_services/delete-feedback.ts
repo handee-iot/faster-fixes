@@ -41,14 +41,22 @@ export async function deleteFeedback(
     await deleteAsset(feedback.screenshotId);
   }
 
-  // Comment attachments go with the Feedback: their rows cascade, their files
-  // do not (ADR-0026).
+  // Attachments go with the Feedback: their rows cascade, their files do not
+  // (ADR-0026).
+  const reportAttachments = await db.feedbackAttachment.findMany({
+    where: { feedbackId },
+    select: { assetId: true },
+  });
   const commentAttachments = await db.feedbackCommentAttachment.findMany({
     where: { comment: { feedbackId } },
     select: { assetId: true },
   });
-  if (commentAttachments.length > 0) {
-    await deleteAssets(commentAttachments.map(({ assetId }) => assetId));
+  const attachmentAssetIds = [
+    ...reportAttachments.map(({ assetId }) => assetId),
+    ...commentAttachments.map(({ assetId }) => assetId),
+  ];
+  if (attachmentAssetIds.length > 0) {
+    await deleteAssets(attachmentAssetIds);
   }
 
   await db.feedback.delete({ where: { id: feedbackId } });

@@ -81,6 +81,7 @@ const createdFeedbackRow = {
   metadata: null,
   reviewer: { id: REVIEWER_ID, name: REVIEWER_NAME },
   screenshot: null,
+  attachments: [],
   createdAt: CREATED_AT,
 };
 
@@ -272,6 +273,7 @@ describe("POST /api/v1/feedback", () => {
       clickY: 34,
       selector: "#submit",
       screenshotUrl: null,
+      attachments: [],
       metadata: null,
       reviewer: { id: REVIEWER_ID, name: REVIEWER_NAME },
       createdAt: CREATED_AT.toISOString(),
@@ -440,6 +442,7 @@ describe("GET /api/v1/feedback", () => {
           clickY: 34,
           selector: "#submit",
           screenshotUrl: SIGNED_ASSET_URL,
+          attachments: [],
           metadata: null,
           commentCount: 2,
           reviewer: { id: REVIEWER_ID, name: REVIEWER_NAME },

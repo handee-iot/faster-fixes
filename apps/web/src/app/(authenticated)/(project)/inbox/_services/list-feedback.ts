@@ -1,6 +1,7 @@
 import { ForbiddenError, NotFoundError } from "@/server/errors/domain-errors";
 import { getSignedAssetUrl } from "@/server/storage/get-signed-asset-url";
 import { prisma } from "@workspace/db";
+import { toFileAttachments } from "@/app/_domains/feedback/_helpers/file-attachments";
 import type { ListFeedbackInput } from "./list-feedback.schema";
 
 export async function listFeedback(
@@ -37,6 +38,7 @@ export async function listFeedback(
       screenshot: {
         select: { id: true, key: true, provider: true, bucket: true },
       },
+      attachments: { orderBy: { position: "asc" }, include: { asset: true } },
       issueLink: {
         select: {
           issueNumber: true,
@@ -92,6 +94,7 @@ export async function listFeedback(
       screenshotUrl: f.screenshot
         ? await getSignedAssetUrl(f.screenshot)
         : null,
+      attachments: await toFileAttachments(f.attachments),
       metadata: f.metadata as Record<string, unknown> | null,
       issueLink: f.issueLink,
       linearIssueLink: f.linearIssueLink,

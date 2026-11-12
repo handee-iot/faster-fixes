@@ -1,10 +1,12 @@
 /**
- * The widget API's HTTP boundary for comment attachments (ADR-0026): the
- * caller may be a Reviewer (widget token, or the portal's session/hand-off
- * cookie) or a signed-in Member of the Feedback's organization; everything else
- * is refused before the file is read.
+ * The widget API's HTTP boundary for attachments (ADR-0026): a comment reply
+ * by default, or the report itself with `?scope=feedback`. The caller may be a
+ * Reviewer (widget token, or the portal's session/hand-off cookie) or a
+ * signed-in Member of the Feedback's organization; everything else is refused
+ * before the file is read.
  */
 
+import { linkFeedbackAttachments } from "@/app/_domains/feedback/_services/link-feedback-attachments";
 import { PORTAL_REVIEWER_COOKIE } from "@/app/_domains/project/_helpers/portal-reviewer-cookie";
 import { isAllowedOrigin } from "@/app/_domains/project/_helpers/is-allowed-origin";
 import { findPortalReviewer } from "@/app/_domains/project/_services/find-portal-reviewer";
@@ -100,6 +102,12 @@ async function resolveUploader(
 export async function POST(req: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
+  const requestedScope = req.nextUrl.searchParams.get("scope");
+  if (requestedScope !== null && requestedScope !== "feedback") {
+    return NextResponse.json({ error: "Unknown scope" }, { status: 400 });
+  }
+  const scope = requestedScope === "feedback" ? "feedback" : "comment";
+
   const feedback = await getFeedbackForAttachment({ feedbackId: id });
   if (!feedback) {
     return NextResponse.json({ error: "Feedback not found" }, { status: 404 });
@@ -156,11 +164,20 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
   const attachment = await createFeedbackAttachment({
     feedbackId: feedback.id,
+    scope,
     filename: file.name || "attachment",
     mimeType: file.type,
     body,
     uploadedById: uploader.uploadedById,
   });
+
+  if (scope === "feedback") {
+    const [linked] = await linkFeedbackAttachments({
+      feedbackId: feedback.id,
+      assetIds: [attachment.id],
+    });
+    return NextResponse.json(linked, { status: 201 });
+  }
 
   return NextResponse.json(attachment, { status: 201 });
 }

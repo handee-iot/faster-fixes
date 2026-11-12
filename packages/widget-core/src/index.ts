@@ -15,6 +15,7 @@ export type {
   ApiErrorResponse,
   FeedbackClient,
   FeedbackCommentAttachment,
+  FileAttachment,
   FeedbackCommentAuthor,
   FeedbackCommentItem,
   FeedbackCommentListResponse,

@@ -67,6 +67,7 @@ function toCreatedItem(data: CreateFeedbackData | null): FeedbackItem {
     clickY: data?.clickY ?? null,
     selector: data?.selector ?? null,
     screenshotUrl: null,
+    attachments: [],
     reviewer: { id: "e2e-reviewer", name: "E2E Reviewer" },
     createdAt: new Date().toISOString(),
     metadata: data?.metadata ?? null,

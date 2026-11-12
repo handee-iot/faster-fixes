@@ -1,3 +1,4 @@
+import { toFileAttachments } from "@/app/_domains/feedback/_helpers/file-attachments";
 import { getSignedAssetUrl } from "@/server/storage/get-signed-asset-url";
 import { prisma } from "@workspace/db";
 
@@ -24,6 +25,7 @@ export async function listPortalBoard(
       include: {
         reviewer: { select: { id: true, name: true } },
         screenshot: { select: { key: true, provider: true, bucket: true } },
+        attachments: { orderBy: { position: "asc" }, include: { asset: true } },
         _count: { select: { comments: true } },
       },
     }),
@@ -45,6 +47,7 @@ export async function listPortalBoard(
         screenshotUrl: f.screenshot
           ? await getSignedAssetUrl(f.screenshot)
           : null,
+        attachments: await toFileAttachments(f.attachments),
       })),
     ),
   };

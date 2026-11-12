@@ -72,6 +72,7 @@ export async function createFeedback({
     clickY: feedback.clickY,
     selector: feedback.selector,
     screenshotUrl,
+    attachments: [],
     metadata: feedback.metadata,
     reviewer: feedback.reviewer,
     createdAt: feedback.createdAt,

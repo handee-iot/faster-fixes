@@ -7,6 +7,7 @@ import type {
   FeedbackCommentItem,
   FeedbackCommentListResponse,
   FeedbackListResponse,
+  FileAttachment,
   UpdateFeedbackData,
   UpdateFeedbackResponse,
   WidgetConfig,
@@ -161,11 +162,34 @@ export class FasterFixesClient implements FeedbackClient {
     file: File,
     reviewerToken: string,
   ): Promise<FeedbackCommentAttachment> {
+    return this.uploadAttachment(feedbackId, file, reviewerToken);
+  }
+
+  /** Uploads one file for the report itself, from the creation popover. */
+  async uploadFeedbackAttachment(
+    feedbackId: string,
+    file: File,
+    reviewerToken: string,
+  ): Promise<FileAttachment> {
+    return this.uploadAttachment(
+      feedbackId,
+      file,
+      reviewerToken,
+      "?scope=feedback",
+    );
+  }
+
+  private async uploadAttachment<T>(
+    feedbackId: string,
+    file: File,
+    reviewerToken: string,
+    query = "",
+  ): Promise<T> {
     const formData = new FormData();
     formData.append("file", file);
     // No Content-Type header: the browser sets the multipart boundary itself.
-    return this.request<FeedbackCommentAttachment>(
-      `/api/v1/feedback/${feedbackId}/attachments`,
+    return this.request<T>(
+      `/api/v1/feedback/${feedbackId}/attachments${query}`,
       {
         method: "POST",
         headers: this.headers(reviewerToken),

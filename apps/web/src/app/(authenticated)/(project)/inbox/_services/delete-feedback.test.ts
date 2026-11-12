@@ -3,6 +3,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "@/server/errors/domain-errors";
+import { deleteAssets } from "@/server/storage/delete-assets";
 import { describe, expect, it, vi } from "vitest";
 import { deleteFeedback } from "./delete-feedback";
 
@@ -31,12 +32,14 @@ function fakeDb(
       delete: vi.fn().mockResolvedValue({ id: "feedback_1" }),
     },
     member: { findFirst: vi.fn().mockResolvedValue(membership) },
+    feedbackAttachment: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
     feedbackCommentAttachment: {
       findMany: vi.fn().mockResolvedValue([]),
     },
   } as unknown as FakeDb;
 }
-
 const archived: FakeFeedback = {
   status: "closed",
   screenshotId: null,
@@ -75,5 +78,22 @@ describe("deleteFeedback", () => {
     expect(db.feedback.delete).toHaveBeenCalledWith({
       where: { id: "feedback_1" },
     });
+  });
+
+  it("frees the report's and its comments' attachment files", async () => {
+    const db = fakeDb(archived, { id: "member_1" });
+    vi.mocked(db.feedbackAttachment.findMany).mockResolvedValue([
+      { assetId: "asset_report" },
+    ] as never);
+    vi.mocked(db.feedbackCommentAttachment.findMany).mockResolvedValue([
+      { assetId: "asset_comment" },
+    ] as never);
+
+    await deleteFeedback(input, db);
+
+    expect(deleteAssets).toHaveBeenCalledWith([
+      "asset_report",
+      "asset_comment",
+    ]);
   });
 });

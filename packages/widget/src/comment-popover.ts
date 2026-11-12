@@ -1,5 +1,6 @@
 import type { Labels } from "@fasterfixes/core";
 
+import { createAttachmentPicker } from "./attachments.js";
 import {
   anchorBelow,
   createActionButton,
@@ -7,8 +8,8 @@ import {
 } from "./popover-shell.js";
 
 type CommentPopoverActions = {
-  /** Sends the comment; a rejection shows the error state. */
-  onSubmit: (comment: string) => Promise<void>;
+  /** Sends the comment and its files; a rejection shows the error state. */
+  onSubmit: (comment: string, files: readonly File[]) => Promise<void>;
   /** The popover closed, by cancel, Escape or after a successful submit. */
   onClose: () => void;
 };
@@ -38,6 +39,7 @@ export function createCommentPopover(
   textarea.setAttribute("part", "textarea");
   textarea.placeholder = labels.textareaPlaceholder;
   textarea.setAttribute("aria-label", labels.textareaPlaceholder);
+  const picker = createAttachmentPicker(document, labels);
   const formActions = document.createElement("div");
   formActions.className = "actions";
   const cancelButton = createActionButton(
@@ -50,8 +52,8 @@ export function createCommentPopover(
     labels.submitButton,
     "primary",
   );
-  formActions.append(cancelButton, submitButton);
-  form.append(textarea, formActions);
+  formActions.append(picker.trigger, cancelButton, submitButton);
+  form.append(textarea, picker.list, picker.input, formActions);
 
   const errorState = document.createElement("div");
   errorState.setAttribute("role", "alert");
@@ -85,6 +87,7 @@ export function createCommentPopover(
     cancelButton.disabled = submitting;
     submitButton.disabled = submitting || empty;
     submitButton.setAttribute("aria-busy", String(submitting));
+    picker.setDisabled(submitting);
   }
 
   function showError(message: string | null) {
@@ -113,11 +116,12 @@ export function createCommentPopover(
   async function submit() {
     const comment = textarea.value.trim();
     if (!comment || submitting) return;
+    const files = picker.files();
     submitting = true;
     showError(null);
     render();
     try {
-      await onSubmit(comment);
+      await onSubmit(comment, files);
     } catch (error) {
       if (!isOpen) return;
       submitting = false;
@@ -148,6 +152,7 @@ export function createCommentPopover(
       teardown();
       isOpen = true;
       textarea.value = "";
+      picker.reset();
       showError(null);
       render();
       container.appendChild(popover);

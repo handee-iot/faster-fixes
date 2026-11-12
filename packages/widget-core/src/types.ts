@@ -18,6 +18,16 @@ export type FeedbackReviewer = {
   name: string;
 };
 
+/** A file on a Feedback or one of its comments, with a signed URL (ADR-0026). */
+export type FileAttachment = {
+  id: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+  /** A short-lived signed URL from the instance. */
+  url: string;
+};
+
 export type FeedbackItem = {
   id: string;
   status: FeedbackStatus;
@@ -29,6 +39,8 @@ export type FeedbackItem = {
   clickY: number | null;
   selector: string | null;
   screenshotUrl: string | null;
+  /** Files attached to the report itself, in order (ADR-0026). */
+  attachments: FileAttachment[];
   /** How many comments the thread holds; omitted when the source cannot count. */
   commentCount?: number;
   reviewer: FeedbackReviewer;
@@ -93,14 +105,7 @@ export type FeedbackCommentAuthor = {
   name: string;
 };
 
-export type FeedbackCommentAttachment = {
-  id: string;
-  filename: string;
-  mimeType: string;
-  size: number;
-  /** A short-lived signed URL from the instance. */
-  url: string;
-};
+export type FeedbackCommentAttachment = FileAttachment;
 
 export type FeedbackCommentItem = {
   id: string;
@@ -170,4 +175,10 @@ export type FeedbackClient = {
     file: File,
     reviewerToken: string,
   ): Promise<FeedbackCommentAttachment>;
+  /** Uploads one file for the report itself (the creation popover). */
+  uploadFeedbackAttachment(
+    feedbackId: string,
+    file: File,
+    reviewerToken: string,
+  ): Promise<FileAttachment>;
 };

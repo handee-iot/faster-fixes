@@ -1,13 +1,23 @@
 import { s3Client } from "@/server/storage";
 import { createAsset } from "@/server/storage/create-asset";
 import { getSignedAssetUrl } from "@/server/storage/get-signed-asset-url";
+import type { FileAttachment } from "@fasterfixes/core";
 import { requireEnv } from "@/utils/environment/require-env";
 import { putObject } from "@better-upload/server/helpers";
 import crypto from "crypto";
 import path from "path";
 
+/** Where the file hangs: a reply (ADR-0026), or the report itself. */
+export type AttachmentScope = "comment" | "feedback";
+
+const KEY_PREFIX: Record<AttachmentScope, string> = {
+  comment: "comment-attachments",
+  feedback: "feedback-attachments",
+};
+
 type CreateFeedbackAttachmentInput = {
   feedbackId: string;
+  scope: AttachmentScope;
   /** The original filename, kept for the download and the extension. */
   filename: string;
   mimeType: string;
@@ -25,17 +35,22 @@ function extensionFor(filename: string, mimeType: string) {
 }
 
 /**
- * Stores one comment attachment (ADR-0026) in the bucket and records the Asset
- * that points at it. The caller decides what an upload failure means.
+ * Stores one attachment (ADR-0026) in the bucket and records the Asset that
+ * points at it. The caller decides what an upload failure means, and links the
+ * Asset to the comment or feedback it belongs to.
  */
 export async function createFeedbackAttachment({
   feedbackId,
+  scope,
   filename,
   mimeType,
   body,
   uploadedById,
-}: CreateFeedbackAttachmentInput) {
-  const key = `comment-attachments/${feedbackId}/${crypto.randomUUID()}${extensionFor(filename, mimeType)}`;
+}: CreateFeedbackAttachmentInput): Promise<FileAttachment> {
+  const key = `${KEY_PREFIX[scope]}/${feedbackId}/${crypto.randomUUID()}${extensionFor(
+    filename,
+    mimeType,
+  )}`;
   const bucket = requireEnv(
     "STORAGE_BUCKET_NAME",
     process.env.STORAGE_BUCKET_NAME,

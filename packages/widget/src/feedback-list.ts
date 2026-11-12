@@ -5,12 +5,8 @@ import type {
   Labels,
   WidgetPosition,
 } from "@fasterfixes/core";
-import {
-  COMMENT_ATTACHMENT_MAX_BYTES,
-  COMMENT_ATTACHMENT_MAX_FILES,
-  COMMENT_ATTACHMENT_TYPES,
-} from "@fasterfixes/core";
 
+import { createAttachmentPicker } from "./attachments.js";
 import { createIcon } from "./icons.js";
 import { statusColor } from "./pins.js";
 
@@ -256,69 +252,24 @@ export function createFeedbackList(
 
     // Attachments: a paperclip over a hidden picker, then the chosen files as
     // removable chips (ADR-0026).
-    const chosen: File[] = [];
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.multiple = true;
-    fileInput.hidden = true;
-    fileInput.accept = COMMENT_ATTACHMENT_TYPES.join(",");
-    const attach = document.createElement("button");
-    attach.type = "button";
-    attach.className = "action thread-attach";
-    attach.textContent = labels.attachFile;
-    attach.addEventListener("click", () => fileInput.click());
-
-    const files = document.createElement("ul");
-    files.className = "thread-files";
-    function createFileChip(file: File, index: number) {
-      const chip = document.createElement("li");
-      chip.className = "thread-file";
-      const name = document.createElement("span");
-      name.className = "thread-file-name";
-      name.textContent = file.name;
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.className = "thread-file-remove";
-      remove.setAttribute("aria-label", `Remove ${file.name}`);
-      remove.textContent = "×";
-      remove.addEventListener("click", () => {
-        chosen.splice(index, 1);
-        renderFiles();
-      });
-      chip.append(name, remove);
-      return chip;
-    }
-    function renderFiles() {
-      files.replaceChildren(...chosen.map(createFileChip));
-    }
-    fileInput.addEventListener("change", () => {
-      const selected = [...(fileInput.files ?? [])];
-      fileInput.value = "";
-      for (const file of selected) {
-        if (chosen.length >= COMMENT_ATTACHMENT_MAX_FILES) break;
-        if (file.size > COMMENT_ATTACHMENT_MAX_BYTES) continue;
-        chosen.push(file);
-      }
-      renderFiles();
-    });
-
+    const picker = createAttachmentPicker(document, labels);
     const row = document.createElement("div");
     row.className = "thread-composer-row";
     const send = document.createElement("button");
     send.type = "submit";
     send.className = "action action-primary thread-send";
     send.textContent = labels.sendButton;
-    row.append(attach, send);
-    form.append(input, files, fileInput, row);
+    row.append(picker.trigger, send);
+    form.append(input, picker.list, picker.input, row);
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       const body = input.value.trim();
-      const hasFiles = chosen.length > 0;
-      if (sending || (body === "" && !hasFiles)) return;
+      const chosen = picker.files();
+      if (sending || (body === "" && chosen.length === 0)) return;
       sending = true;
       send.disabled = true;
-      attach.disabled = true;
+      picker.setDisabled(true);
       void (async () => {
         try {
           const attachmentIds: string[] = [];
@@ -333,7 +284,7 @@ export function createFeedbackList(
         } catch {
           sending = false;
           send.disabled = false;
-          attach.disabled = false;
+          picker.setDisabled(false);
           form.querySelector(".thread-error")?.remove();
           const error = document.createElement("p");
           error.className = "thread-error";
@@ -455,6 +406,21 @@ export function createFeedbackList(
     comment.className = "detail-comment";
     comment.textContent = item.comment;
     body.appendChild(comment);
+
+    if (item.attachments.length > 0) {
+      const files = document.createElement("div");
+      files.className = "detail-files";
+      for (const file of item.attachments) {
+        const link = document.createElement("a");
+        link.className = "detail-file";
+        link.href = file.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = file.filename;
+        files.appendChild(link);
+      }
+      body.appendChild(files);
+    }
 
     if (item.screenshotUrl) {
       const shot = document.createElement("button");

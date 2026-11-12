@@ -49,3 +49,19 @@ screenshot, which is captured at submission time.
   so the three composers cannot drift.
 - The widget IIFE grows by ~3.3KB for the composer and the client method; the
   build ceiling moves with it.
+
+## Follow-up: the report itself carries files (12 Nov)
+
+The creation popover ("Describe the issue...") took text only, so a Reviewer
+who wanted to send a screenshot or a PDF had to submit first and reply. The same
+endpoint now takes `?scope=feedback`: the file is stored under
+`feedback-attachments/<feedbackId>/` and `linkFeedbackAttachments` guards that
+prefix exactly as the comment path does, appending the Asset to
+`FeedbackAttachment` in order.
+
+The Feedback does not exist until the report is saved, so the widget creates it
+first and uploads afterwards, like the screenshot. Those uploads are
+best-effort: a failure logs a warning and never shows the submit as an error,
+which would tempt a retry into a duplicate report. The widget, dashboard and
+portal render the files under the report body with signed URLs, and deleting
+the Feedback frees them with the rest.

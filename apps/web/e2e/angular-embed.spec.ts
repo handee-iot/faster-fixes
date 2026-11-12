@@ -32,6 +32,7 @@ test.describe("Angular Embed", () => {
           clickY: 10,
           selector: "h1",
           screenshotUrl: null,
+          attachments: [],
           reviewer: { id: "e2e-reviewer", name: "E2E Reviewer" },
           createdAt: new Date().toISOString(),
           metadata: {

@@ -794,7 +794,8 @@ export const WIDGET_CSS = `
     gap: 6px;
   }
 
-  .thread-attach {
+  .attach-file {
+    margin-right: auto;
     align-self: flex-start;
     padding: 4px 10px;
     font-size: 12px;
@@ -805,7 +806,7 @@ export const WIDGET_CSS = `
     cursor: pointer;
   }
 
-  .thread-files {
+  .attach-files {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -814,7 +815,7 @@ export const WIDGET_CSS = `
     list-style: none;
   }
 
-  .thread-file {
+  .attach-file-chip {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -825,13 +826,13 @@ export const WIDGET_CSS = `
     font-size: 12px;
   }
 
-  .thread-file-name {
+  .attach-file-name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .thread-file-remove {
+  .attach-file-remove {
     flex-shrink: 0;
     border: 0;
     background: transparent;
@@ -839,6 +840,26 @@ export const WIDGET_CSS = `
     cursor: pointer;
     font-size: 14px;
     line-height: 1;
+  }
+
+  .detail-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .detail-file {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--ff-muted);
+    color: inherit;
+    font-size: 12px;
+    text-decoration: underline;
+    overflow-wrap: anywhere;
   }
 
   .thread-comment-files {

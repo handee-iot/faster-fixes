@@ -81,7 +81,11 @@ ported selectively; candidates for upstream PRs):
 13. Comment attachments (ADR-0026) — replies on the widget, portal and dashboard
     take up to three files (10MB, an allowlist) uploaded through the instance;
     `linkCommentAttachments` guards the asset prefix, reads hand back signed
-    URLs, and deleting a Feedback frees the files. Candidate for an upstream PR.
+    URLs, and deleting a Feedback frees the files. The same endpoint takes
+    `?scope=feedback` for the report itself, so the creation popover's paperclip
+    works; `linkFeedbackAttachments` guards the `feedback-attachments/` prefix
+    and the feedback detail shows the files on all three surfaces. Candidate
+    for an upstream PR.
 
 Deploy artifacts:
 

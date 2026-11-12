@@ -273,6 +273,23 @@ function PortalDetail({ item, columns }: PortalDetailProps) {
           {item.comment}
         </p>
 
+        {item.attachments.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {item.attachments.map((attachment) => (
+              <a
+                key={attachment.id}
+                href={attachment.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex max-w-full items-center gap-1 rounded border bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground hover:underline"
+              >
+                <Paperclip className="size-3 shrink-0" />
+                <span className="truncate">{attachment.filename}</span>
+              </a>
+            ))}
+          </div>
+        )}
+
         {item.screenshotUrl && (
           // eslint-disable-next-line @next/next/no-img-element -- screenshots come from the deployment's own storage host, which is not in the static remotePatterns allowlist
           <img

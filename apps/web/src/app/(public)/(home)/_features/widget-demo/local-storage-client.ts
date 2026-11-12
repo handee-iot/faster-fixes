@@ -122,6 +122,7 @@ export class LocalStorageFeedbackClient implements FeedbackClient {
       clickY: data.clickY ?? null,
       selector: data.selector ?? null,
       screenshotUrl: null,
+      attachments: [],
       reviewer: { id: "demo-visitor", name: "You" },
       createdAt: new Date().toISOString(),
       metadata: data.metadata ?? null,
@@ -198,6 +199,10 @@ export class LocalStorageFeedbackClient implements FeedbackClient {
   }
 
   async uploadCommentAttachment(): Promise<never> {
+    throw new Error("Attachments are not supported in the demo");
+  }
+
+  async uploadFeedbackAttachment(): Promise<never> {
     throw new Error("Attachments are not supported in the demo");
   }
 }

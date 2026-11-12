@@ -7,7 +7,7 @@ import {
   SheetTitle,
 } from "@workspace/ui/components/sheet";
 import { cn } from "@workspace/ui/lib/utils";
-import { ImageOff } from "lucide-react";
+import { ImageOff, Paperclip } from "lucide-react";
 import { getElementContext } from "../../_helpers/feedback-detail";
 import type { ListFeedbackColumnsOutput } from "@/app/(authenticated)/(project)/settings/_services/list-feedback-columns";
 import type { ListFeedbackOutput } from "../../_services/list-feedback";
@@ -68,6 +68,22 @@ export function FeedbackDetailPanel({
               <p className="text-lg leading-snug font-semibold whitespace-pre-wrap">
                 {feedback.comment}
               </p>
+              {feedback.attachments.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {feedback.attachments.map((attachment) => (
+                    <a
+                      key={attachment.id}
+                      href={attachment.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex max-w-full items-center gap-1 rounded border bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground hover:underline"
+                    >
+                      <Paperclip className="size-3 shrink-0" />
+                      <span className="truncate">{attachment.filename}</span>
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
 
             {feedback.screenshotUrl ? (

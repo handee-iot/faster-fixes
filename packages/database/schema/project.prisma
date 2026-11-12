@@ -116,6 +116,7 @@ model Feedback {
   jiraIssueLink   FeedbackJiraIssueLink?
   slackMessage    FeedbackSlackMessage?
   comments        FeedbackComment[]
+  attachments     FeedbackAttachment[]
 
   @@unique([projectId, number])
   @@index([projectId])
@@ -189,4 +190,24 @@ model FeedbackCommentAttachment {
   @@unique([commentId, assetId])
   @@index([commentId, position])
   @@map("feedback_comment_attachment")
+}
+
+/// Files the Reviewer attaches to the Feedback itself at submit time, as
+/// opposed to a reply (ADR-0026). The Asset holds the storage facts, this row
+/// orders it on the report.
+model FeedbackAttachment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  feedbackId String
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+
+  assetId String
+  asset   Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  position Int @default(0)
+
+  @@unique([feedbackId, assetId])
+  @@index([feedbackId, position])
+  @@map("feedback_attachment")
 }
