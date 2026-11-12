@@ -19,9 +19,11 @@ export async function GET() {
     return new Response(script, {
       headers: {
         "Content-Type": "text/javascript; charset=utf-8",
-        // The file changes only on deploy; a short window keeps installed
-        // sites current without hammering the instance.
-        "Cache-Control": "public, max-age=300",
+        // `no-store` rather than a short `max-age`: Cloudflare's Browser Cache
+        // TTL rewrites `max-age` to four hours on this zone, which stranded
+        // installed sites on the previous bundle after a deploy. The script is
+        // ~34KB gzipped, so fetching it per page load is cheap.
+        "Cache-Control": "no-store",
       },
     });
   } catch {
