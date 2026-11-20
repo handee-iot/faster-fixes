@@ -18,9 +18,12 @@ import { defineConfig } from "tsdown";
 // composer and the upload client method added 3.3KB (106.2KB minified).
 //
 // 2026-11-20: raised from 110,000 for sensitive-data masking (ADR-0027). The
-// clone pass and its selectors added 2.2KB (109.8KB minified). 115,000 keeps
-// a small margin for fixes in the same area.
-const IIFE_MAX_BYTES = 115_000;
+// clone pass and its selectors added 2.2KB (109.8KB minified).
+//
+// 2026-11-20: raised from 115,000 for automatic PII detection (ADR-0028). The
+// field heuristics and identifier patterns added 4.4KB (114.9KB minified).
+// 120,000 keeps a small margin for fixes in the same area.
+const IIFE_MAX_BYTES = 120_000;
 
 export default defineConfig([
   {
