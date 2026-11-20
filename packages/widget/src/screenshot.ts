@@ -1,5 +1,7 @@
 import { domToBlob } from "modern-screenshot";
 
+import { maskSensitiveData, prepareCaptureMasking } from "./masking.js";
+
 export type CaptureViewportScreenshotOptions = {
   // Skip images and videos so the capture finishes fast when the full one timed out
   lightweight?: boolean;
@@ -31,6 +33,7 @@ export function captureViewportScreenshot(
   options: CaptureViewportScreenshotOptions = {},
 ): Promise<Blob | null> {
   const { scrollX, scrollY } = window;
+  const masking = prepareCaptureMasking(document);
 
   return domToBlob(document.body, {
     width: window.innerWidth,
@@ -41,7 +44,11 @@ export function captureViewportScreenshot(
     // screenshot shows the top of the document.
     style: { transform: `translate(${-scrollX}px, ${-scrollY}px)` },
     features: { restoreScrollPosition: true },
-    onCloneNode: (cloned) => reanchorFixedElements(cloned, scrollX, scrollY),
+    onCloneNode: (cloned) => {
+      // Mask before re-anchoring so fixed excluded blocks shift with the rest.
+      if (cloned instanceof Element) maskSensitiveData(cloned, masking);
+      reanchorFixedElements(cloned, scrollX, scrollY);
+    },
     // Inverted from html2canvas: return true to INCLUDE, false to EXCLUDE
     filter: (node: Node) => {
       if (!(node instanceof Element)) return true;
@@ -49,8 +56,10 @@ export function captureViewportScreenshot(
       if (options.lightweight && isMediaElement(node)) return false;
       return true;
     },
-  }).catch((err) => {
-    console.warn("[faster-fixes] screenshot capture failed:", err);
-    return null;
-  });
+  })
+    .finally(masking.cleanup)
+    .catch((err) => {
+      console.warn("[faster-fixes] screenshot capture failed:", err);
+      return null;
+    });
 }

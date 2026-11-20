@@ -1,0 +1,74 @@
+---
+title: Sensitive data
+description: Mask or exclude sensitive content from screenshots with CSS classes.
+---
+
+Screenshots can contain account numbers, addresses, customer records or tokens shown in a debug panel. Add a class to the markup and the widget masks that content in the browser, before the image is created. The original text never reaches the server.
+
+## Classes
+
+| Class        | What it does                                                                                                                                                                |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ff-exclude` | Strongest. The element and everything inside it are replaced by a neutral hatched block of the same size. Use it for forms, cards, tables, images and anything mixed-media. |
+| `ff-mask`    | Replaces the element's text with bullets of the same length, preserving the layout. Input values and image `alt` text inside the region are cleared. Text only.             |
+| `ff-unmask`  | Restores a child inside a `ff-mask` region. It has no effect inside `ff-exclude`, or inside an automatically masked secret field.                                           |
+
+The same rules are available as attributes for templates and CMS content:
+`data-ff-exclude`, `data-ff-mask` and `data-ff-unmask`.
+
+```html
+<form class="ff-exclude" action="/billing">
+  <input name="card" value="4111 1111 1111 1111" />
+</form>
+
+<section class="ff-mask">
+  <p>Account balance: R 123 456,78</p>
+  <p>Account type: Cheque</p>
+</section>
+```
+
+In React, use `className`; in Vue and Svelte, `class`; in Angular, `class`.
+
+### Unmasking part of a masked region
+
+```html
+<div class="ff-mask">
+  <h2>Customer</h2>
+  <p>Jane Doe, 12 Long Street, Cape Town</p>
+  <span class="ff-unmask">Preferred language: English</span>
+</div>
+```
+
+The heading and address are bullets; the language stays readable.
+
+## Automatic masking
+
+These controls are masked without a class:
+
+- `input[type="password"]`
+- `autocomplete` values containing `password`
+- `autocomplete` values containing `cc-` (card number, expiry, security code, cardholder name)
+- `autocomplete` values containing `one-time-code`
+
+They cannot be unmasked by `ff-unmask`. If a wrapper is masked and contains a password field, the field stays masked.
+
+## When to use which
+
+- A block that may contain images, canvas, charts or CSS background images: `ff-exclude`.
+- Text and form values inside a region that should keep its shape: `ff-mask`.
+- A value inside a masked region that is safe to show: `ff-unmask`.
+
+Masking does not blur. Blurred short strings can be recovered, so the widget replaces text or excludes the element instead.
+
+## Limits
+
+- Masking applies to screenshots. Session replay is not implemented.
+- The Diagnostics Trail (console and network context) is separate and is not changed by these classes.
+- Text masking does not touch images, canvas, video or CSS background images. Use `ff-exclude` for those.
+- Pseudo-element content (`::before` / `::after`) inside a masked or excluded region, including decorative icons, is hidden while the screenshot is captured. `ff-unmask` restores element text, not pseudo content.
+- Shadow DOM and cross-origin iframes are outside the captured clone. Put the classes on the light-DOM wrapper.
+- Masking is client-side and driven by your markup. It prevents accidental leakage; it is not a defence against a page that deliberately removes the classes.
+
+## Check it
+
+Add `ff-mask` to an element with obvious text, submit a report, and open the screenshot in the feedback list. The text should appear as bullets. If it does not, check that the class is on the element in the live DOM (not only on a parent that is re-rendered) and that the element is inside the viewport when the report is started.

@@ -86,6 +86,13 @@ ported selectively; candidates for upstream PRs):
     works; `linkFeedbackAttachments` guards the `feedback-attachments/` prefix
     and the feedback detail shows the files on all three surfaces. Candidate
     for an upstream PR.
+14. Sensitive data masking (ADR-0027): `.ff-exclude`, `.ff-mask` and
+    `.ff-unmask` (plus `data-ff-*` attributes) applied to modern-screenshot's
+    DOM clone before rasterising, so the live page is never changed and the
+    original text never reaches the uploaded image. Excluded elements become
+    measured hatched blocks; masked text becomes same-length bullets; password,
+    card and one-time-code controls are masked automatically and cannot be
+    unmasked. No `.mk-*` aliases. Candidate for an upstream PR.
 
 Deploy artifacts:
 
