@@ -1,8 +1,13 @@
+import { isPiiField, isTextLikeControl, maskPiiText, maskText } from "./pii.js";
+
+export { maskText };
+
 /**
- * Sensitive-data masking for captures (ADR-0027).
+ * Sensitive-data masking for captures (ADR-0027, ADR-0028).
  *
  * The site owner marks elements with `ff-exclude`, `ff-mask` or `ff-unmask`
- * (or the `data-ff-*` attribute forms). `maskSensitiveData` runs on
+ * (or the `data-ff-*` attribute forms), and personal form fields and
+ * identifiers are detected automatically. `maskSensitiveData` runs on
  * modern-screenshot's DOM clone, before it is rasterised, so the live page is
  * never changed and the original text never reaches the uploaded image.
  */
@@ -139,36 +144,31 @@ function hidePseudoContent(doc: Document): () => void {
   return () => style.remove();
 }
 
-/**
- * Replaces every non-whitespace character with a bullet, preserving the
- * string's length, spaces and line breaks so the masked text keeps the shape
- * of the original.
- */
-export function maskText(value: string): string {
-  return value.replace(/[^\s]/g, "\u2022");
-}
-
 type MaskState = {
   masked: boolean;
   /** Automatic secret fields cannot be unmasked by a descendant. */
   locked: boolean;
+  /** Whether unmarked text in this region is scanned for PII patterns. */
+  patterns: boolean;
 };
 
-const UNMASKED: MaskState = { masked: false, locked: false };
+const ROOT_STATE: MaskState = { masked: false, locked: false, patterns: true };
+const UNMASKED: MaskState = { masked: false, locked: false, patterns: false };
+
+const NON_RENDERED_SELECTOR = "script, style, noscript, template, title";
 
 function resolveState(element: Element, inherited: MaskState): MaskState {
   if (element.matches(SENSITIVE_SELECTOR)) {
-    return { masked: true, locked: true };
+    return { masked: true, locked: true, patterns: false };
   }
   if (element.matches(MASK_SELECTOR)) {
-    return { masked: true, locked: false };
+    return { masked: true, locked: false, patterns: false };
   }
-  if (
-    element.matches(UNMASK_SELECTOR) &&
-    inherited.masked &&
-    !inherited.locked
-  ) {
+  if (element.matches(UNMASK_SELECTOR) && !inherited.locked) {
     return UNMASKED;
+  }
+  if (isPiiField(element)) {
+    return { masked: true, locked: false, patterns: false };
   }
   return inherited;
 }
@@ -191,32 +191,65 @@ export function maskSensitiveData(
     replaceWithBlock(element, id ? masking?.boxes.get(id) : undefined, masking);
   }
 
-  walk(root, UNMASKED);
+  walk(root, ROOT_STATE);
 }
 
 function walk(element: Element, inherited: MaskState): void {
   // A replaced element is a plain block now; never look inside it.
   if (element.matches(EXCLUDE_SELECTOR)) return;
+  if (element.matches(NON_RENDERED_SELECTOR)) return;
 
   const state = resolveState(element, inherited);
 
   for (const node of Array.from(element.childNodes)) {
     if (node.nodeType === 3) {
-      if (state.masked) node.textContent = maskText(node.textContent ?? "");
+      const text = node.textContent ?? "";
+      if (state.masked) node.textContent = maskText(text);
+      else if (state.patterns) node.textContent = maskPiiText(text);
       continue;
     }
     if (node.nodeType === 1) walk(node as Element, state);
   }
 
-  if (!state.masked) return;
+  if (isTextLikeControl(element)) {
+    if (state.masked) blankControl(element);
+    else if (state.patterns) maskControlPatterns(element);
+  }
 
-  // Values live in attributes or child text; both are handled above or here.
-  if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+  // A missing image shows its alt text, which can name the thing being hidden.
+  if (state.masked && element.tagName === "IMG") element.removeAttribute("alt");
+}
+
+/** Clears a value the capture would otherwise show. */
+function blankControl(element: Element): void {
+  if (element.tagName === "INPUT") {
+    const input = element as HTMLInputElement;
+    input.value = "";
     element.removeAttribute("value");
     element.removeAttribute("placeholder");
+  } else if (element.tagName === "TEXTAREA") {
+    const textarea = element as HTMLTextAreaElement;
+    textarea.value = "";
+    textarea.textContent = "";
+    element.removeAttribute("placeholder");
+  } else if (element.tagName === "SELECT") {
+    (element as HTMLSelectElement).selectedIndex = -1;
   }
-  // A missing image shows its alt text, which can name the thing being hidden.
-  if (element.tagName === "IMG") element.removeAttribute("alt");
+}
+
+/** Masks an identifier typed into a control whose labels did not give it away. */
+function maskControlPatterns(element: Element): void {
+  if (element.tagName !== "INPUT" && element.tagName !== "TEXTAREA") return;
+  const control = element as HTMLInputElement | HTMLTextAreaElement;
+  const value =
+    control.value === ""
+      ? (element.getAttribute("value") ?? "")
+      : control.value;
+  if (value === "") return;
+  const masked = maskPiiText(value);
+  if (masked === value) return;
+  control.value = masked;
+  if (element.tagName === "INPUT") element.setAttribute("value", masked);
 }
 
 /**

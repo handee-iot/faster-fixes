@@ -136,8 +136,8 @@ describe("automatic secret fields", () => {
       expect(root.querySelector(id)?.hasAttribute("value")).toBe(false);
     }
     expect(root.querySelector("#plain")?.getAttribute("value")).toBe("keep me");
-    expect(root.querySelector("#pw2")?.textContent).toBe(maskText("secret"));
-    expect(root.querySelector("#exp")?.textContent).toBe(maskText("12/30"));
+    expect(root.querySelector("#pw2")?.textContent).toBe("");
+    expect(root.querySelector("#exp")?.textContent).toMatch(/^(?:|\u2022+)$/);
   });
 
   it("cannot be unmasked by a descendant", () => {
@@ -172,5 +172,96 @@ describe("attribute forms", () => {
     );
     expect(root.querySelector("[data-ff-unmask]")?.textContent).toBe("Public");
     expect(root.querySelector("#excluded")?.textContent).toBe("");
+  });
+});
+
+describe("automatic personal data", () => {
+  it("clears fields named or labelled as personal data", () => {
+    const root = mount(`
+      <label for="fullName">Full name, as on your ID</label>
+      <input id="fullName" value="Dawid Pieter Harmse" />
+      <label for="idNumber">ID number</label>
+      <input id="idNumber" value="8301045067083" />
+      <label for="email">Email</label>
+      <input id="email" type="email" value="dawie@example.com" />
+      <label for="phone">Phone number</label>
+      <input id="phone" value="0825672884" />
+      <label for="address">Home address</label>
+      <input id="address" value="12 Main Street" />
+      <label for="search">Search</label>
+      <input id="search" value="invoice" />
+    `);
+
+    maskSensitiveData(root);
+
+    for (const id of [
+      "#fullName",
+      "#idNumber",
+      "#email",
+      "#phone",
+      "#address",
+    ]) {
+      expect(root.querySelector(id)?.hasAttribute("value")).toBe(false);
+    }
+    expect(root.querySelector("#search")?.getAttribute("value")).toBe(
+      "invoice",
+    );
+  });
+
+  it("masks identifiers in ordinary text", () => {
+    const root = mount(
+      `<p id="note">Email dawie@example.com, ID 8301045067083, call 0825672884.</p>`,
+    );
+
+    maskSensitiveData(root);
+
+    const text = root.querySelector("#note")?.textContent ?? "";
+    expect(text).not.toContain("dawie@example.com");
+    expect(text).not.toContain("8301045067083");
+    expect(text).not.toContain("0825672884");
+  });
+
+  it("masks a contenteditable address", () => {
+    const root = mount(
+      `<div id="editor" contenteditable="true" aria-label="Home address">12 Main Street</div>`,
+    );
+
+    maskSensitiveData(root);
+
+    expect(root.querySelector("#editor")?.textContent).not.toContain("Main");
+  });
+
+  it("hides a personal select value", () => {
+    const root = mount(`
+      <label for="marital">Marital status</label>
+      <select id="marital"><option selected>Married out of community</option></select>
+    `);
+
+    maskSensitiveData(root);
+
+    expect(root.querySelector("#marital")?.textContent).not.toContain(
+      "Married",
+    );
+  });
+
+  it("lets ff-unmask opt out of automatic detection, except for secrets", () => {
+    const root = mount(`
+      <p>dawie@example.com</p>
+      <p id="kept" class="ff-unmask">dawie@example.com</p>
+      <label for="name">Full name</label>
+      <input id="name" class="ff-unmask" value="Dawid" />
+      <input id="pw" class="ff-unmask" type="password" value="hunter2" />
+    `);
+
+    maskSensitiveData(root);
+
+    expect(root.querySelector("p")?.textContent).not.toContain(
+      "dawie@example.com",
+    );
+    expect(root.querySelector("#kept")?.textContent).toContain(
+      "dawie@example.com",
+    );
+    expect(root.querySelector("#name")?.getAttribute("value")).toBe("Dawid");
+    expect(root.querySelector("#pw")?.hasAttribute("value")).toBe(false);
   });
 });

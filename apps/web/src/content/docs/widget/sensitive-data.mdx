@@ -3,15 +3,15 @@ title: Sensitive data
 description: Mask or exclude sensitive content from screenshots with CSS classes.
 ---
 
-Screenshots can contain account numbers, addresses, customer records or tokens shown in a debug panel. Add a class to the markup and the widget masks that content in the browser, before the image is created. The original text never reaches the server.
+Screenshots can contain account numbers, addresses, customer records or tokens shown in a debug panel. The widget masks personal form fields automatically, and a class masks anything else. Masking happens in the browser, before the image is created, so the original text never reaches the server.
 
 ## Classes
 
-| Class        | What it does                                                                                                                                                                |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ff-exclude` | Strongest. The element and everything inside it are replaced by a neutral hatched block of the same size. Use it for forms, cards, tables, images and anything mixed-media. |
-| `ff-mask`    | Replaces the element's text with bullets of the same length, preserving the layout. Input values and image `alt` text inside the region are cleared. Text only.             |
-| `ff-unmask`  | Restores a child inside a `ff-mask` region. It has no effect inside `ff-exclude`, or inside an automatically masked secret field.                                           |
+| Class        | What it does                                                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ff-exclude` | Strongest. The element and everything inside it are replaced by a neutral hatched block of the same size. Use it for forms, cards, tables, images and anything mixed-media.                 |
+| `ff-mask`    | Replaces the element's text with bullets of the same length, preserving the layout. Input values and image `alt` text inside the region are cleared. Text only.                             |
+| `ff-unmask`  | Restores a child inside a `ff-mask` region, or opts a field out of automatic personal-data detection. It has no effect inside `ff-exclude`, or inside an automatically masked secret field. |
 
 The same rules are available as attributes for templates and CMS content:
 `data-ff-exclude`, `data-ff-mask` and `data-ff-unmask`.
@@ -41,7 +41,7 @@ In React, use `className`; in Vue and Svelte, `class`; in Angular, `class`.
 
 The heading and address are bullets; the language stays readable.
 
-## Automatic masking
+## Automatic secrets
 
 These controls are masked without a class:
 
@@ -51,6 +51,32 @@ These controls are masked without a class:
 - `autocomplete` values containing `one-time-code`
 
 They cannot be unmasked by `ff-unmask`. If a wrapper is masked and contains a password field, the field stays masked.
+
+## Automatic personal data
+
+Personal-data fields are masked without a class, using the field's label, `name`, `id`, `placeholder`, `aria-label`, `autocomplete` or input type. That covers names, surnames, ID and passport numbers, phone numbers, email addresses, physical addresses, postal codes, dates of birth, banking details, tax numbers, marital status, gender and similar fields.
+
+The value is cleared, a `select`'s selection is hidden and a `contenteditable`'s text is bulleted. The labels stay readable so the report still makes sense.
+
+Identifiers in ordinary text are masked too:
+
+- South African ID numbers (13 digits with a valid date and check digit).
+- Credit card numbers that pass the Luhn check.
+- Email addresses.
+- South African phone numbers.
+- Values written after a personal-data label, such as `Date of birth: 4 January 1983`.
+
+A field or region that should stay readable can opt out with `ff-unmask`, unless it is a password, card or one-time-code field.
+
+```html
+<label for="fullName">Full name, as on your ID</label>
+<input id="fullName" value="Dawid Pieter Harmse" />
+
+<label for="email">Email</label>
+<input id="email" type="email" value="dawie@example.com" />
+```
+
+Both values are cleared in the screenshot even though neither field has a class.
 
 ## When to use which
 
@@ -67,7 +93,10 @@ Masking does not blur. Blurred short strings can be recovered, so the widget rep
 - Text masking does not touch images, canvas, video or CSS background images. Use `ff-exclude` for those.
 - Pseudo-element content (`::before` / `::after`) inside a masked or excluded region, including decorative icons, is hidden while the screenshot is captured. `ff-unmask` restores element text, not pseudo content.
 - Shadow DOM and cross-origin iframes are outside the captured clone. Put the classes on the light-DOM wrapper.
-- Masking is client-side and driven by your markup. It prevents accidental leakage; it is not a defence against a page that deliberately removes the classes.
+- Automatic detection reads English labels and field names. A field named in another language may need `ff-mask`.
+- Names and addresses in free prose without a label have no dependable shape. Put `ff-mask` on the paragraph.
+- Radio and checkbox group selections are not auto-detected: put `ff-mask` on the group or `ff-exclude` on the fieldset.
+- Masking is client-side. It prevents accidental leakage; it is not a defence against a page that deliberately removes the masks.
 
 ## Check it
 

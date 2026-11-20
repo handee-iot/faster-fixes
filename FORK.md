@@ -92,7 +92,13 @@ ported selectively; candidates for upstream PRs):
     original text never reaches the uploaded image. Excluded elements become
     measured hatched blocks; masked text becomes same-length bullets; password,
     card and one-time-code controls are masked automatically and cannot be
-    unmasked. No `.mk-*` aliases. Candidate for an upstream PR.
+    unmasked. Automatic personal-data detection (ADR-0028): fields labelled or
+    named as names, ID/passport, phone, email, address, birth date, banking or
+    similar are cleared, and text is scanned for SA IDs, Luhn-valid cards,
+    emails, SA phone numbers and labelled values; `ff-unmask` opts out except
+    for secrets. Names and addresses in unlabelled prose, and radio/checkbox
+    groups, still need classes. No `.mk-*` aliases. Candidate for an upstream
+    PR.
 
 Deploy artifacts:
 
