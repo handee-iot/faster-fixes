@@ -362,8 +362,8 @@ Include a note for anything intentionally left visible and why.
 ## Copy-paste prompt for the implementing agent
 
 > You are implementing Faster Fixes sensitive-data masking on an existing site.
-> Follow `.claude/skills/sensitive-data-labelling/SKILL.md` exactly. Do not
-> modify the widget package, API or database.
+> Use the `sensitive-data-labelling` skill exactly. Do not modify the widget
+> package, API or database.
 >
 > 1. Inventory every route and multi-step flow that collects or displays
 >    personal data. Include confirmation, summary and account pages.
