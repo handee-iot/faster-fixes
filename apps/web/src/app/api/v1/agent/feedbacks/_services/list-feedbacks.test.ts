@@ -30,6 +30,8 @@ const feedbackRow = {
   browserVersion: "120",
   os: "macOS",
   screenshot: { key: "shot.png", provider: "s3", bucket: "assets" },
+  attachments: [],
+  comments: [],
   metadata: { source: "bugherd" },
   diagnosticTrail: null,
   reviewer: { name: "Dana" },
@@ -93,10 +95,54 @@ describe("listFeedbacks", () => {
         browserVersion: "120",
         os: "macOS",
         screenshotUrl: SIGNED_ASSET_URL,
+        attachments: [],
         metadata: { source: "bugherd" },
         diagnosticTrail: null,
         reviewerName: "Dana",
         createdAt: new Date("2026-01-02T03:04:05.000Z"),
+      },
+    ]);
+  });
+
+  it("returns signed urls for files attached to the report", async () => {
+    const db = fakeDb([
+      {
+        ...feedbackRow,
+        attachments: [
+          {
+            id: "attachment_1",
+            position: 0,
+            asset: {
+              id: "asset_1",
+              filename: "income-expenses.png",
+              mimeType: "image/png",
+              size: 202768,
+              key: "feedback-attachments/feedback_1/income.png",
+              provider: "s3",
+              bucket: "assets",
+            },
+          },
+        ],
+      },
+    ]);
+
+    const result = await listFeedbacks(
+      {
+        project: "proj_public_1",
+        organizationProjects: ORGANIZATION_PROJECTS,
+      },
+      db,
+    );
+
+    expect(result.items[0]?.attachments).toEqual([
+      {
+        id: "asset_1",
+        filename: "income-expenses.png",
+        mimeType: "image/png",
+        size: 202768,
+        url: SIGNED_ASSET_URL,
+        source: "feedback",
+        commentId: null,
       },
     ]);
   });
@@ -132,5 +178,55 @@ describe("listFeedbacks", () => {
         },
       }),
     );
+  });
+});
+
+describe("reply attachments", () => {
+  it("includes files attached to the conversation", async () => {
+    const db = fakeDb([
+      {
+        ...feedbackRow,
+        comments: [
+          {
+            id: "comment_1",
+            attachments: [
+              {
+                id: "attachment_2",
+                position: 0,
+                asset: {
+                  id: "asset_2",
+                  filename: "fields.png",
+                  mimeType: "image/png",
+                  size: 4096,
+                  key: "comment-attachments/feedback_1/fields.png",
+                  provider: "s3",
+                  bucket: "assets",
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+
+    const result = await listFeedbacks(
+      {
+        project: "proj_public_1",
+        organizationProjects: ORGANIZATION_PROJECTS,
+      },
+      db,
+    );
+
+    expect(result.items[0]?.attachments).toEqual([
+      {
+        id: "asset_2",
+        filename: "fields.png",
+        mimeType: "image/png",
+        size: 4096,
+        url: SIGNED_ASSET_URL,
+        source: "comment",
+        commentId: "comment_1",
+      },
+    ]);
   });
 });

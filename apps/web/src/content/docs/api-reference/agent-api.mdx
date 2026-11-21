@@ -53,13 +53,34 @@ GET /feedbacks?project=proj_xxx
       "browserVersion": "120",
       "os": "macOS",
       "screenshotUrl": "https://...",
+      "attachments": [
+        {
+          "id": "uuid",
+          "filename": "income-expenses.png",
+          "mimeType": "image/png",
+          "size": 202768,
+          "url": "https://...",
+          "source": "feedback",
+          "commentId": null
+        }
+      ],
       "metadata": {},
       "diagnosticTrail": {
         "console": [
-          { "level": "error", "message": "Uncaught TypeError: x is undefined", "timestamp": 1736937000000 }
+          {
+            "level": "error",
+            "message": "Uncaught TypeError: x is undefined",
+            "timestamp": 1736937000000
+          }
         ],
         "network": [
-          { "method": "GET", "url": "https://api.myapp.com/user", "status": 500, "duration": 142, "timestamp": 1736937000000 }
+          {
+            "method": "GET",
+            "url": "https://api.myapp.com/user",
+            "status": 500,
+            "duration": 142,
+            "timestamp": 1736937000000
+          }
         ]
       },
       "reviewerName": "Sarah",
@@ -70,9 +91,11 @@ GET /feedbacks?project=proj_xxx
 }
 ```
 
+Attachment URLs are signed and expire after about an hour; fetch them while they are fresh. `source` is `feedback` for a file attached to the report and `comment` for a file attached to a reply, with `commentId` identifying that reply.
+
 ### Markdown response
 
-When `format=markdown`, the response is a structured markdown document with sections for each feedback item, ready for AI agent consumption.
+When `format=markdown`, the response is a structured markdown document with sections for each feedback item, including an Attachments section with the signed links, ready for AI agent consumption.
 
 ---
 

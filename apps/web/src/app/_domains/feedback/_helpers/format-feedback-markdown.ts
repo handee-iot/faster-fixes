@@ -3,7 +3,11 @@
  * Used by both the dashboard export and the agent API.
  */
 
-import type { DiagnosticTrail } from "@fasterfixes/core";
+import type { DiagnosticTrail, FileAttachment } from "@fasterfixes/core";
+
+export type FeedbackAttachmentForMarkdown = FileAttachment & {
+  source?: "feedback" | "comment";
+};
 
 export type FeedbackForMarkdown = {
   id: string;
@@ -19,6 +23,8 @@ export type FeedbackForMarkdown = {
   browserVersion: string | null;
   os: string | null;
   screenshotUrl: string | null;
+  /** Files attached to the report or its replies; optional for lean reads. */
+  attachments?: FeedbackAttachmentForMarkdown[];
   metadata: Record<string, unknown> | null;
   // Optional: the dashboard's lean list query doesn't load it; the agent API and
   // issue creators do. Absent → the Diagnostics section is skipped.
@@ -97,6 +103,21 @@ export function formatFeedbackAsMarkdown(f: FeedbackForMarkdown): string {
     lines.push("## Diagnostics");
     lines.push("");
     lines.push(...diagnosticLines);
+  }
+
+  // Attached files, each with a signed URL the caller can fetch
+  if (f.attachments && f.attachments.length > 0) {
+    lines.push("");
+    lines.push("## Attachments");
+    lines.push("");
+    for (const attachment of f.attachments) {
+      const name = attachment.filename.replace(/[[\]]/g, "");
+      const suffix =
+        attachment.source === "comment" ? " (attached to a reply)" : "";
+      lines.push(
+        `- [${name}](${attachment.url}) (${attachment.mimeType})${suffix}`,
+      );
+    }
   }
 
   // Screenshot with instruction for multimodal AI agents

@@ -1,4 +1,5 @@
 import type { FeedbackStatus } from "@/app/_domains/feedback";
+import { toFileAttachments } from "@/app/_domains/feedback/_helpers/file-attachments";
 import { NotFoundError } from "@/server/errors/domain-errors";
 import { getSignedAssetUrl } from "@/server/storage/get-signed-asset-url";
 import type { DiagnosticTrail } from "@fasterfixes/core";
@@ -35,31 +36,65 @@ export async function listFeedbacks(
     include: {
       reviewer: { select: { name: true } },
       screenshot: { select: { key: true, provider: true, bucket: true } },
+      attachments: { orderBy: { position: "asc" }, include: { asset: true } },
+      comments: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          attachments: {
+            orderBy: { position: "asc" },
+            include: { asset: true },
+          },
+        },
+      },
     },
   });
 
   const items = await Promise.all(
-    feedbacks.map(async (f) => ({
-      id: f.id,
-      status: f.status,
-      comment: f.comment,
-      pageUrl: f.pageUrl,
-      selector: f.selector,
-      clickX: f.clickX,
-      clickY: f.clickY,
-      viewportWidth: f.viewportWidth,
-      viewportHeight: f.viewportHeight,
-      browserName: f.browserName,
-      browserVersion: f.browserVersion,
-      os: f.os,
-      screenshotUrl: f.screenshot
-        ? await getSignedAssetUrl(f.screenshot)
-        : null,
-      metadata: f.metadata as Record<string, unknown> | null,
-      diagnosticTrail: f.diagnosticTrail as DiagnosticTrail | null,
-      reviewerName: f.reviewer.name,
-      createdAt: f.createdAt,
-    })),
+    feedbacks.map(async (f) => {
+      const reportAttachments = await toFileAttachments(f.attachments);
+      const replyAttachments = (
+        await Promise.all(
+          f.comments.map(async (comment) =>
+            (await toFileAttachments(comment.attachments)).map((file) => ({
+              ...file,
+              source: "comment" as const,
+              commentId: comment.id,
+            })),
+          ),
+        )
+      ).flat();
+
+      return {
+        id: f.id,
+        status: f.status,
+        comment: f.comment,
+        pageUrl: f.pageUrl,
+        selector: f.selector,
+        clickX: f.clickX,
+        clickY: f.clickY,
+        viewportWidth: f.viewportWidth,
+        viewportHeight: f.viewportHeight,
+        browserName: f.browserName,
+        browserVersion: f.browserVersion,
+        os: f.os,
+        screenshotUrl: f.screenshot
+          ? await getSignedAssetUrl(f.screenshot)
+          : null,
+        attachments: [
+          ...reportAttachments.map((file) => ({
+            ...file,
+            source: "feedback" as const,
+            commentId: null,
+          })),
+          ...replyAttachments,
+        ],
+        metadata: f.metadata as Record<string, unknown> | null,
+        diagnosticTrail: f.diagnosticTrail as DiagnosticTrail | null,
+        reviewerName: f.reviewer.name,
+        createdAt: f.createdAt,
+      };
+    }),
   );
 
   // `projectId` travels back so the boundary can name the resolved Project in

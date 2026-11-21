@@ -162,13 +162,15 @@ Or set up a scheduled task to fetch and fix feedback automatically.
 
 ### `list_feedbacks`
 
-List feedback items for your project. Returns page URL, CSS selector, click coordinates, component tree, browser info, and screenshot.
+List feedback items for your project. Returns page URL, CSS selector, click coordinates, component tree, browser info, the screenshot, and signed URLs for files attached to the report or its replies.
 
 | Parameter  | Type   | Required | Description                                        |
 | ---------- | ------ | -------- | -------------------------------------------------- |
 | `status`   | string | No       | Filter: `new`, `in_progress`, `resolved`, `closed` |
 | `page_url` | string | No       | Filter by the page where feedback was left         |
 | `format`   | string | No       | `markdown` (default) or `json`                     |
+
+Each attachment carries `id`, `filename`, `mimeType`, `size`, a signed `url`, `source` (`feedback` or `comment`), and `commentId` when it came from a reply. Signed URLs are temporary; fetch them while they are fresh.
 
 ### `update_feedback_status`
 
